@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="pt-BR" style="scroll-behavior: smooth;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cabelo no Inverno: Guia Completo para Todos os Tipos de Fio | Widi Care</title>
+<meta name="description" content="Monte sua rotina capilar para o inverno com Widi Care. Dicas para cabelos lisos, cacheados e crespos: como combater o frizz, ressecamento e falta de brilho no frio.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --brand: #D4437A;
+    --brand-light: #fbeaf0;
+    --text: #1a1a1a;
+    --text-muted: #666;
+    --white: #ffffff;
+    --border: #f0e8e3;
+    --step-bg: #fef6f0;
+    --winter-blue: #e8f0fb;
+    --winter-blue-dark: #1a3a6b;
+    --winter-accent: #5b8dee;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: #fffaf8; color: var(--text); line-height: 1.8; }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #e8f0fb 0%, #fbeaf0 60%, #fef6f0 100%);
+    padding: 80px 24px 60px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #c5d8f8 0%, transparent 70%);
+    top: -150px; left: -100px;
+    opacity: 0.5;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    width: 350px; height: 350px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #f4c0d1 0%, transparent 70%);
+    bottom: -80px; right: -60px;
+    opacity: 0.4;
+  }
+  .tag {
+    display: inline-block;
+    background: var(--winter-accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 5vw, 54px);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    max-width: 820px;
+    margin: 0 auto 20px;
+    position: relative;
+    z-index: 1;
+  }
+  .hero h1 em { color: var(--brand); font-style: italic; }
+  .hero .subtitle {
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto 32px;
+    font-weight: 300;
+    position: relative;
+    z-index: 1;
+  }
+  .meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+
+  /* LAYOUT */
+  .container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+  article { padding: 56px 0; }
+
+  /* TIPOGRAFIA */
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 52px 0 20px;
+    line-height: 1.3;
+  }
+  h2:first-child { margin-top: 0; }
+  h3 { font-size: 18px; font-weight: 500; color: var(--text); margin: 28px 0 10px; }
+  p { font-size: 16px; color: #333; margin-bottom: 20px; line-height: 1.9; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+  ul { padding-left: 22px; margin-bottom: 20px; }
+  ul li { font-size: 15px; color: #333; margin-bottom: 8px; line-height: 1.7; }
+
+  /* ALERT BOX */
+  .alert-box {
+    background: var(--winter-blue);
+    border: 1px solid #c0d4f5;
+    border-left: 4px solid var(--winter-accent);
+    border-radius: 8px;
+    padding: 22px 26px;
+    margin: 32px 0;
+  }
+  .alert-box p { margin: 0; font-size: 15px; color: #1a3a6b; }
+
+  /* INTRO BOX */
+  .intro-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--brand);
+    border-radius: 8px;
+    padding: 24px 28px;
+    margin: 32px 0;
+  }
+  .intro-box p { margin: 0; font-size: 15px; color: var(--text-muted); }
+
+  /* CARDS DE TIPO DE CABELO */
+  .tipos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .tipo-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 18px;
+    text-align: center;
+  }
+  .tipo-icon { font-size: 36px; margin-bottom: 12px; display: block; }
+  .tipo-card strong { display: block; font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .tipo-card .problema {
+    font-size: 13px;
+    color: #c0392b;
+    background: #fdf2f2;
+    border-radius: 6px;
+    padding: 4px 10px;
+    display: inline-block;
+    margin-top: 6px;
+  }
+
+  /* SEÇÃO POR TIPO */
+  .tipo-section {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin: 28px 0;
+  }
+  .tipo-section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tipo-section-icon {
+    font-size: 32px;
+    width: 56px; height: 56px;
+    background: var(--brand-light);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .tipo-section-header h3 {
+    margin: 0;
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .tipo-section-header span { font-size: 13px; color: var(--text-muted); display: block; margin-top: 2px; }
+
+  /* PRODUTO CARD */
+  .linha-badge {
+    display: inline-block;
+    background: var(--brand-light);
+    color: var(--brand);
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    margin-top: 4px;
+  }
+  .produto-card {
+    background: #fafafa;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin: 12px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .produto-badge {
+    flex-shrink: 0;
+    background: var(--brand-light);
+    border-radius: 8px;
+    width: 42px; height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  .produto-info strong { display: block; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+  .produto-info p { margin: 0; font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+  .produto-tag {
+    display: inline-block;
+    background: #eaf3de;
+    color: #3b6d11;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 5px;
+    font-weight: 500;
+  }
+
+  /* DICA */
+  .dica {
+    background: #fef9f0;
+    border: 1px solid #fac775;
+    border-radius: 10px;
+    padding: 18px 22px;
+    margin: 20px 0;
+  }
+  .dica-title { font-size: 12px; font-weight: 600; color: #854f0b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .dica p { margin: 0; font-size: 14px; color: #555; }
+
+  /* CHECKLIST */
+  .checklist {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 28px;
+    margin: 32px 0;
+  }
+  .checklist h3 { margin-top: 0; margin-bottom: 16px; font-size: 17px; }
+  .check-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid #f5f0ed;
+    font-size: 15px;
+    color: #333;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-icon { color: var(--brand); font-size: 18px; flex-shrink: 0; margin-top: 2px; }
+
+  /* TABELA ERROS */
+  .erros-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+  .erros-table th {
+    background: var(--brand);
+    color: white;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 500;
+  }
+  .erros-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .erros-table tr:nth-child(even) td { background: #fafafa; }
+  .erros-table th:first-child { border-radius: 8px 0 0 0; }
+  .erros-table th:last-child { border-radius: 0 8px 0 0; }
+
+  /* FAQ */
+  .faq-item { border-bottom: 1px solid var(--border); padding: 20px 0; }
+  .faq-q { font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 10px; }
+  .faq-a { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin: 0; }
+
+  /* CTA */
+  .cta-block {
+    background: linear-gradient(135deg, #e8f0fb 0%, #fbeaf0 100%);
+    border: 1px solid #c0d4f5;
+    border-radius: 16px;
+    padding: 40px 32px;
+    text-align: center;
+    margin: 48px 0;
+  }
+  .cta-block h2 { margin-top: 0; font-size: 26px; margin-bottom: 12px; }
+  .cta-block p { color: var(--text-muted); max-width: 480px; margin: 0 auto 24px; font-size: 15px; }
+  .btn {
+    display: inline-block;
+    background: var(--brand);
+    color: white;
+    text-decoration: none;
+    padding: 14px 32px;
+    border-radius: 30px;
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .btn:hover { opacity: 0.9; }
+
+
+  /* Cards clicáveis */
+  a.tipo-card {
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: block;
+  }
+  a.tipo-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(212,67,122,0.15);
+    border-color: var(--brand);
+  }
+  a.tipo-card .tipo-hint {
+    display: block;
+    font-size: 11px;
+    color: var(--brand);
+    margin-top: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  @media (max-width: 600px) {
+    .tipos-grid { grid-template-columns: 1fr; }
+    .tipo-section-header { flex-direction: column; text-align: center; }
+    .meta { flex-direction: column; gap: 8px; }
+    .erros-table { font-size: 13px; }
+    .erros-table th, .erros-table td { padding: 10px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="tag">❄️ Cuidados de Inverno</span>
+  <h1>Cabelo no <em>Inverno</em>: Guia Completo para Todos os Tipos de Fio</h1>
+  <p class="subtitle">Como combater o ressecamento, o frizz e a falta de brilho no frio — com produtos Widi Care para cada tipo de cabelo</p>
+  <div class="meta">
+    <span>📅 Junho de 2025</span>
+    <span>⏱️ 10 min de leitura</span>
+    <span>✅ Para lisos, ondulados, cacheados e crespos</span>
+  </div>
+</header>
+
+<div class="container">
+<article>
+
+  <h2>Por que o inverno é o pior inimigo do seu cabelo?</h2>
+
+  <p>Enquanto todo mundo está preocupado em proteger a pele do frio, o cabelo sofre em silêncio. O ar mais seco, as temperaturas baixas e — sejamos honestas — aquele banho quente irresistível formam uma combinação devastadora para a saúde capilar.</p>
+
+  <p>O resultado é sempre o mesmo: frizz fora de controle, fios opacos, ressecamento nas pontas, eletricidade estática e cachos que perdem toda a definição. E o pior: muita gente só percebe o estrago quando o verão chega e o cabelo está quebradiço.</p>
+
+  <div class="alert-box">
+    <p>🌡️ <strong>O que acontece com o fio no frio:</strong> a baixa umidade do ar retira a hidratação natural dos cabelos. Os banhos com água quente abrem as cutículas e removem os lipídios protetores. Já o choque térmico entre ambientes aquecidos e o ar gelado da rua resseca a camada externa dos fios — deixando-os vulneráveis e sem brilho.</p>
+  </div>
+
+  <p>A boa notícia é que com ajustes simples na rotina e os produtos certos, dá para atravessar o inverno com o cabelo bonito, hidratado e saudável — independente se você tem fios lisos, ondulados, cacheados ou crespos.</p>
+
+  <h2>Como o inverno afeta cada tipo de cabelo</h2>
+
+  <p>Nem todo cabelo sofre da mesma forma. Antes de montar sua rotina de inverno, entenda o que acontece especificamente com o seu tipo de fio:</p>
+
+  <div class="tipos-grid">
+    <a href="#secao-liso" class="tipo-card">
+      <span class="tipo-icon">〰️</span>
+      <strong>Liso (tipo 1)</strong>
+      <span style="font-size:13px;color:#555;">Fica opaco, sem brilho e com tendência à eletricidade estática</span>
+      <span class="problema">⚡ Eletricidade estática</span>
+      <span class="tipo-hint">Ver cuidados →</span>
+    </a>
+    <a href="#secao-ondulado" class="tipo-card">
+      <span class="tipo-icon">🌊</span>
+      <strong>Ondulado (tipo 2)</strong>
+      <span style="font-size:13px;color:#555;">Perde definição das ondas e fica armado com volume irregular</span>
+      <span class="problema">💨 Frizz volumoso</span>
+      <span class="tipo-hint">Ver cuidados →</span>
+    </a>
+    <a href="#secao-cacheado" class="tipo-card">
+      <span class="tipo-icon">🌀</span>
+      <strong>Cacheado (tipo 3)</strong>
+      <span style="font-size:13px;color:#555;">Os cachos perdem a mola, ficam ressecados e sem definição</span>
+      <span class="problema">🔴 Ressecamento intenso</span>
+      <span class="tipo-hint">Ver cuidados →</span>
+    </a>
+    <a href="#secao-crespo" class="tipo-card">
+      <span class="tipo-icon">🔁</span>
+      <strong>Crespo (tipo 4)</strong>
+      <span style="font-size:13px;color:#555;">Já naturalmente mais seco, fica quebradiço e difícil de modelar</span>
+      <span class="problema">⚠️ Quebra dos fios</span>
+      <span class="tipo-hint">Ver cuidados →</span>
+    </a>
+  </div>
+
+  <hr class="divider">
+
+  <h2>Rotina de inverno por tipo de cabelo</h2>
+  <p>Cada textura precisa de uma abordagem diferente. Veja o que priorizar no inverno de acordo com o seu tipo de fio:</p>
+
+  <!-- LISO -->
+  <div class="tipo-section" id="secao-liso">
+    <div class="tipo-section-header">
+      <div class="tipo-section-icon">〰️</div>
+      <div>
+        <h3>Cabelos Lisos</h3>
+        <span>Tipos 1A, 1B e 1C — foco em brilho e controle de estática</span>
+      </div>
+    </div>
+
+    <p>Os lisos costumam ser os mais resistentes ao inverno, mas sofrem com a opacidade e a eletricidade estática. O segredo está em reforçar a nutrição e usar finalizadores que formem uma barreira protetora contra o ressecamento.</p>
+
+    <div class="linha-badge">Linha Infusão 2.0</div>
+
+    <div class="produto-card">
+      <div class="produto-badge">💎</div>
+      <div class="produto-info">
+        <strong>Infusão 2.0 — Shampoo Reconstrutor</strong>
+        <p>Shampoo com proteínas reconstrutoras que fortalecem os fios e repõem a proteção natural removida pela água quente do banho no inverno.</p>
+        <span class="produto-tag">✓ Reconstrução + proteção</span>
+      </div>
+    </div>
+
+    <div class="produto-card">
+      <div class="produto-badge">✨</div>
+      <div class="produto-info">
+        <strong>Infusão 2.0 — Máscara de Reconstrução</strong>
+        <p>Máscara de tratamento profundo que reconstrói a fibra capilar, devolve o brilho e reduz a porosidade causada pelo clima seco do inverno.</p>
+        <span class="produto-tag">✓ Brilho intenso</span>
+      </div>
+    </div>
+
+    <div class="dica">
+      <div class="dica-title">💡 Dica de Inverno para Lisos</div>
+      <p>Aplique 2 a 3 gotas de óleo finalizador nas pontas após secar o cabelo. Ele sela as cutículas, elimina a eletricidade estática e dá aquele brilho espelhado que o frio tira dos fios lisos.</p>
+    </div>
+  </div>
+
+  <!-- ONDULADO -->
+  <div class="tipo-section" id="secao-ondulado">
+    <div class="tipo-section-header">
+      <div class="tipo-section-icon">🌊</div>
+      <div>
+        <h3>Cabelos Ondulados</h3>
+        <span>Tipos 2A, 2B e 2C — foco em definição e anti-frizz</span>
+      </div>
+    </div>
+
+    <p>Os ondulados têm um drama específico no inverno: a umidade irregular do ar causa frizz mas não o suficiente para definir as ondas. O resultado é aquele cabelo "nem liso nem encaracolado" que acompanha o inverno inteiro.</p>
+
+    <div class="linha-badge">Linha Juba — Ondulando</div>
+
+    <div class="produto-card">
+      <div class="produto-badge">🌊</div>
+      <div class="produto-info">
+        <strong>Ondulando a Juba — Creme de Pentear 500ml</strong>
+        <p>Creme definidor para ondulados que mantém as ondas no lugar mesmo com o ar seco do inverno. Hidrata e controla o frizz durante todo o dia.</p>
+        <span class="produto-tag">✓ Para curvaturas 2A, 2B e 2C</span>
+      </div>
+    </div>
+
+    <div class="produto-card">
+      <div class="produto-badge">🍯</div>
+      <div class="produto-info">
+        <strong>Modelando a Juba — Geleia Seladora</strong>
+        <p>Geleia que sela as cutículas e fixa as ondas sem pesar, criando uma barreira protetora contra o ressecamento do ar frio.</p>
+        <span class="produto-tag">✓ Anti-frizz de longa duração</span>
+      </div>
+    </div>
+
+    <div class="dica">
+      <div class="dica-title">💡 Dica de Inverno para Ondulados</div>
+      <p>No inverno, aplique o creme de pentear no cabelo mais molhado do que o habitual. A água extra ajuda a ativar as ondas e compensa a secagem mais rápida causada pelo ar frio.</p>
+    </div>
+  </div>
+
+  <!-- CACHEADO -->
+  <div class="tipo-section" id="secao-cacheado">
+    <div class="tipo-section-header">
+      <div class="tipo-section-icon">🌀</div>
+      <div>
+        <h3>Cabelos Cacheados</h3>
+        <span>Tipos 3A, 3B e 3C — foco em hidratação profunda e definição</span>
+      </div>
+    </div>
+
+    <p>Os cacheados são os que mais sofrem no inverno. A estrutura espiral já dificulta a distribuição natural de oleosidade — com o ar seco, esse processo fica ainda mais prejudicado. O resultado são cachos "embarrigados", sem definição e com muito frizz.</p>
+
+    <div class="linha-badge">Linha Juba</div>
+
+    <div class="produto-card">
+      <div class="produto-badge">💜</div>
+      <div class="produto-info">
+        <strong>Juba Butter Oil — Tratamento Nutritivo 500g</strong>
+        <p>Tratamento profundo com óleos e manteigas que penetram nos fios e repõem a nutrição perdida pelo frio. Use semanalmente como máscara de tratamento de inverno.</p>
+        <span class="produto-tag">✓ Nutrição profunda de inverno</span>
+      </div>
+    </div>
+
+    <div class="produto-card">
+      <div class="produto-badge">✨</div>
+      <div class="produto-info">
+        <strong>Acidificante Juba Widi Care 500ml</strong>
+        <p>Essencial no inverno para fechar as cutículas após a lavagem e selar toda a hidratação que o ar frio tenta roubar dos fios.</p>
+        <span class="produto-tag">✓ Sela a hidratação no frio</span>
+      </div>
+    </div>
+
+    <div class="produto-card">
+      <div class="produto-badge">💫</div>
+      <div class="produto-info">
+        <strong>Encaracolando a Juba — Creme de Pentear 500ml</strong>
+        <p>Creme definidor que mantém os cachos modelados e hidratados mesmo com o ressecamento do inverno. Com manteiga de murumuru e óleo de linhaça.</p>
+        <span class="produto-tag">✓ Para curvaturas 3A, 3B e 3C</span>
+      </div>
+    </div>
+
+    <div class="dica">
+      <div class="dica-title">💡 Dica de Inverno para Cacheados</div>
+      <p>Aumente a frequência da máscara nutritiva para 2x por semana no inverno. Depois de aplicar, use uma touca térmica por 30 minutos para maximizar a absorção — o calor compensa o ressecamento do ar frio.</p>
+    </div>
+  </div>
+
+  <!-- CRESPO -->
+  <div class="tipo-section" id="secao-crespo">
+    <div class="tipo-section-header">
+      <div class="tipo-section-icon">🔁</div>
+      <div>
+        <h3>Cabelos Crespos</h3>
+        <span>Tipos 4A, 4B e 4C — foco em nutrição intensa e proteção</span>
+      </div>
+    </div>
+
+    <p>O crespo já é naturalmente mais seco — e o inverno potencializa esse ressecamento a níveis críticos. Sem uma rotina bem estruturada, os fios ficam quebradiços, sem brilho e com dificuldade de modelagem. A prioridade é nutrição densa e proteção constante.</p>
+
+    <div class="linha-badge">Linha Juba — Encrespando</div>
+
+    <div class="produto-card">
+      <div class="produto-badge">🔮</div>
+      <div class="produto-info">
+        <strong>Encrespando a Juba — Creme de Pentear 500ml</strong>
+        <p>Creme de alta performance para curvaturas 3C, 4A, 4B e 4C. No inverno, funciona também como leave-in diário para manter a hidratação dos fios entre as lavagens.</p>
+        <span class="produto-tag">✓ Para curvaturas 3C ao 4C</span>
+      </div>
+    </div>
+
+    <div class="produto-card">
+      <div class="produto-badge">🌸</div>
+      <div class="produto-info">
+        <strong>Máscara Hidro-Nutritiva Juba 500g</strong>
+        <p>Máscara com manteiga de murumuru orgânica e óleo de linhaça. Para crespos no inverno, deixe agindo por 40-60 minutos — o cabelo precisa de mais tempo para absorver os nutrientes no frio.</p>
+        <span class="produto-tag">✓ Hidratação máxima</span>
+      </div>
+    </div>
+
+    <div class="dica">
+      <div class="dica-title">💡 Dica de Inverno para Crespos</div>
+      <p>Adote o LOC Method no inverno: aplique leave-in (L), depois óleo (O) e finalize com creme (C). Essa camada tripla cria uma barreira protetora que mantém a hidratação por muito mais tempo no frio.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h2>O checklist de hábitos do inverno</h2>
+  <p>Além dos produtos, alguns hábitos fazem toda a diferença na saúde do cabelo durante o inverno:</p>
+
+  <div class="checklist">
+    <h3>✅ Faça isso no inverno</h3>
+    <div class="check-item"><span class="check-icon">✓</span><span><strong>Lave com água morna, não quente.</strong> A água muito quente abre as cutículas e remove os lipídios naturais que protegem os fios. Termina sempre com um jato de água fria para fechar as cutículas.</span></div>
+    <div class="check-item"><span class="check-icon">✓</span><span><strong>Aumente a frequência de hidratação.</strong> No inverno, passe de uma para duas máscaras por semana — o ar seco exige reposição constante de hidratação.</span></div>
+    <div class="check-item"><span class="check-icon">✓</span><span><strong>Use touca de cetim para dormir.</strong> Tecidos como algodão absorvem a umidade dos fios durante a noite — o cetim protege a hidratação e evita o frizz matinal.</span></div>
+    <div class="check-item"><span class="check-icon">✓</span><span><strong>Aplique finalizador antes de sair.</strong> Uma camada de produto finalizador cria uma barreira protetora entre os fios e o ar frio e seco da rua.</span></div>
+    <div class="check-item"><span class="check-icon">✓</span><span><strong>Use protetor térmico se usar secador.</strong> No inverno tendemos a usar mais o secador — proteja os fios com produto térmico antes de qualquer ferramenta de calor.</span></div>
+    <div class="check-item"><span class="check-icon">✓</span><span><strong>Corte as pontas a cada 3 meses.</strong> O inverno agrava as pontas duplas. Um corte de manutenção elimina as pontas ressecadas e melhora a aparência geral do cabelo.</span></div>
+  </div>
+
+  <hr class="divider">
+
+  <h2>Os erros mais comuns no inverno</h2>
+  <p>Esses hábitos parecem inofensivos mas sabotam completamente o seu cabelo durante o inverno:</p>
+
+  <table class="erros-table">
+    <tr>
+      <th>❌ Erro</th>
+      <th>✅ O que fazer no lugar</th>
+    </tr>
+    <tr>
+      <td><strong>Banho com água muito quente</strong></td>
+      <td>Água morna + jato frio no final para fechar as cutículas</td>
+    </tr>
+    <tr>
+      <td><strong>Pular a máscara de tratamento</strong></td>
+      <td>Aumentar para 2x por semana no inverno, não reduzir</td>
+    </tr>
+    <tr>
+      <td><strong>Sair com o cabelo molhado</strong></td>
+      <td>Secar completamente antes de sair — o frio com cabelo úmido quebra os fios</td>
+    </tr>
+    <tr>
+      <td><strong>Usar gorro ou chapéu diretamente no cabelo</strong></td>
+      <td>Use um lenço de seda ou cetim por baixo para evitar atrito e estática</td>
+    </tr>
+    <tr>
+      <td><strong>Aumentar a frequência de lavagem</strong></td>
+      <td>No inverno, lave menos — cada lavagem retira oleosidade natural protetora</td>
+    </tr>
+    <tr>
+      <td><strong>Usar o secador sem protetor térmico</strong></td>
+      <td>Aplique protetor térmico sempre, especialmente no inverno quando já há ressecamento</td>
+    </tr>
+  </table>
+
+  <hr class="divider">
+
+  <h2>Perguntas frequentes sobre cabelo no inverno</h2>
+
+  <div class="faq-item">
+    <div class="faq-q">Por que o cabelo fica com mais frizz no inverno?</div>
+    <p class="faq-a">O ar frio tem menos umidade, o que cria uma diferença de potencial entre os fios e o ambiente. Para compensar, os cabelos absorvem umidade do ar de forma irregular, fazendo as cutículas se abrirem e gerando o frizz. A solução é manter os fios hidratados e as cutículas fechadas com acidificante e finalizadores.</p>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Devo mudar todos os meus produtos no inverno?</div>
+    <p class="faq-a">Não necessariamente. O que muda é a frequência e a intensidade do tratamento. Você pode manter os mesmos produtos, mas aumentar a frequência da máscara, adicionar um óleo finalizador e reforçar o uso de acidificante. Se o ressecamento for muito intenso, vale adicionar um produto mais nutritivo — como os da linha Juba Butter Oil.</p>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Posso usar produtos Widi Care em cabelo com química no inverno?</div>
+    <p class="faq-a">Sim — e é ainda mais importante fazê-lo. Cabelos quimicamente tratados (coloridos, alisados, relaxados) já têm a cutícula mais comprometida, e o inverno agrava esse quadro. Priorize as máscaras nutritivas e o acidificante para selar e proteger os fios tratados durante o frio.</p>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">A queda de cabelo aumenta no inverno?</div>
+    <p class="faq-a">É comum perceber mais queda no outono e inverno — uma resposta natural do organismo à mudança de estação. Se a queda for moderada e não durar mais de 6 a 8 semanas, é normal. O que ajuda é manter o couro cabeludo bem hidratado e limpo, evitar o calor excessivo do secador e uma alimentação equilibrada. Quedas intensas e persistentes merecem avaliação de um dermatologista.</p>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Quanto tempo leva para o cabelo se recuperar após o inverno?</div>
+    <p class="faq-a">Com uma rotina consistente durante o inverno, o cabelo mantém a saúde durante toda a estação — não há "recuperação" necessária. Se você descuidou e os fios ficaram ressecados, um cronograma de hidratação intensiva por 4 a 6 semanas já é suficiente para restaurar a maciez e o brilho.</p>
+  </div>
+
+  <hr class="divider">
+
+  <div class="cta-block">
+    <h2>Seu cabelo pronto para o inverno</h2>
+    <p>Encontre todos os produtos Widi Care para a sua rotina de inverno — para lisos, ondulados, cacheados e crespos. Frete grátis em compras acima do valor mínimo.</p>
+    <a href="https://lojawidicare.com.br" class="btn">Ver todos os produtos Widi Care →</a>
+  </div>
+
+</article>
+</div>
+</body>
+</html>
