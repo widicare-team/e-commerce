@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" style="scroll-behavior: smooth;">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -448,6 +448,27 @@
     margin: 48px 0;
   }
 
+
+  /* Cards clicáveis */
+  a.tipo-card {
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: block;
+  }
+  a.tipo-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(212,67,122,0.15);
+    border-color: var(--brand);
+  }
+  a.tipo-card .tipo-hint {
+    display: block;
+    font-size: 11px;
+    color: var(--brand);
+    margin-top: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
   @media (max-width: 600px) {
     .step { flex-direction: column; gap: 12px; }
     .step-num { width: 40px; height: 40px; font-size: 18px; }
@@ -488,28 +509,31 @@
   <p>Antes de montar a sua rotina, o primeiro passo é entender em qual curvatura os seus fios se encaixam. Isso define quais produtos e técnicas fazem mais sentido para você:</p>
 
   <div class="tipos-grid">
-    <div class="tipo-card">
+    <a href="#produto-ondulado" class="tipo-card">
       <span class="tipo-icon">〰️</span>
       <strong>Tipo 2 (Ondulado)</strong>
       <span>2A, 2B, 2C — ondas suaves a pronunciadas</span>
-    </div>
-    <div class="tipo-card destaque">
+      <span class="tipo-hint">Ver produtos →</span>
+    </a>
+    <a href="#produto-cacheado" class="tipo-card destaque">
       <span class="tipo-icon">🌀</span>
       <strong>Tipo 3 (Cacheado)</strong>
       <span>3A, 3B, 3C — cachos definidos e volumosos</span>
-    </div>
-    <div class="tipo-card">
+      <span class="tipo-hint">Ver produtos →</span>
+    </a>
+    <a href="#produto-crespo" class="tipo-card">
       <span class="tipo-icon">🔁</span>
       <strong>Tipo 4 (Crespo)</strong>
       <span>4A, 4B, 4C — cachos bem fechados e coily</span>
-    </div>
+      <span class="tipo-hint">Ver produtos →</span>
+    </a>
   </div>
 
   <p>A linha <strong>Juba da Widi Care</strong> foi desenvolvida especialmente para todos esses tipos, com produtos específicos para cada curvatura — dos ondulados (2A–2C) aos crespos (4A–4C).</p>
 
   <hr class="divider">
 
-  <h2>A rotina capilar passo a passo</h2>
+  <h2 id="rotina-passo-a-passo">A rotina capilar passo a passo</h2>
 
   <div class="rotina-steps">
 
@@ -607,7 +631,7 @@
     <div class="step">
       <div class="step-num">5</div>
       <div class="step-content">
-        <h3>Finalização: definindo e selando os cachos</h3>
+        <h3 id="produtos-ondulado">Finalização: definindo e selando os cachos</h3>
         <p>Com o cabelo ainda bem molhado (o ponto certo faz toda a diferença!), aplique o creme de pentear dividindo o cabelo em mechas finas. Amasse os cachos de baixo para cima para ajudar na definição. Deixe secar naturalmente ou use um difusor.</p>
 
         <div class="linha-badge">Linha Juba — escolha pelo seu tipo</div>
@@ -615,7 +639,7 @@
         <div class="produto-card">
           <div class="produto-badge">🌊</div>
           <div class="produto-info">
-            <strong>Ondulando a Juba — Creme de Pentear 500ml</strong>
+            <strong id="produto-ondulado">Ondulando a Juba — Creme de Pentear 500ml</strong>
             <p>Para cabelos ondulados com curvatura 2A, 2B ou 2C. Proporciona ondas definidas e hidratadas com leveza.</p>
             <span class="produto-tag">✓ Para curvaturas 2A, 2B e 2C</span>
           </div>
@@ -624,7 +648,7 @@
         <div class="produto-card">
           <div class="produto-badge">💫</div>
           <div class="produto-info">
-            <strong>Encaracolando a Juba — Creme de Pentear 500ml</strong>
+            <strong id="produto-cacheado">Encaracolando a Juba — Creme de Pentear 500ml</strong>
             <p>Para cabelos cacheados 3A, 3B e 3C. Com manteiga de murumuru orgânica, óleo de linhaça dourada e extrato de avelã. Define, nutre, hidrata e empodera seus cachos.</p>
             <span class="produto-tag">✓ Para curvaturas 3A, 3B e 3C</span>
           </div>
@@ -633,7 +657,7 @@
         <div class="produto-card">
           <div class="produto-badge">🔮</div>
           <div class="produto-info">
-            <strong>Encrespando a Juba — Creme de Pentear 500ml</strong>
+            <strong id="produto-crespo">Encrespando a Juba — Creme de Pentear 500ml</strong>
             <p>Para cachos bem fechados e crespos. Brilho, modelagem e hidratação intensa para as curvaturas mais definidas.</p>
             <span class="produto-tag">✓ Para curvaturas 3C, 4A, 4B e 4C</span>
           </div>
