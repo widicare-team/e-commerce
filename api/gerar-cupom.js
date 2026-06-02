@@ -1,6 +1,14 @@
 export default async function handler(req, res) {
 
-    res.setHeader('Access-Control-Allow-Origin', 'https://testewidicare.lojavirtualnuvem.com.br');
+    const origensPermitidas = [
+        'https://testewidicare.lojavirtualnuvem.com.br',
+        'https://lojawidicare.com.br',
+        'https://www.lojawidicare.com.br'
+    ];
+    const origem = req.headers.origin;
+    if (origensPermitidas.includes(origem)) {
+        res.setHeader('Access-Control-Allow-Origin', origem);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -12,11 +20,9 @@ export default async function handler(req, res) {
     if (!resultado || !cpf || !email) {
         return res.status(400).json({ erro: 'Dados incompletos' });
     }
-
     if (!['gol', 'trave'].includes(resultado)) {
         return res.status(400).json({ erro: 'Resultado inválido' });
     }
-
     if (!/^\d{11}$/.test(cpf)) {
         return res.status(400).json({ erro: 'CPF inválido' });
     }
@@ -25,7 +31,6 @@ export default async function handler(req, res) {
         const sufixo = Math.random().toString(36).substring(2, 8).toUpperCase();
         const prefixo = resultado === 'gol' ? 'WIDI-GOL' : 'WIDI-TRAVE';
         const codigoCupom = `${prefixo}-${sufixo}`;
-
         const ehGol = resultado === 'gol';
 
         const validade = new Date();
