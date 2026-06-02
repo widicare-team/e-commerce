@@ -1,0 +1,9 @@
+{
+    "version": 2,
+    "functions": {
+        "api/gerar-cupom.js": {
+            "memory": 128,
+            "maxDuration": 10
+        }
+    }
+}
