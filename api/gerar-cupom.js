@@ -27,9 +27,6 @@ export default async function handler(req, res) {
         return res.status(400).json({ erro: 'CPF inválido' });
     }
 
-    // =============================================
-    // VERIFICAÇÃO DE CPF (antes de jogar)
-    // =============================================
     if (resultado === 'verificar') {
         try {
             const redisUrl = process.env.KV_REST_API_URL;
@@ -47,9 +44,6 @@ export default async function handler(req, res) {
         }
     }
 
-    // =============================================
-    // 1. CONTROLE POR CPF via Redis (Upstash)
-    // =============================================
     try {
         const redisUrl = process.env.KV_REST_API_URL;
         const redisToken = process.env.KV_REST_API_TOKEN;
@@ -66,7 +60,6 @@ export default async function handler(req, res) {
             });
         }
 
-        // Marca o CPF como já jogou (expira em 365 dias)
         await fetch(`${redisUrl}/set/jogou_${cpf}/true/ex/31536000`, {
             method: 'POST',
             headers: { Authorization: `Bearer ${redisToken}` }
@@ -76,9 +69,6 @@ export default async function handler(req, res) {
         console.error('Erro Redis:', erroRedis);
     }
 
-    // =============================================
-    // 2. CRIAR CUPOM ÚNICO na Nuvemshop
-    // =============================================
     try {
         const sufixo = Math.random().toString(36).substring(2, 8).toUpperCase();
         const prefixo = resultado === 'gol' ? 'WIDI-GOL' : 'WIDI-TRAVE';
@@ -127,25 +117,32 @@ export default async function handler(req, res) {
             const resultadoTexto = resultado === 'gol' ? 'GOL ⚽' : 'TRAVE 🇧🇷';
 
             const token = await getGoogleToken();
+
+            // Log para debug
+            console.log('Token Google obtido:', token ? 'sim' : 'não');
+
             const sheetId = process.env.GOOGLE_SHEET_ID;
             const range = 'Página1!A:F';
+            const urlSheets = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=USER_ENTERED`;
 
-            await fetch(
-                `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=USER_ENTERED`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        values: [[agora, cpf, email, resultadoTexto, codigoCupom, 'Não']]
-                    })
-                }
-            );
+            console.log('Chamando Sheets URL:', urlSheets);
+
+            const sheetsResp = await fetch(urlSheets, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    values: [[agora, cpf, email, resultadoTexto, codigoCupom, 'Não']]
+                })
+            });
+
+            const sheetsData = await sheetsResp.json();
+            console.log('Resposta Sheets:', JSON.stringify(sheetsData));
 
         } catch (erroSheets) {
-            console.error('Erro Google Sheets:', erroSheets);
+            console.error('Erro Google Sheets detalhado:', erroSheets.message, erroSheets.stack);
         }
 
         return res.status(200).json({
