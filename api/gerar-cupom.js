@@ -2,6 +2,8 @@ export default async function handler(req, res) {
 
     const origensPermitidas = [
         'https://testewidicare.lojavirtualnuvem.com.br',
+        'https://lojawidicare.com.br',
+        'https://www.lojawidicare.com.br'
     ];
     const origem = req.headers.origin;
     if (origensPermitidas.includes(origem)) {
@@ -18,11 +20,31 @@ export default async function handler(req, res) {
     if (!resultado || !cpf || !email) {
         return res.status(400).json({ erro: 'Dados incompletos' });
     }
-    if (!['gol', 'trave'].includes(resultado)) {
+    if (!['gol', 'trave', 'verificar'].includes(resultado)) {
         return res.status(400).json({ erro: 'Resultado inválido' });
     }
     if (!/^\d{11}$/.test(cpf)) {
         return res.status(400).json({ erro: 'CPF inválido' });
+    }
+
+    // =============================================
+    // VERIFICAÇÃO DE CPF (antes de jogar)
+    // =============================================
+    if (resultado === 'verificar') {
+        try {
+            const redisUrl = process.env.KV_REST_API_URL;
+            const redisToken = process.env.KV_REST_API_TOKEN;
+            const checkResp = await fetch(`${redisUrl}/get/jogou_${cpf}`, {
+                headers: { Authorization: `Bearer ${redisToken}` }
+            });
+            const checkData = await checkResp.json();
+            if (checkData.result) {
+                return res.status(200).json({ jaJogou: true });
+            }
+            return res.status(200).json({ jaJogou: false });
+        } catch (e) {
+            return res.status(200).json({ jaJogou: false });
+        }
     }
 
     // =============================================
@@ -32,7 +54,6 @@ export default async function handler(req, res) {
         const redisUrl = process.env.KV_REST_API_URL;
         const redisToken = process.env.KV_REST_API_TOKEN;
 
-        // Verifica se o CPF já jogou
         const checkResp = await fetch(`${redisUrl}/get/jogou_${cpf}`, {
             headers: { Authorization: `Bearer ${redisToken}` }
         });
@@ -53,7 +74,6 @@ export default async function handler(req, res) {
 
     } catch (erroRedis) {
         console.error('Erro Redis:', erroRedis);
-        // Não bloqueia o jogo se Redis falhar
     }
 
     // =============================================
@@ -106,9 +126,7 @@ export default async function handler(req, res) {
             const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
             const resultadoTexto = resultado === 'gol' ? 'GOL ⚽' : 'TRAVE 🇧🇷';
 
-            // Gera JWT para autenticação Google
             const token = await getGoogleToken();
-
             const sheetId = process.env.GOOGLE_SHEET_ID;
             const range = 'Página1!A:F';
 
@@ -128,7 +146,6 @@ export default async function handler(req, res) {
 
         } catch (erroSheets) {
             console.error('Erro Google Sheets:', erroSheets);
-            // Não bloqueia se Sheets falhar
         }
 
         return res.status(200).json({
@@ -145,9 +162,6 @@ export default async function handler(req, res) {
     }
 }
 
-// =============================================
-// Função auxiliar: gera token Google via JWT
-// =============================================
 async function getGoogleToken() {
     const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
     const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
@@ -161,9 +175,7 @@ async function getGoogleToken() {
         iat: now
     };
 
-    // Importa a chave privada
     const encoder = new TextEncoder();
-    const keyData = encoder.encode(privateKey);
 
     const cryptoKey = await crypto.subtle.importKey(
         'pkcs8',
@@ -173,7 +185,6 @@ async function getGoogleToken() {
         ['sign']
     );
 
-    // Cria o JWT
     const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
     const body = btoa(JSON.stringify(payload));
     const signingInput = `${header}.${body}`;
@@ -186,7 +197,6 @@ async function getGoogleToken() {
 
     const jwt = `${signingInput}.${btoa(String.fromCharCode(...new Uint8Array(signature)))}`;
 
-    // Troca JWT por access token
     const tokenResp = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
