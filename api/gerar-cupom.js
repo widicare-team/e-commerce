@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-
     const origensPermitidas = [
         'https://testewidicare.lojavirtualnuvem.com.br',
         'https://lojawidicare.com.br',
@@ -37,15 +36,14 @@ export default async function handler(req, res) {
         validade.setHours(validade.getHours() + 48);
         const validadeISO = validade.toISOString().split('T')[0];
 
+        // CORRIGIDO: tipos corretos e campos válidos da API Nuvemshop
         const dadosCupom = {
             code: codigoCupom,
             type: 'percentage',
-            value: ehGol ? '20' : '10',
-            valid: validadeISO,
-            used: 0,
+            value: ehGol ? 20 : 10,           // número, não string
+            valid_until: validadeISO,           // nome correto do campo
             max_uses: 1,
-            min_price: ehGol ? '150.00' : '0.00',
-            includes_shipping: false,
+            min_price: ehGol ? 150 : 0,        // número, não string
             active: true
         };
 
@@ -68,7 +66,6 @@ export default async function handler(req, res) {
         }
 
         const cupomCriado = await resposta.json();
-
         console.log(`Cupom gerado: ${codigoCupom} | CPF: ${cpf} | Email: ${email} | Resultado: ${resultado}`);
 
         return res.status(200).json({
