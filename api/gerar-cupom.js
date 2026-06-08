@@ -1,8 +1,6 @@
 export default async function handler(req, res) {
     const origensPermitidas = [
         'https://testewidicare.lojavirtualnuvem.com.br',
-        'https://lojawidicare.com.br',
-        'https://www.lojawidicare.com.br'
     ];
     const origem = req.headers.origin;
     if (origensPermitidas.includes(origem)) {
