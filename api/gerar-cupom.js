@@ -109,23 +109,16 @@ export default async function handler(req, res) {
 
         console.log(`Cupom gerado: ${codigoCupom} | CPF: ${cpf} | Email: ${email} | Resultado: ${resultado}`);
 
-        // =============================================
-        // 3. SALVAR NO GOOGLE SHEETS
-        // =============================================
         try {
             const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
             const resultadoTexto = resultado === 'gol' ? 'GOL ⚽' : 'TRAVE 🇧🇷';
 
             const token = await getGoogleToken();
-
-            // Log para debug
             console.log('Token Google obtido:', token ? 'sim' : 'não');
 
             const sheetId = process.env.GOOGLE_SHEET_ID;
             const range = 'Página1!A:F';
             const urlSheets = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}:append?valueInputOption=USER_ENTERED`;
-
-            console.log('Chamando Sheets URL:', urlSheets);
 
             const sheetsResp = await fetch(urlSheets, {
                 method: 'POST',
@@ -159,20 +152,39 @@ export default async function handler(req, res) {
     }
 }
 
+// FIX: Base64 URL-safe encoding para JWT válido
+function base64url(data) {
+    const str = typeof data === 'string' ? data : JSON.stringify(data);
+    return btoa(unescape(encodeURIComponent(str)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
+}
+
+function base64urlFromBuffer(buffer) {
+    return btoa(String.fromCharCode(...new Uint8Array(buffer)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
+}
+
 async function getGoogleToken() {
     const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
     const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
 
     const now = Math.floor(Date.now() / 1000);
-    const payload = {
+
+    const header = base64url({ alg: 'RS256', typ: 'JWT' });
+    const payload = base64url({
         iss: clientEmail,
+        sub: clientEmail,
         scope: 'https://www.googleapis.com/auth/spreadsheets',
         aud: 'https://oauth2.googleapis.com/token',
         exp: now + 3600,
         iat: now
-    };
+    });
 
-    const encoder = new TextEncoder();
+    const signingInput = `${header}.${payload}`;
 
     const cryptoKey = await crypto.subtle.importKey(
         'pkcs8',
@@ -182,17 +194,13 @@ async function getGoogleToken() {
         ['sign']
     );
 
-    const header = btoa(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
-    const body = btoa(JSON.stringify(payload));
-    const signingInput = `${header}.${body}`;
-
     const signature = await crypto.subtle.sign(
         'RSASSA-PKCS1-v1_5',
         cryptoKey,
-        encoder.encode(signingInput)
+        new TextEncoder().encode(signingInput)
     );
 
-    const jwt = `${signingInput}.${btoa(String.fromCharCode(...new Uint8Array(signature)))}`;
+    const jwt = `${signingInput}.${base64urlFromBuffer(signature)}`;
 
     const tokenResp = await fetch('https://oauth2.googleapis.com/token', {
         method: 'POST',
@@ -201,6 +209,7 @@ async function getGoogleToken() {
     });
 
     const tokenData = await tokenResp.json();
+    console.log('Token response Google:', JSON.stringify(tokenData));
     return tokenData.access_token;
 }
 
