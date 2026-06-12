@@ -82,7 +82,7 @@ export default async function handler(req, res) {
         const dadosCupom = {
             code: codigoCupom,
             type: 'percentage',
-            value: ehGol ? 20 : 10,
+            value: ehGol ? 12 : 5,
             valid_until: validadeISO,
             max_uses: 1,
             min_price: ehGol ? 150 : 0,
