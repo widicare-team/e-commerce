@@ -2,17 +2,38 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
 
     try {
-        const pedido = req.body;
+        const payload = req.body;
+        console.log('PAYLOAD RECEBIDO:', JSON.stringify(payload));
 
-        // Log temporário para debug
-        console.log('PEDIDO RECEBIDO:', JSON.stringify(pedido).substring(0, 500));
-        
+        // Nuvemshop envia só o ID — busca os detalhes completos via API
+        const pedidoId = payload.id;
+        const storeId = payload.store_id || process.env.NUVEMSHOP_USER_ID;
+
+        if (!pedidoId) {
+            return res.status(200).json({ sucesso: true, msg: 'Payload sem ID de pedido' });
+        }
+
+        const respPedido = await fetch(`https://api.tiendanube.com/v1/${storeId}/orders/${pedidoId}`, {
+            headers: {
+                'Authentication': `bearer ${process.env.NUVEMSHOP_ACCESS_TOKEN}`,
+                'User-Agent': 'WidiCare-CopaCashback/1.0 (widicasmarketing@gmail.com)'
+            }
+        });
+
+        if (!respPedido.ok) {
+            console.error('Erro ao buscar pedido:', await respPedido.text());
+            return res.status(200).json({ sucesso: true, msg: 'Erro ao buscar detalhes do pedido' });
+        }
+
+        const pedido = await respPedido.json();
+        console.log('PEDIDO COMPLETO:', JSON.stringify(pedido).substring(0, 500));
+
         // Dados do pedido
         const nomeCliente = pedido.contact_name || '';
         const emailCliente = pedido.contact_email || '';
         const cpfCliente = pedido.contact_identification || '';
         const numeroPedido = pedido.number || '';
-        const valorPedido = parseFloat(pedido.total || 0).toFixed(2);
+        const valorPedido = parseFloat(pedido.total || pedido.subtotal || 0).toFixed(2);
 
         // Busca o placar atual no Redis
         const redisUrl = process.env.KV_REST_API_URL;
@@ -41,7 +62,7 @@ export default async function handler(req, res) {
         const sufixo = Math.random().toString(36).substring(2, 8).toUpperCase();
         const codigoCupom = `COPA-${pctCashback}PCT-${sufixo}`;
 
-        // Validade: 30 dias (30 dias para uso)
+        // Validade: 30 dias
         const validade = new Date();
         validade.setDate(validade.getDate() + 30);
         const validadeISO = validade.toISOString().split('T')[0];
