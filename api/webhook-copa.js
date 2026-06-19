@@ -5,6 +5,16 @@ export default async function handler(req, res) {
         const payload = req.body;
         console.log('PAYLOAD RECEBIDO:', JSON.stringify(payload));
 
+        // Verifica se está dentro do período do jogo
+        const agora = new Date();
+        const inicio = new Date('2026-06-19T21:00:00-03:00');
+        const fim = new Date('2026-06-20T21:00:00-03:00');
+
+        if (agora < inicio || agora > fim) {
+            console.log('Fora do período do jogo Copa Brasil');
+            return res.status(200).json({ sucesso: true, msg: 'Fora do período da campanha' });
+        }
+
         // Nuvemshop envia só o ID — busca os detalhes completos via API
         const pedidoId = payload.id;
         const storeId = payload.store_id || process.env.NUVEMSHOP_USER_ID;
@@ -97,11 +107,102 @@ export default async function handler(req, res) {
 
         console.log(`Cupom gerado: ${codigoCupom} | Pedido: #${numeroPedido} | Gols: ${gols} | Cashback: ${pctCashback}%`);
 
+        // Envia e-mail automático via Resend
+        if (emailCliente) {
+            try {
+                const nomeExibir = nomeCliente.split(' ')[0] || 'cliente';
+                await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        from: 'Widi Care <noreply@lojawidicare.com.br>',
+                        to: emailCliente,
+                        subject: '🇧🇷 Você ganhou um Cashback Especial Copa Brasil!',
+                        html: `
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:white;border-radius:12px;overflow:hidden;max-width:600px;">
+        
+        <!-- Header -->
+        <tr>
+          <td style="background:linear-gradient(135deg,#002776,#009C3B);padding:32px;text-align:center;">
+            <p style="color:#FFDC00;font-size:13px;font-weight:700;letter-spacing:2px;margin:0 0 8px;">COPA BRASIL 2026</p>
+            <h1 style="color:white;font-size:26px;margin:0;line-height:1.3;">Você ganhou um<br><span style="color:#FFDC00;">Cashback Especial!</span> 🏆</h1>
+          </td>
+        </tr>
+
+        <!-- Corpo -->
+        <tr>
+          <td style="padding:32px;">
+            <p style="color:#333;font-size:16px;line-height:1.6;">Olá, <strong>${nomeExibir}</strong>! 👋</p>
+            <p style="color:#333;font-size:15px;line-height:1.6;">
+              Sua compra foi confirmada e você está participando da promoção <strong>Cashback Copa Brasil Widi Care</strong>! 🇧🇷⚽
+            </p>
+            <p style="color:#333;font-size:15px;line-height:1.6;">
+              Em breve você receberá um <strong>cupom exclusivo de cashback</strong> para usar na sua próxima compra. Fique de olho no seu e-mail!
+            </p>
+
+            <!-- Box destaque -->
+            <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+              <tr>
+                <td style="background:#f0f9f4;border:2px solid #009C3B;border-radius:10px;padding:20px;text-align:center;">
+                  <p style="color:#009C3B;font-size:14px;font-weight:700;margin:0 0 6px;text-transform:uppercase;letter-spacing:1px;">Seu cashback está garantido!</p>
+                  <p style="color:#333;font-size:13px;margin:0;line-height:1.5;">O cupom será enviado em até 7 dias úteis<br>diretamente para este e-mail.</p>
+                </td>
+              </tr>
+            </table>
+
+            <p style="color:#666;font-size:13px;line-height:1.6;">
+              O cupom poderá ser utilizado em compras acima de R$99,00 e tem validade de 30 dias após o recebimento.
+            </p>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:0 32px 32px;text-align:center;">
+            <a href="https://lojawidicare.com.br" style="background:#009C3B;color:white;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;font-weight:700;display:inline-block;">
+              Continuar Comprando 🛍️
+            </a>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#f9f9f9;padding:20px 32px;text-align:center;border-top:1px solid #eee;">
+            <p style="color:#999;font-size:12px;margin:0;line-height:1.6;">
+              Widi Care — Cabelos que brilham, vidas que transformam 💚<br>
+              <a href="https://lojawidicare.com.br" style="color:#009C3B;">lojawidicare.com.br</a>
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
+                        `
+                    })
+                });
+                console.log(`E-mail enviado para ${emailCliente}`);
+            } catch (erroEmail) {
+                console.error('Erro ao enviar e-mail:', erroEmail.message);
+            }
+        }
+
         // Salva no Google Sheets
         try {
             const token = await getGoogleToken();
             const sheetId = '1_sgDtQsHFpfv_PKbTBWATTk-nMzkRlI1IanLHQDRneU';
-            const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+            const agoraStr = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
 
             await fetch(
                 `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Página1!A:H:append?valueInputOption=USER_ENTERED`,
@@ -112,7 +213,7 @@ export default async function handler(req, res) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        values: [[agora, nomeCliente, emailCliente, cpfCliente, numeroPedido, `R$${valorPedido}`, `${gols} gol(s)`, codigoCupom]]
+                        values: [[agoraStr, nomeCliente, emailCliente, cpfCliente, numeroPedido, `R$${valorPedido}`, `${gols} gol(s)`, codigoCupom]]
                     })
                 }
             );
@@ -135,7 +236,7 @@ export default async function handler(req, res) {
 }
 
 // =============================================
-// Google Token (mesmo do gerar-cupom.js)
+// Google Token
 // =============================================
 function base64url(data) {
     const str = typeof data === 'string' ? data : JSON.stringify(data);
