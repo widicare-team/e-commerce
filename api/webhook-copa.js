@@ -84,6 +84,7 @@ export default async function handler(req, res) {
                 valid_until: validadeISO,
                 max_uses: 1,
                 min_price: 99,
+                max_discount_percentage: 25,
                 active: true
             })
         });
