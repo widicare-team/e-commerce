@@ -135,7 +135,7 @@ export default async function handler(req, res) {
           <td style="padding:32px 32px 8px;">
             <p style="color:#333;font-size:16px;line-height:1.7;margin:0 0 16px;">Olá, <strong>${nomeExibir}</strong>!</p>
             <p style="color:#333;font-size:15px;line-height:1.7;margin:0 0 16px;">Temos uma ótima notícia: você recebeu <strong>${pctCashback}% de cashback</strong> para usar na sua próxima compra na Widi Care. ✨</p>
-            <p style="color:#333;font-size:15px;line-height:1.7;margin:0 0 24px;">Seu cupom já está disponível e poderá ser utilizado até <strong>${dataValidade}</strong>.</p>
+            <p style="color:#333;font-size:15px;line-height:1.7;margin:0 0 24px;">Seu benefício ficará disponível até <strong>${dataValidade}</strong> e, em até 7 dias, enviaremos por aqui o seu cupom para que você possa aproveitar essa condição especial.</p>
             <p style="color:#333;font-size:15px;line-height:1.7;margin:0 0 32px;">Aproveite para garantir seus próximos favoritos com essa condição especial!</p>
           </td>
         </tr>
