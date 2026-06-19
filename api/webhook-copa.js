@@ -28,6 +28,12 @@ export default async function handler(req, res) {
             return res.status(200).json({ sucesso: true, msg: 'Sem gols, sem cupom gerado' });
         }
 
+        // Valor mínimo para ganhar o cupom: R$26,00
+        if (parseFloat(valorPedido) < 26) {
+            console.log(`Pedido #${numeroPedido} — valor R$${valorPedido} abaixo do mínimo de R$26,00`);
+            return res.status(200).json({ sucesso: true, msg: 'Pedido abaixo do valor mínimo de R$26,00' });
+        }
+
         // Gera cupom único
         const sufixo = Math.random().toString(36).substring(2, 8).toUpperCase();
         const codigoCupom = `COPA-${pctCashback}PCT-${sufixo}`;
@@ -53,7 +59,7 @@ export default async function handler(req, res) {
                 value: pctCashback,
                 valid_until: validadeISO,
                 max_uses: 1,
-                min_price: 0,
+                min_price: 99,
                 active: true
             })
         });
