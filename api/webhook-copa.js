@@ -38,9 +38,9 @@ export default async function handler(req, res) {
         const sufixo = Math.random().toString(36).substring(2, 8).toUpperCase();
         const codigoCupom = `COPA-${pctCashback}PCT-${sufixo}`;
 
-        // Validade: 37 dias (7 dias para envio + 30 dias para uso)
+        // Validade: 30 dias (30 dias para uso)
         const validade = new Date();
-        validade.setDate(validade.getDate() + 37);
+        validade.setDate(validade.getDate() + 30);
         const validadeISO = validade.toISOString().split('T')[0];
 
         // Cria cupom na Nuvemshop
