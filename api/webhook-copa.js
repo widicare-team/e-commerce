@@ -167,7 +167,7 @@ export default async function handler(req, res) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        from: 'Widi Care <onboarding@resend.dev>',
+                        from: 'Widi Care Loja Oficial | Produtos Veganos para Todos os Cabelos <noreply@lojawidicare.com.br>',
                         to: emailCliente,
                         subject: '🎉 Seu cashback Copa Brasil chegou!',
                         html: htmlEmail
