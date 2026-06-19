@@ -7,8 +7,8 @@ export default async function handler(req, res) {
 
         // Verifica se está dentro do período do jogo
         const agora = new Date();
-        const inicio = new Date('2026-06-19T21:00:00-03:00');
-        const fim = new Date('2026-06-20T21:00:00-03:00');
+        const inicio = new Date('2026-06-19T15:05:00-03:00');
+        const fim = new Date('2026-06-20T21:30:00-03:00');
 
         if (agora < inicio || agora > fim) {
             console.log('Fora do período do jogo Copa Brasil');
@@ -76,6 +76,7 @@ export default async function handler(req, res) {
         const validade = new Date();
         validade.setDate(validade.getDate() + 30);
         const validadeISO = validade.toISOString().split('T')[0];
+        const dataValidade = validade.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric' });
 
         // Cria cupom na Nuvemshop
         const urlApi = `https://api.tiendanube.com/v1/${process.env.NUVEMSHOP_USER_ID}/coupons`;
@@ -107,10 +108,58 @@ export default async function handler(req, res) {
 
         console.log(`Cupom gerado: ${codigoCupom} | Pedido: #${numeroPedido} | Gols: ${gols} | Cashback: ${pctCashback}%`);
 
-        // Envia e-mail automático via Resend
+        // Envia e-mail via Resend
         if (emailCliente) {
             try {
                 const nomeExibir = nomeCliente.split(' ')[0] || 'cliente';
+
+                const htmlEmail = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:white;border-radius:12px;overflow:hidden;max-width:600px;width:100%;">
+        <tr>
+          <td align="center" valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+              <tr>
+                <td align="center" style="padding:20px 0;">
+                  <img src="https://d2az8otjr0j19j.cloudfront.net/templates/003/941/769/twig/static/images/logo_widi.png" alt="Logo WidiCare" style="display:block;max-width:150px;height:auto;" />
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px 32px 8px;">
+            <p style="color:#333;font-size:16px;line-height:1.7;margin:0 0 16px;">Olá, <strong>${nomeExibir}</strong>!</p>
+            <p style="color:#333;font-size:15px;line-height:1.7;margin:0 0 16px;">Temos uma ótima notícia: você recebeu <strong>${pctCashback}% de cashback</strong> para usar na sua próxima compra na Widi Care. ✨</p>
+            <p style="color:#333;font-size:15px;line-height:1.7;margin:0 0 24px;">Seu cupom já está disponível e poderá ser utilizado até <strong>${dataValidade}</strong>.</p>
+            <p style="color:#333;font-size:15px;line-height:1.7;margin:0 0 32px;">Aproveite para garantir seus próximos favoritos com essa condição especial!</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 32px 24px;text-align:center;">
+            <a href="https://lojawidicare.com.br" style="background:#d6408b;color:white;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;font-weight:700;display:inline-block;">Aproveitar Agora</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 32px 32px;text-align:center;">
+            <p style="color:#999;font-size:13px;margin:0;">Confira aqui o <a href="https://lojawidicare.com.br/regulamento-promocional/" style="color:#d6408b;text-decoration:underline;">regulamento: Regras para Cupons e Promoções na Loja Online</a></p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#f9f9f9;padding:20px 32px;text-align:center;border-top:1px solid #eee;">
+            <p style="color:#999;font-size:12px;margin:0;line-height:1.6;">Widi Care — Toda Beleza Importa<br><a href="https://lojawidicare.com.br" style="color:#d6408b;">lojawidicare.com.br</a></p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
                 await fetch('https://api.resend.com/emails', {
                     method: 'POST',
                     headers: {
@@ -118,78 +167,10 @@ export default async function handler(req, res) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        from: 'Widi Care <noreply@lojawidicare.com.br>',
+                        from: 'Widi Care <onboarding@resend.dev>',
                         to: emailCliente,
-                        subject: '🇧🇷 Você ganhou um Cashback Especial Copa Brasil!',
-                        html: `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:32px 0;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="background:white;border-radius:12px;overflow:hidden;max-width:600px;">
-        
-        <!-- Header -->
-        <tr>
-          <td style="background:linear-gradient(135deg,#002776,#009C3B);padding:32px;text-align:center;">
-            <p style="color:#FFDC00;font-size:13px;font-weight:700;letter-spacing:2px;margin:0 0 8px;">COPA BRASIL 2026</p>
-            <h1 style="color:white;font-size:26px;margin:0;line-height:1.3;">Você ganhou um<br><span style="color:#FFDC00;">Cashback Especial!</span> 🏆</h1>
-          </td>
-        </tr>
-
-        <!-- Corpo -->
-        <tr>
-          <td style="padding:32px;">
-            <p style="color:#333;font-size:16px;line-height:1.6;">Olá, <strong>${nomeExibir}</strong>! 👋</p>
-            <p style="color:#333;font-size:15px;line-height:1.6;">
-              Sua compra foi confirmada e você está participando da promoção <strong>Cashback Copa Brasil Widi Care</strong>! 🇧🇷⚽
-            </p>
-            <p style="color:#333;font-size:15px;line-height:1.6;">
-              Em breve você receberá um <strong>cupom exclusivo de cashback</strong> para usar na sua próxima compra. Fique de olho no seu e-mail!
-            </p>
-
-            <!-- Box destaque -->
-            <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
-              <tr>
-                <td style="background:#f0f9f4;border:2px solid #009C3B;border-radius:10px;padding:20px;text-align:center;">
-                  <p style="color:#009C3B;font-size:14px;font-weight:700;margin:0 0 6px;text-transform:uppercase;letter-spacing:1px;">Seu cashback está garantido!</p>
-                  <p style="color:#333;font-size:13px;margin:0;line-height:1.5;">O cupom será enviado em até 7 dias úteis<br>diretamente para este e-mail.</p>
-                </td>
-              </tr>
-            </table>
-
-            <p style="color:#666;font-size:13px;line-height:1.6;">
-              O cupom poderá ser utilizado em compras acima de R$99,00 e tem validade de 30 dias após o recebimento.
-            </p>
-          </td>
-        </tr>
-
-        <!-- CTA -->
-        <tr>
-          <td style="padding:0 32px 32px;text-align:center;">
-            <a href="https://lojawidicare.com.br" style="background:#009C3B;color:white;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;font-weight:700;display:inline-block;">
-              Continuar Comprando 🛍️
-            </a>
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="background:#f9f9f9;padding:20px 32px;text-align:center;border-top:1px solid #eee;">
-            <p style="color:#999;font-size:12px;margin:0;line-height:1.6;">
-              Widi Care — Cabelos que brilham, vidas que transformam 💚<br>
-              <a href="https://lojawidicare.com.br" style="color:#009C3B;">lojawidicare.com.br</a>
-            </p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>
-                        `
+                        subject: '🎉 Seu cashback Copa Brasil chegou!',
+                        html: htmlEmail
                     })
                 });
                 console.log(`E-mail enviado para ${emailCliente}`);
