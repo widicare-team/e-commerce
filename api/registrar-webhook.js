@@ -15,7 +15,7 @@ export default async function handler(req, res) {
 
         // Verifica se já existe
         const jaExiste = Array.isArray(existentes) && existentes.find(w =>
-            w.url === urlWebhook && w.event === 'order/created'
+            w.url === urlWebhook && w.event === 'order/paid'
         );
 
         if (jaExiste) {
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
                 'User-Agent': 'WidiCare-CopaCashback/1.0 (widicasmarketing@gmail.com)'
             },
             body: JSON.stringify({
-                event: 'order/created',
+                event: 'order/paid',
                 url: urlWebhook
             })
         });
