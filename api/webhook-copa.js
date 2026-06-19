@@ -4,6 +4,9 @@ export default async function handler(req, res) {
     try {
         const pedido = req.body;
 
+        // Log temporário para debug
+        console.log('PEDIDO RECEBIDO:', JSON.stringify(pedido).substring(0, 500));
+        
         // Dados do pedido
         const nomeCliente = pedido.contact_name || '';
         const emailCliente = pedido.contact_email || '';
