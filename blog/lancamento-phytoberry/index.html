@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="pt-BR" style="scroll-behavior: smooth;">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phytoberry: Lançamento Ultra Hidratação para Todas as Curvaturas | Widi Care</title>
+<meta name="description" content="Conheça a linha Phytoberry da Widi Care: ultra hidratação e definição para todas as curvaturas com a exclusiva Tecnologia Curvelini™. Shampoo, condicionador, máscara 2 em 1 e gel creme antiencolhimento.">
+<meta name="keywords" content="phytoberry widi care, ultra hidratação cabelo, tecnologia curvelini, produtos para todas as curvaturas, lançamento widi care">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --brand: #D6207F;
+    --brand-dark: #9c0e5c;
+    --brand-deep: #5c0a36;
+    --brand-light: #fde9f2;
+    --brand-mid: #f7b8d6;
+    --black: #111111;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --bg: #fff7fb;
+    --white: #ffffff;
+    --border: #f3d6e6;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; }
+
+  img { max-width: 100%; display: block; }
+
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+
+  .topbar {
+    background: var(--black);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+  .topbar .wrap {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    padding: 10px 24px;
+    flex-wrap: wrap;
+  }
+  .topbar span { display: flex; align-items: center; gap: 6px; }
+
+  header {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 18px 0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; }
+  .logo {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--brand);
+    letter-spacing: -0.5px;
+    text-decoration: none;
+  }
+  .logo span { color: var(--black); font-weight: 600; }
+  nav { display: flex; gap: 32px; }
+  nav a {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  nav a:hover { color: var(--brand); }
+
+  .hero {
+    background: linear-gradient(160deg, #fff 0%, var(--brand-light) 55%, #fbd8ea 100%);
+    padding: 64px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .badge-row { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; }
+  .tag-launch {
+    display: inline-block;
+    background: var(--black);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 18px;
+    border-radius: 30px;
+  }
+  .tag-new {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.2;
+    flex-shrink: 0;
+  }
+
+  .hero h1 {
+    font-size: clamp(42px, 6vw, 68px);
+    font-weight: 800;
+    color: var(--brand);
+    letter-spacing: -1.5px;
+    line-height: 0.95;
+    margin-bottom: 14px;
+  }
+
+  .hero-sub {
+    display: inline-block;
+    background: var(--brand-deep);
+    color: #fff;
+    font-size: clamp(18px, 2.4vw, 26px);
+    font-weight: 700;
+    padding: 8px 18px;
+    margin-bottom: 12px;
+  }
+
+  .hero-tagline {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--brand-dark);
+    margin-bottom: 18px;
+    letter-spacing: 0.2px;
+  }
+
+  .hero p.desc {
+    font-size: 16px;
+    color: var(--text);
+    max-width: 480px;
+    margin-bottom: 30px;
+  }
+  .hero p.desc strong { color: var(--black); font-weight: 700; }
+  .hero p.desc em { color: var(--brand); font-style: normal; font-weight: 700; }
+
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 16px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--brand-dark); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--black);
+    border: 2px solid var(--black);
+    font-family: 'Poppins', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 14px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .hero-img-col { position: relative; }
+  .hero-img-col img { border-radius: 16px; width: 100%; }
+  .curvelini-badge {
+    position: absolute;
+    bottom: -18px;
+    left: -18px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--brand-mid), var(--brand-deep) 80%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(214,32,127,0.35);
+  }
+  .curvelini-badge span {
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .curvelini-badge em { display: block; font-style: normal; font-size: 9px; font-weight: 500; opacity: 0.85; }
+
+  .seals { background: var(--black); padding: 0; }
+  .seals .wrap { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+  .seal { text-align: center; padding: 32px 16px; border-right: 1px solid rgba(255,255,255,0.12); }
+  .seal:last-child { border-right: none; }
+  .seal-icon {
+    width: 48px; height: 48px;
+    margin: 0 auto 12px;
+    border-radius: 50%;
+    background: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .seal h4 { color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .seal p { color: #b8b8b8; font-size: 12px; line-height: 1.4; }
+
+  .tech-section { padding: 80px 0; background: #fff; }
+  .tech-grid { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 56px; align-items: center; }
+  .tech-badge-lg {
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, var(--brand-mid), var(--brand) 50%, var(--brand-deep) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 0 auto;
+    box-shadow: 0 16px 40px rgba(214,32,127,0.28);
+  }
+  .tech-badge-lg span { color: #fff; font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 22px; }
+  .tech-badge-lg em { display: block; font-style: normal; font-size: 12px; font-weight: 500; opacity: 0.9; margin-top: 4px; }
+
+  .eyebrow {
+    color: var(--brand);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .tech-section h2 {
+    font-size: clamp(28px, 3.5vw, 38px);
+    font-weight: 800;
+    color: var(--black);
+    line-height: 1.15;
+    margin-bottom: 18px;
+    letter-spacing: -0.5px;
+  }
+  .tech-section h2 em { color: var(--brand); font-style: normal; }
+  .tech-section .tech-grid > div:last-child p {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    max-width: 480px;
+  }
+
+  .feature-list { display: flex; flex-direction: column; gap: 14px; }
+  .feature-item { display: flex; align-items: flex-start; gap: 12px; }
+  .feature-check {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: var(--brand-light);
+    color: var(--brand);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 800;
+    margin-top: 2px;
+  }
+  .feature-item span { font-size: 15px; color: var(--text); }
+  .feature-item strong { color: var(--black); }
+
+  .products-section { padding: 80px 0; background: var(--brand-light); }
+  .section-head { text-align: center; margin-bottom: 48px; }
+  .section-head h2 { font-size: clamp(28px, 3.5vw, 38px); font-weight: 800; color: var(--black); letter-spacing: -0.5px; }
+  .section-head h2 em { color: var(--brand); font-style: normal; }
+  .section-head p { color: var(--text-muted); font-size: 15px; margin-top: 8px; }
+
+  .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .product-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px 18px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.2s;
+  }
+  .product-card:hover { transform: translateY(-4px); }
+  .product-card .pill-new {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: var(--black);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+  }
+  .product-card .ph {
+    width: 100%; height: 160px;
+    border-radius: 10px;
+    background: linear-gradient(160deg, var(--brand-mid), var(--brand));
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+  .product-card h4 { font-size: 15px; font-weight: 700; color: var(--black); margin-bottom: 2px; }
+  .product-card p.cat { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+  .product-card .price { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 800; color: var(--brand); }
+  .add-btn {
+    margin-top: 12px;
+    width: 100%;
+    background: var(--black);
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .curv-section { padding: 80px 0; background: #fff; }
+  .curv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .curv-card { border: 2px solid var(--border); border-radius: 14px; padding: 28px 22px; text-align: center; }
+  .curv-card .num {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  .curv-card h4 { font-size: 17px; font-weight: 700; color: var(--black); margin-bottom: 6px; }
+  .curv-card p { font-size: 13px; color: var(--text-muted); }
+
+  .reviews-section { background: var(--black); padding: 64px 0; text-align: center; }
+  .stars { color: #ffc62b; font-size: 26px; letter-spacing: 4px; margin-bottom: 10px; }
+  .reviews-section h3 { color: #fff; font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .reviews-section p { color: #b8b8b8; font-size: 14px; }
+
+  .trust-section { padding: 56px 0; background: var(--brand-light); }
+  .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; text-align: center; }
+  .trust-item h4 { font-size: 14px; font-weight: 700; color: var(--black); margin-bottom: 4px; }
+  .trust-item p { font-size: 12px; color: var(--text-muted); }
+  .trust-icon { font-size: 28px; margin-bottom: 10px; }
+
+  .final-cta { background: linear-gradient(120deg, var(--brand), var(--brand-deep)); padding: 72px 0; text-align: center; }
+  .final-cta h2 { color: #fff; font-size: clamp(28px, 4vw, 42px); font-weight: 800; margin-bottom: 14px; letter-spacing: -0.5px; }
+  .final-cta p { color: #fce4f0; font-size: 16px; margin-bottom: 30px; }
+  .final-cta .btn-primary { background: #fff; color: var(--brand); }
+  .final-cta .btn-primary:hover { background: #fbe6f1; }
+
+  footer { background: var(--black); color: #888; text-align: center; padding: 32px 0; font-size: 12px; }
+  footer .logo { color: #fff; font-size: 20px; margin-bottom: 8px; display: inline-block; }
+  footer .logo span { color: var(--brand-mid); }
+
+  @media (max-width: 860px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .tech-grid { grid-template-columns: 1fr; }
+    .seals .wrap { grid-template-columns: repeat(2, 1fr); }
+    .seal { border-bottom: 1px solid rgba(255,255,255,0.12); }
+    .product-grid { grid-template-columns: repeat(2, 1fr); }
+    .curv-grid { grid-template-columns: 1fr; }
+    .trust-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="wrap">
+      <span>Frete grátis acima de R$199</span>
+      <span>Parcele em até 6x sem juros</span>
+      <span>10% OFF na primeira compra</span>
+    </div>
+  </div>
+
+  <header>
+    <div class="wrap">
+      <a href="#" class="logo">widi<span>care</span></a>
+      <nav>
+        <a href="#">Cabelos</a>
+        <a href="#">Kits e Ofertas</a>
+        <a href="#">Lançamentos</a>
+        <a href="#">Blog</a>
+        <a href="#">Sobre a Widi</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="badge-row">
+          <span class="tag-launch">Lançamento</span>
+          <div class="tag-new">NOVO<br>NOVO<br>NOVO</div>
+        </div>
+
+        <h1>Phytoberry</h1>
+        <div class="hero-sub">Ultra Hidratação</div>
+        <p class="hero-tagline">Para todas as curvaturas</p>
+
+        <p class="desc">
+          Desenvolvida para proporcionar <strong>ultra hidratação</strong> e <strong>definição</strong>
+          para todas as curvaturas, potencializando a beleza natural dos fios por meio da
+          exclusiva <em>Tecnologia Curvelini™</em>.
+        </p>
+
+        <div class="cta-row">
+          <a href="#produtos" class="btn-primary">Comprar agora</a>
+          <a href="#tecnologia" class="btn-secondary">Conheça a linha</a>
+        </div>
+      </div>
+
+      <div class="hero-img-col">
+        <div style="background: linear-gradient(160deg, var(--brand-mid), var(--brand-deep)); border-radius: 16px; height: 420px; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Poppins',sans-serif; font-weight:700; text-align:center; padding: 24px;">
+          [ Imagem do banner Phytoberry — modelos com cachos + produtos da linha ]
+        </div>
+        <div class="curvelini-badge">
+          <span>Tecnologia<br><em>Curvelini™</em></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seals">
+    <div class="wrap">
+      <div class="seal">
+        <div class="seal-icon">H</div>
+        <h4>Ultra Hidratação</h4>
+        <p>Hidratação profunda que penetra na fibra capilar</p>
+      </div>
+      <div class="seal">
+        <div class="seal-icon">D</div>
+        <h4>Definição</h4>
+        <p>Cachos definidos com movimento natural</p>
+      </div>
+      <div class="seal">
+        <div class="seal-icon">C</div>
+        <h4>Tecnologia Curvelini™</h4>
+        <p>Exclusiva Widi Care para potencializar curvas</p>
+      </div>
+      <div class="seal">
+        <div class="seal-icon">T</div>
+        <h4>Todas as Curvaturas</h4>
+        <p>De ondulados a crespos — 2A ao 4C</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="tech-section" id="tecnologia">
+    <div class="wrap tech-grid">
+      <div>
+        <div class="tech-badge-lg">
+          <span>Tecnologia<br>Curvelini<em>™</em></span>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow">A inovação Widi Care</div>
+        <h2>A exclusiva <em>Tecnologia Curvelini™</em> potencializa as curvas naturais dos seus fios</h2>
+        <p>Desenvolvida com extrato de frutas vermelhas e manteiga de acerola, a fórmula Phytoberry deixa os cachos mais definidos, macios, brilhantes e cheios de movimento — sem pesar e sem efeito borracha.</p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-check">&#10003;</div>
+            <span><strong>Extrato de frutas vermelhas</strong> — antioxidante natural que protege a fibra capilar</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-check">&#10003;</div>
+            <span><strong>Manteiga de acerola</strong> — nutrição profunda rica em vitamina C</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-check">&#10003;</div>
+            <span><strong>Totalmente liberado</strong> — compatível com Low Poo e No Poo</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-check">&#10003;</div>
+            <span><strong>Vegano</strong> — não testado em animais</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="products-section" id="produtos">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Conheça a linha completa <em>Phytoberry</em></h2>
+        <p>4 produtos desenvolvidos para ultra hidratação de todas as curvaturas</p>
+      </div>
+
+      <div class="product-grid">
+        <div class="product-card">
+          <span class="pill-new">Novo</span>
+          <div class="ph">PHYTOBERRY<br>SHAMPOO</div>
+          <h4>Shampoo Ultra Hidratante</h4>
+          <p class="cat">500ml</p>
+          <div class="price">R$ 59,90</div>
+          <button class="add-btn">Adicionar ao carrinho</button>
+        </div>
+        <div class="product-card">
+          <span class="pill-new">Novo</span>
+          <div class="ph">PHYTOBERRY<br>CONDICIONADOR</div>
+          <h4>Condicionador Ultra Hidratante</h4>
+          <p class="cat">500ml</p>
+          <div class="price">R$ 59,90</div>
+          <button class="add-btn">Adicionar ao carrinho</button>
+        </div>
+        <div class="product-card">
+          <span class="pill-new">Novo</span>
+          <div class="ph">PHYTOBERRY<br>MÁSCARA 2 EM 1</div>
+          <h4>Máscara 2 em 1 Ultra Hidratante</h4>
+          <p class="cat">500g</p>
+          <div class="price">R$ 74,90</div>
+          <button class="add-btn">Adicionar ao carrinho</button>
+        </div>
+        <div class="product-card">
+          <span class="pill-new">Novo</span>
+          <div class="ph">PHYTOBERRY<br>GEL CREME</div>
+          <h4>Antiencolhimento Gel Creme</h4>
+          <p class="cat">500ml</p>
+          <div class="price">R$ 64,90</div>
+          <button class="add-btn">Adicionar ao carrinho</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="curv-section">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Para <em>todas</em> as curvaturas</h2>
+        <p>A linha Phytoberry foi formulada para entregar resultado em qualquer tipo de fio</p>
+      </div>
+      <div class="curv-grid">
+        <div class="curv-card">
+          <div class="num">2</div>
+          <h4>Ondulados</h4>
+          <p>2A, 2B e 2C — ondas com definição e leveza</p>
+        </div>
+        <div class="curv-card">
+          <div class="num">3</div>
+          <h4>Cacheados</h4>
+          <p>3A, 3B e 3C — cachos volumosos e hidratados</p>
+        </div>
+        <div class="curv-card">
+          <div class="num">4</div>
+          <h4>Crespos</h4>
+          <p>4A, 4B e 4C — definição com antiencolhimento</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reviews-section">
+    <div class="wrap">
+      <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <h3>4,9 de 5 — 1.248 avaliações</h3>
+      <p>"Cachos definidos, macios e com muito brilho!"</p>
+    </div>
+  </section>
+
+  <section class="trust-section">
+    <div class="wrap trust-grid">
+      <div class="trust-item">
+        <div class="trust-icon">C</div>
+        <h4>Tecnologia Curvelini™</h4>
+        <p>Exclusiva Widi Care</p>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">L</div>
+        <h4>Liberado para Low Poo e No Poo</h4>
+        <p>Sem sulfatos agressivos</p>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">T</div>
+        <h4>Para todas as curvaturas</h4>
+        <p>2A ao 4C</p>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">V</div>
+        <h4>Vegano</h4>
+        <p>Não testado em animais</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta">
+    <div class="wrap">
+      <h2>Ultra hidratação para os seus cachos</h2>
+      <p>Conheça a linha Phytoberry e descubra a Tecnologia Curvelini™</p>
+      <a href="#produtos" class="btn-primary">Comprar a linha Phytoberry</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <a href="#" class="logo">widi<span>care</span></a>
+      <p>&#169; 2026 Widi Care. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
