@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Widi Care — Quiz de Rotina Capilar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#26121B;
+    --ink-soft:#7C5A68;
+    --rose:#FF0084;          /* cor exata extraída da logo Widi Care */
+    --rose-deep:#C40067;
+    --rose-soft:#FF6FC0;
+    --blush:#FFE9F4;
+    --off:#FFFAFC;
+    --off-2:#FBEEF5;
+    --card:#FFFFFF;
+    --line:rgba(255,0,132,.14);
+    --shadow:0 20px 50px -20px rgba(255,0,132,.35);
+    --radius:26px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:
+      radial-gradient(600px 400px at 90% -10%, var(--blush) 0%, transparent 60%),
+      radial-gradient(500px 380px at -10% 110%, #FDEDEF 0%, transparent 55%),
+      var(--off);
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px 14px;
+  }
+  h1,h2,h3{font-family:'Fredoka',sans-serif; font-weight:600; margin:0;}
+  .app{
+    width:100%;
+    max-width:460px;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    position:relative;
+    border:1px solid rgba(232,83,111,.08);
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:18px 20px 10px;
+  }
+  .back-btn{
+    width:34px;height:34px;border-radius:50%;
+    border:1px solid var(--line);
+    background:#fff;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    flex:none;
+    color:var(--ink);
+    transition:.15s;
+  }
+  .back-btn:hover{background:var(--blush); border-color:var(--rose-soft);}
+  .back-btn.hidden{visibility:hidden;}
+  .progress-wrap{flex:1; height:34px; display:flex; align-items:center; gap:10px;}
+  .progress-track{
+    flex:1; height:8px; background:var(--off-2); border-radius:999px; overflow:hidden; position:relative;
+  }
+  .progress-fill{
+    height:100%; border-radius:999px;
+    background:linear-gradient(90deg, var(--rose-soft), var(--rose));
+    width:0%;
+    transition:width .45s cubic-bezier(.65,0,.35,1);
+  }
+  .progress-label{font-size:12px; color:var(--ink-soft); font-weight:600; white-space:nowrap;}
+  .curl-mark{flex:none; color:var(--rose);}
+  .screen{padding:8px 26px 30px; animation:fadeIn .35s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  /* INTRO */
+  .intro{text-align:center; padding:38px 30px 32px;}
+  .logo{ margin-bottom:26px; }
+  .logo img{ height:34px; width:auto; display:block; margin:0 auto; }
+  .intro h1{font-size:30px; line-height:1.18; margin-bottom:14px;}
+  .intro h1 em{font-style:normal; color:var(--rose); font-weight:700;}
+  .intro p{color:var(--ink-soft); font-size:15px; line-height:1.55; margin-bottom:26px;}
+  .trust{display:flex; justify-content:center; gap:18px; margin-top:18px; font-size:12.5px; color:var(--ink-soft);}
+  .trust span{display:flex; align-items:center; gap:6px;}
+
+  .btn-primary{
+    width:100%; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--rose), var(--rose-deep));
+    color:#fff; font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:15.5px;
+    padding:16px 20px; border-radius:16px;
+    box-shadow:0 14px 28px -12px rgba(196,56,89,.55);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn-primary:hover{transform:translateY(-1px); box-shadow:0 18px 32px -12px rgba(196,56,89,.65);}
+  .btn-primary:disabled{opacity:.45; cursor:not-allowed; transform:none; box-shadow:none;}
+  .btn-secondary{
+    width:100%; border:1.5px solid var(--line); background:#fff; color:var(--ink);
+    font-weight:700; font-size:14.5px; padding:13px 18px; border-radius:16px; cursor:pointer;
+  }
+
+  /* QUESTIONS */
+  .eyebrow{font-size:12px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--rose); margin-bottom:8px;}
+  .q-title{font-size:22px; line-height:1.28; margin-bottom:20px;}
+  .options{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .options.single-col{grid-template-columns:1fr;}
+  .opt{
+    border:1.5px solid var(--line); background:#fff; border-radius:18px;
+    padding:16px 12px; cursor:pointer; text-align:left;
+    display:flex; flex-direction:column; gap:10px;
+    transition:.15s ease; position:relative;
+  }
+  .opt.wide{flex-direction:row; align-items:center; gap:12px; padding:14px 16px;}
+  .opt:hover{border-color:var(--rose-soft); background:var(--blush);}
+  .opt.selected{border-color:var(--rose); background:var(--blush); box-shadow:0 0 0 3px rgba(232,83,111,.12);}
+  .opt-icon{color:var(--rose-deep); width:30px; height:30px; flex:none;}
+  .opt-label{font-weight:700; font-size:14px; line-height:1.3;}
+  .opt-sub{font-size:11.5px; color:var(--ink-soft); font-weight:500;}
+
+  /* LEAD */
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:6px;}
+  .field input[type=text], .field input[type=email], .field input[type=tel]{
+    width:100%; padding:13px 14px; border-radius:14px; border:1.5px solid var(--line);
+    font-family:'Plus Jakarta Sans',sans-serif; font-size:14.5px; color:var(--ink); background:var(--off);
+    outline:none; transition:.15s;
+  }
+  .field input:focus{border-color:var(--rose); background:#fff;}
+  .consent{display:flex; gap:10px; align-items:flex-start; margin:18px 0 20px; font-size:12.5px; color:var(--ink-soft); line-height:1.5;}
+  .consent input{margin-top:3px; flex:none; accent-color:var(--rose);}
+  .consent a{color:var(--rose-deep); font-weight:700; text-decoration:none;}
+  .lead-note{font-size:11.5px; color:var(--ink-soft); text-align:center; margin-top:12px;}
+
+  /* RESULT */
+  .diag-card{
+    background:linear-gradient(160deg, var(--blush), #fff 65%);
+    border-radius:20px; padding:20px; margin-bottom:20px; border:1px solid rgba(232,83,111,.15);
+  }
+  .diag-eyebrow{font-size:11.5px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--rose-deep); margin-bottom:6px;}
+  .diag-text{font-size:16px; line-height:1.5; font-family:'Fredoka',sans-serif; font-weight:600;}
+  .diag-text b{color:var(--rose-deep); font-style:normal; font-weight:700;}
+
+  .section-title{font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft); margin:22px 0 10px;}
+  .product-card{
+    display:flex; gap:12px; border:1.5px solid var(--line); border-radius:18px; padding:12px; margin-bottom:10px; background:#fff;
+    align-items:center;
+  }
+  .product-swatch{
+    width:56px; height:56px; border-radius:14px; flex:none;
+    background:linear-gradient(150deg, var(--rose-soft), var(--rose));
+    display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Fredoka',sans-serif; font-weight:700; font-size:15px;
+  }
+  .product-info{flex:1; min-width:0;}
+  .product-name{font-weight:700; font-size:13.5px; line-height:1.3; margin-bottom:3px;}
+  .product-tag{font-size:11px; color:var(--rose-deep); font-weight:700; margin-bottom:5px;}
+  .product-price{font-size:13.5px; font-weight:800;}
+  .product-price .old{font-weight:600; color:var(--ink-soft); text-decoration:line-through; margin-right:6px; font-size:12px;}
+  .add-btn{
+    flex:none; border:none; background:var(--ink); color:#fff; font-weight:700; font-size:12px;
+    padding:9px 12px; border-radius:12px; cursor:pointer; white-space:nowrap;
+  }
+  .add-btn:hover{background:var(--rose-deep);}
+
+  .crosssell{display:flex; gap:8px; overflow-x:auto; padding-bottom:4px;}
+  .chip{
+    flex:none; border:1.5px solid var(--line); border-radius:999px; padding:8px 14px; font-size:12px; font-weight:700;
+    background:#fff; white-space:nowrap; color:var(--ink-soft);
+  }
+
+  details.routine{border:1.5px solid var(--line); border-radius:16px; padding:14px 16px; margin-top:20px;}
+  details.routine summary{cursor:pointer; font-weight:700; font-size:13.5px; list-style:none; display:flex; justify-content:space-between; align-items:center;}
+  details.routine summary::-webkit-details-marker{display:none;}
+  .routine-list{margin-top:12px; padding-left:0; list-style:none; font-size:13px; color:var(--ink-soft); line-height:1.9;}
+  .routine-list li{display:flex; gap:8px;}
+  .routine-list b{color:var(--ink); font-weight:700;}
+
+  .share-row{display:flex; gap:10px; margin-top:20px;}
+  .share-row button{flex:1; padding:12px; border-radius:14px; border:1.5px solid var(--line); background:#fff; font-weight:700; font-size:12.5px; cursor:pointer; color:var(--ink);}
+  .share-row button:hover{background:var(--off-2);}
+
+  .restart{text-align:center; margin-top:18px;}
+  .restart button{background:none; border:none; color:var(--ink-soft); font-size:12.5px; text-decoration:underline; cursor:pointer; font-weight:600;}
+
+  .dev-note{
+    font-size:11px; color:var(--ink-soft); background:var(--off-2); border-radius:12px; padding:10px 12px; margin-top:22px; line-height:1.5;
+  }
+  .dev-note b{color:var(--ink);}
+
+  .toast{
+    position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--ink); color:#fff; padding:12px 20px; border-radius:999px; font-size:13px; font-weight:600;
+    opacity:0; transition:.25s ease; pointer-events:none; z-index:50; white-space:nowrap; box-shadow:0 10px 30px rgba(0,0,0,.25);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .banner{
+    background:var(--ink); color:#fff; font-size:11.5px; text-align:center; padding:9px 16px; line-height:1.5;
+  }
+  .banner b{color:var(--rose-soft);}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <div class="banner">Protótipo funcional · <b>preços e estoque reais</b> puxados do catálogo Nuvemshop · combinações sem SKU definido aparecem sinalizadas</div>
+  <div class="topbar">
+    <button class="back-btn hidden" id="backBtn" aria-label="Voltar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="progress-wrap" id="progressWrap" style="display:none;">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel"></div>
+    </div>
+  </div>
+  <div id="screenHost"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const LOGO_SRC = 'data:image/webp;base64,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';
+/* ============ SIGNATURE MOTIF: the "curl" line, reused as icon, divider & progress mark ============ */
+function curlSVG(w,h,stroke){
+  return `<svg viewBox="0 0 100 100" width="${w}" height="${h}" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 70 C 12 40, 40 20, 55 35 C 68 48, 55 62, 42 55 C 32 50, 35 38, 48 38 C 62 38, 70 55, 60 68 C 50 80, 30 82, 20 68"
+      stroke="${stroke||'currentColor'}" stroke-width="7" stroke-linecap="round" fill="none"/>
+  </svg>`;
+}
+
+/* ============ ICONS (line-style, brand rose) ============ */
+const ICONS = {
+  straight:`<svg viewBox="0 0 32 32" fill="none"><path d="M8 4v24M16 4v24M24 4v24" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  wave:`<svg viewBox="0 0 32 32" fill="none"><path d="M4 10c3-4 6-4 9 0s6 4 9 0 6-4 9 0" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M4 20c3-4 6-4 9 0s6 4 9 0 6-4 9 0" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" opacity=".5"/></svg>`,
+  curl:`<svg viewBox="0 0 32 32" fill="none"><path d="M6 24c0-8 6-14 12-10 5 3 2 9-3 7-4-2-2-7 3-7 6 0 9 6 5 11" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  coil:`<svg viewBox="0 0 32 32" fill="none"><path d="M5 26c-2-6 1-11 5-10 3 1 2 5-1 4-2-1-1-4 2-4 4 0 6 4 4 7-2 3-6 3-7-1 3 3 8 3 10-1 3-5-1-11-7-11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  drop:`<svg viewBox="0 0 32 32" fill="none"><path d="M16 4c6 8 9 13 9 17a9 9 0 1 1-18 0c0-4 3-9 9-17Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></svg>`,
+  paint:`<svg viewBox="0 0 32 32" fill="none"><path d="M16 5l9 9-9 9-9-9 9-9Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><circle cx="16" cy="14" r="2.4" fill="currentColor"/></svg>`,
+  hourglass:`<svg viewBox="0 0 32 32" fill="none"><path d="M8 4h16M8 28h16M9 4c0 7 6 8 7 10-1 2-7 3-7 10M23 4c0 7-6 8-7 10 1 2 7 3 7 10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  sparkle:`<svg viewBox="0 0 32 32" fill="none"><path d="M16 4l2.4 8.6L27 15l-8.6 2.4L16 26l-2.4-8.6L5 15l8.6-2.4L16 4Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`,
+  leaf:`<svg viewBox="0 0 32 32" fill="none"><path d="M6 26C6 12 18 6 27 6c0 9-6 21-20 21-3 0-1-6 1-8" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>`,
+  question:`<svg viewBox="0 0 32 32" fill="none"><path d="M11.5 12a4.5 4.5 0 1 1 6.6 4c-1.4 1-2.1 1.8-2.1 3.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="16" cy="24.5" r="1.4" fill="currentColor"/></svg>`,
+  swirlLow:`<svg viewBox="0 0 32 32" fill="none"><path d="M6 26c0-4 3-8 8-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 26h20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".3"/></svg>`,
+  swirlMed:`<svg viewBox="0 0 32 32" fill="none"><path d="M6 26c0-8 6-14 14-12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 26h20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".3"/></svg>`,
+  swirlHigh:`<svg viewBox="0 0 32 32" fill="none"><path d="M6 26c0-12 10-19 20-14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 26h20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" opacity=".3"/></svg>`,
+  spiral:`<svg viewBox="0 0 32 32" fill="none"><path d="M16 16a4 4 0 1 1 4 4 8 8 0 1 1 8-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  wind:`<svg viewBox="0 0 32 32" fill="none"><path d="M4 12h16a3.5 3.5 0 1 0-3.5-3.5M4 20h20a3.5 3.5 0 1 1-3.5 3.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  arrowUp:`<svg viewBox="0 0 32 32" fill="none"><path d="M16 26V6M8 14l8-8 8 8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  sun:`<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="6" stroke="currentColor" stroke-width="2.2"/><path d="M16 3v3M16 26v3M3 16h3M26 16h3M7 7l2 2M23 23l2 2M25 7l-2 2M9 23l-2 2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  sprout:`<svg viewBox="0 0 32 32" fill="none"><path d="M16 28V16M16 16c0-5-4-8-9-7 0 5 3 9 9 7ZM16 16c0-6 5-9 10-8 0 6-4 10-10 8Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>`,
+  calendar:`<svg viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="3" stroke="currentColor" stroke-width="2.2"/><path d="M5 13h22M11 4v6M21 4v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  bottle1:`<svg viewBox="0 0 32 32" fill="none"><path d="M13 4h6v4l2 3v15a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2V11l2-3V4Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M11 18h10" stroke="currentColor" stroke-width="2.2"/></svg>`,
+  bottle2:`<svg viewBox="0 0 32 32" fill="none"><path d="M8 4h5v3l1.5 2.5V26a1.6 1.6 0 0 1-1.6 1.6H8.1A1.6 1.6 0 0 1 6.5 26V9.5L8 7V4Z" stroke="currentColor" stroke-width="2"/><path d="M19 8h5v3l1.5 2.5V26a1.6 1.6 0 0 1-1.6 1.6h-4.8a1.6 1.6 0 0 1-1.6-1.6V13.5L19 11V8Z" stroke="currentColor" stroke-width="2"/></svg>`,
+  bottles:`<svg viewBox="0 0 32 32" fill="none"><path d="M4 10h4v2l1 2v12a1.3 1.3 0 0 1-1.3 1.3H4.3A1.3 1.3 0 0 1 3 26V14l1-2v-2Z" stroke="currentColor" stroke-width="1.8"/><path d="M13 6h5v2.5l1.5 2.5V27a1.6 1.6 0 0 1-1.6 1.6h-4.8A1.6 1.6 0 0 1 11.6 27V11l1.4-2.5V6Z" stroke="currentColor" stroke-width="1.8"/><path d="M23 11h4v2l1 2v11a1.3 1.3 0 0 1-1.3 1.3h-3.4A1.3 1.3 0 0 1 22 26V15l1-2v-2Z" stroke="currentColor" stroke-width="1.8"/></svg>`,
+};
+function icon(name,size=28){ return `<span class="opt-icon" style="width:${size}px;height:${size}px;display:inline-flex">${ICONS[name]}</span>`; }
+
+/* ============ CATALOG — dados reais puxados via Nuvemshop MCP (preço em BRL) ============
+   Itens sem correspondência exata de SKU no catálogo (linhas citadas no escopo mas não
+   encontradas na busca) estão marcados com mock:true — usar como placeholder até o time
+   confirmar o SKU definitivo (ver seção 10 do escopo). */
+const CATALOG = {
+  liso: {
+    label:'Liso Maravilha',
+    shampoo:{name:'Shampoo Hidratante Liso Maravilha 300ml', price:36.9},
+    condicionador:{name:'Condicionador Hidratante Liso Maravilha 300ml', price:39.9},
+    mascara:{name:'Máscara Hidratante Liso Maravilha Condicionante 300g', price:53.9},
+    finalizador:{name:'Finalizador Fluido Anti Frizz Termoativado 200ml', price:53.9},
+    oleosidade:{name:'Shampoo Liso Maravilha Controle De Oleosidade 300ml', price:42.9},
+    leve:{name:'Finalizador Liso Maravilha Super Sérum 7ml', price:18.9},
+  },
+  juba_ondulado: {
+    label:'Juba · Ondulando',
+    shampoo:{name:'Shampoo Widi Care Juba Higienizando A Juba 500ml', price:53.9},
+    condicionador:{name:'Condicionador Hidro-Nutritivo Condicionando A Juba 500ml', price:59.9},
+    mascara:{name:'Máscara Hidro-Nutritiva Juba Ação Condicionante 500g', price:59.9},
+    creme:{name:'Creme de Pentear Ondulando A Juba 500ml', price:59.9},
+    gelatina:{name:'Gelatina Widi Care Juba Ativando a Juba Super Hidratante 300g', price:43.9},
+  },
+  juba_cacheado: {
+    label:'Juba · Encaracolando',
+    shampoo:{name:'Shampoo Widi Care Juba Higienizando A Juba 500ml', price:53.9},
+    condicionador:{name:'Condicionador Hidro-Nutritivo Condicionando A Juba 500ml', price:59.9},
+    mascara:{name:'Máscara Reconstrução Juba Reconstrutora Condicionante 500g', price:59.9},
+    creme:{name:'Creme de Pentear Encaracolando A Juba 500ml', price:59.9},
+    mousse:{name:'Mousse Finalizador Juba Criador De Cachos 200ml', price:53.9},
+    antiporosidade:{name:'Máscara Widi Care Juba Butter Oil Manteiga Antiporosidade 300g', price:43.9},
+  },
+  juba_crespo: {
+    label:'Juba · Encrespando',
+    shampoo:{name:'Shampoo Widi Care Juba Higienizando A Juba 500ml', price:53.9},
+    condicionador:{name:'Condicionador Hidro-Nutritivo Condicionando A Juba 500ml', price:59.9},
+    mascara:{name:'Máscara Widi Care Juba Butter Oil Umectação Intensa 300g', price:43.9},
+    creme:{name:'Creme de Pentear Encrespando A Juba 500ml', price:59.9},
+    mousse:{name:'Mousse Finalizador Juba Mousse Crespo Crespíssimo 200ml', price:53.9},
+    antiporosidade:{name:'Máscara Widi Care Juba Butter Oil Manteiga Antiporosidade 300g', price:43.9},
+  },
+  phytomanga_curvaturas: {
+    label:'PhytoManga Para Curvaturas',
+    shampoo:{name:'Shampoo Phytomanga Para Curvaturas 500ml', price:53.9},
+    creme_leve:{name:'Creme de Pentear Phytomanga Ativador de Curvaturas Efeito Leve 500ml', price:59.9},
+    creme_pesado:{name:'Creme de Pentear Phytomanga Ativador de Curvaturas Efeito Pesado 500ml', price:59.9},
+    serum:{name:'Sérum Reparador de Pontas Phytomanga 60ml', price:43.9},
+  },
+  curvas_magicas: {
+    label:'Curvas Mágicas',
+    shampoo:{name:'Shampoo Cremoso Ultra Hidratante Curvas Mágicas 300ml', price:34.9},
+    condicionador:{name:'Condicionador Hidro-Reconstrutor Curvas Mágicas 300ml', price:38.9},
+    mascara:{name:'Máscara Hidro-Reconstrutora Curvas Mágicas 300g', price:42.9},
+    creme:{name:'Creme de Pentear Hidro-Reconstrutor Curvas Mágicas 300ml', price:40.9},
+    nevoa:{name:'Finalizador Névoa Iluminadora Curvas Mágicas 60ml', price:28.9},
+  },
+  blindando_juba: { label:'Blindando a Juba', mascara:{name:'(referência) Blindando a Juba — reforço antifrizz', price:null, mock:true} },
+  juba_bond_repair: { label:'Juba Bond Define Repair', mascara:{name:'(referência) Juba Bond Define Repair — reconstrução molecular', price:null, mock:true} },
+  quimico: {
+    label:'Operação Resgate',
+    shampoo:{name:'Shampoo Reconstrutor Operação Resgate 300ml', price:39.9},
+    mascara:{name:'Máscara Reconstrução Operação Resgate 300ml', price:53.9},
+    leavein:{name:'Leave In Finalizador Operação Resgate 200ml', price:44.9},
+  },
+  infusao: {
+    label:'Infusão 2.0',
+    shampoo:{name:'Shampoo Revitalizante Infusão 2.0 300ml', price:36.9},
+    mascara:{name:'Máscara Revitalizante Infusão 2.0 300g', price:59.9},
+    acidificante:{name:'Acidificante Infusão 2.0 Controle De pH 300g', price:63.9},
+  },
+  phyto_keratin: {
+    label:'Phyto Keratin',
+    mascara:{name:'Máscara Reconstrutora Phyto Keratin Carga de Queratina 250ml', price:38.9},
+    liquida:{name:'Queratina Líquida Phyto Keratin 200ml', price:38.9},
+  },
+  sete_oleos: {
+    label:'Sete Óleos',
+    shampoo:{name:'Shampoo Nutrição Sete Óleos 300ml', price:32.9},
+    condicionador:{name:'Condicionador Nutrição Sete Óleos 300ml', price:35.9},
+    mascara:{name:'Máscara Nutritiva Sete Óleos 500g', price:59.9},
+  },
+  loiro_perfeito: {
+    label:'Loiro Perfeito',
+    shampoo:{name:'Shampoo Matizador Loiro Perfeito 300ml', price:51.9},
+    revitalizante:{name:'Shampoo Revitalizante Loiro Perfeito 300ml', price:51.9},
+    mascara:{name:'Máscara Matizadora Loiro Perfeito 300g', price:57.9},
+  },
+  bond_gloss: { label:'Bond Gloss Repair', mascara:{name:'(referência) Bond Gloss Repair — proteção de cor', price:null, mock:true} },
+  juba_transicao: {
+    label:'Juba Transição',
+    shampoo:{name:'Shampoo Juba Transição Capilar 500ml', price:53.9},
+    condicionador:{name:'Condicionador Juba Transição Capilar 500ml', price:59.9},
+    creme_leve:{name:'Creme de Pentear Juba Transição Textura Leve 500ml', price:59.9},
+    creme_densa:{name:'Creme de Pentear Juba Transição Textura Densa 500ml', price:59.9},
+    tonico:{name:'Tônico Capilar Juba Transição Crescimento 120ml', price:47.9},
+  },
+  detox: { label:'Detox Purificante', shampoo:{name:'Shampoo Purificante Detox 300ml', price:46.9} },
+  cabeleira: {
+    label:'Cabeleira',
+    shampoo:{name:'Shampoo Fortificante Cabeleira Crescimento e Fortalecimento 300ml', price:34.9},
+    condicionador:{name:'Condicionador Fortificante Cabeleira Crescimento e Fortalecimento 300ml', price:43.9},
+    mascara:{name:'Máscara Reconstrução Cabeleira Crescimento e Fortalecimento 300g', price:53.9},
+    tonico:{name:'Tônico Elixir Cabeleira Crescimento e Fortalecimento 120ml', price:57.9},
+  },
+  power_shot: { label:'Power Shot Cronograma Capilar', kit:{name:'Cronograma Capilar Super Poderosas Travel Size', price:62.9} },
+  super_poderosas: {
+    label:'Super Poderosas',
+    hidratacao:{name:'Máscara Hidratação Super Poderosas 300g', price:53.9},
+    nutricao:{name:'Máscara Nutrição Super Poderosas 300g', price:53.9},
+    reconstrucao:{name:'Máscara Reconstrução Super Poderosas 300g', price:53.9},
+    kit:{name:'Kit Widi Care Cronograma Super Poderosas', price:161.7, promo:145.53},
+  },
+  reforco: {
+    argan:{name:'Óleo Hidratante Argan Oil 60ml', price:43.9},
+    caviar:{name:'Máscara Hidratante Pérolas De Caviar 300g', price:43.9},
+    coconut:{name:'Óleo Hidratante Coconut Oil 60ml', price:43.9},
+  },
+  entrada: {
+    sou10:{name:'Leave In Finalizador Leve Sou 10 200ml', price:49.9},
+    oleoblend:{name:'Finalizador Juba Blend De Óleos Vegetais 60ml', price:41.9},
+  },
+  crosssell: {
+    supershine:{name:'Finalizador Super Shine Gold Iluminador 120ml', price:40.9},
+    moroccan:{name:'Leave-In Magic Treatment Moroccan Oil 60ml', price:28.9},
+    hairbody:{name:'(referência) Hair & Body Splash', price:null, mock:true},
+    lavemosol:{name:'(referência) Lá Vem o Sol — proteção solar capilar', price:null, mock:true},
+  }
+};
+
+/* ============ PERGUNTAS ============ */
+const QUESTIONS = [
+  { key:'hairType', title:'Qual é o seu tipo de cabelo?', cols:2,
+    options:[
+      {v:'Liso', label:'Liso', icon:'straight'},
+      {v:'Ondulado', label:'Ondulado', sub:'2A–2C', icon:'wave'},
+      {v:'Cacheado', label:'Cacheado', sub:'3A–3C', icon:'curl'},
+      {v:'Crespo', label:'Crespo', sub:'4A–4C', icon:'coil'},
+    ]},
+  { key:'mood', title:'Qual o mood atual dele?', cols:1, wide:true,
+    options:[
+      {v:'Quimicamente Tratado', label:'Quimicamente tratado', icon:'drop'},
+      {v:'Tingido', label:'Tingido', icon:'paint'},
+      {v:'Em transição', label:'Em transição', icon:'hourglass'},
+      {v:'Grisalho/Platinado', label:'Grisalho ou platinado', icon:'sparkle'},
+      {v:'Nenhum desses', label:'Nenhum desses — cabelo natural', icon:'leaf'},
+    ]},
+  { key:'porosity', title:'Qual é a porosidade do seu cabelo?', cols:1, wide:true,
+    options:[
+      {v:'Baixa', label:'Baixa', sub:'produtos escorregam, demora a secar', icon:'swirlLow'},
+      {v:'Média', label:'Média', sub:'absorve e mantém bem a hidratação', icon:'swirlMed'},
+      {v:'Alta', label:'Alta', sub:'seca rápido, ressecamento fácil', icon:'swirlHigh'},
+      {v:'Não sei', label:'Não sei', icon:'question'},
+    ]},
+  { key:'need', title:'Qual é a sua maior necessidade hoje?', cols:2,
+    options:[
+      {v:'Hidratação', label:'Hidratação', icon:'drop'},
+      {v:'Definição', label:'Definição', icon:'spiral'},
+      {v:'Redução de frizz', label:'Redução de frizz', icon:'wind'},
+      {v:'Volume e Movimento', label:'Volume e movimento', icon:'arrowUp'},
+      {v:'Oleosidade na raiz', label:'Oleosidade na raiz', icon:'sun'},
+      {v:'Crescimento', label:'Crescimento', icon:'sprout'},
+      {v:'Cronograma Completo', label:'Cronograma completo', icon:'calendar'},
+    ]},
+  { key:'routine', title:'Como está sua rotina atual?', cols:1, wide:true,
+    options:[
+      {v:'Só uso shampoo e condicionador', label:'Só uso shampoo e condicionador', icon:'bottle1'},
+      {v:'Já uso leavein/creme', label:'Já uso leave-in ou creme', icon:'bottle2'},
+      {v:'Rotina completa', label:'Rotina completa (co-wash, máscara etc.)', icon:'bottles'},
+      {v:'Não tenho rotina definida', label:'Não tenho rotina definida', icon:'question'},
+    ]},
+];
+
+/* ============ ESTADO ============ */
+const state = { screen:'intro', qIndex:0, answers:{}, lead:{nome:'',email:'',whatsapp:'',consent:false} };
+const host = document.getElementById('screenHost');
+const backBtn = document.getElementById('backBtn');
+const progressWrap = document.getElementById('progressWrap');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+
+/* GA4 / Meta Pixel — stub de rastreamento por etapa (seção 7 do escopo) */
+function trackEvent(name, params){
+  console.log('[quiz:event]', name, params||{});
+  // Em produção: gtag('event', name, params) + fbq('trackCustom', name, params)
+}
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._h);
+  toast._h = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+function render(){
+  if(state.screen==='intro') return renderIntro();
+  if(state.screen==='question') return renderQuestion();
+  if(state.screen==='lead') return renderLead();
+  if(state.screen==='result') return renderResult();
+}
+
+function updateChrome(){
+  if(state.screen==='intro' || state.screen==='result'){
+    backBtn.classList.add('hidden');
+    progressWrap.style.display = 'none';
+    return;
+  }
+  progressWrap.style.display = 'flex';
+  backBtn.classList.remove('hidden');
+  const totalSteps = QUESTIONS.length + 1; // + tela de lead
+  let currentStep = state.screen==='lead' ? QUESTIONS.length : state.qIndex;
+  const pct = ((currentStep) / totalSteps) * 100;
+  progressFill.style.width = pct + '%';
+  progressLabel.textContent = state.screen==='lead' ? 'Quase lá' : `${state.qIndex+1} de ${QUESTIONS.length}`;
+}
+
+backBtn.addEventListener('click', ()=>{
+  if(state.screen==='lead'){ state.screen='question'; state.qIndex = QUESTIONS.length-1; }
+  else if(state.screen==='question'){
+    if(state.qIndex===0){ state.screen='intro'; }
+    else { state.qIndex -= 1; }
+  }
+  render(); updateChrome();
+});
+
+/* ---------- INTRO ---------- */
+function renderIntro(){
+  host.innerHTML = `
+    <div class="screen intro">
+      <div class="logo"><img src="${LOGO_SRC}" alt="Widi Care"></div>
+      <h1>Descubra a rotina que seu <em>cacho</em> pede hoje</h1>
+      <p>Responda 5 perguntas rápidas e receba um diagnóstico personalizado com os produtos certos pra sua rotina — feito como se fosse sua consultora capilar de confiança. 💗</p>
+      <button class="btn-primary" id="startBtn">Começar meu diagnóstico</button>
+      <div class="trust">
+        <span>⏱️ 1 minuto</span>
+        <span>✨ 100% personalizado</span>
+      </div>
+    </div>`;
+  document.getElementById('startBtn').addEventListener('click', ()=>{
+    trackEvent('quiz_start');
+    state.screen='question'; state.qIndex=0; render(); updateChrome();
+  });
+}
+
+/* ---------- QUESTION ---------- */
+function renderQuestion(){
+  const q = QUESTIONS[state.qIndex];
+  const selected = state.answers[q.key];
+  host.innerHTML = `
+    <div class="screen">
+      <div class="eyebrow">Pergunta ${state.qIndex+1} de ${QUESTIONS.length}</div>
+      <h2 class="q-title">${q.title}</h2>
+      <div class="options ${q.cols===1?'single-col':''}">
+        ${q.options.map(o=>`
+          <button class="opt ${q.wide?'wide':''} ${selected===o.v?'selected':''}" data-v="${o.v}">
+            ${icon(o.icon, q.wide?26:30)}
+            <span>
+              <span class="opt-label">${o.label}</span>
+              ${o.sub?`<div class="opt-sub">${o.sub}</div>`:''}
+            </span>
+          </button>`).join('')}
+      </div>
+    </div>`;
+  host.querySelectorAll('.opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const v = btn.getAttribute('data-v');
+      state.answers[q.key] = v;
+      trackEvent('quiz_question_answered', {question:q.key, answer:v});
+      setTimeout(()=>{
+        if(state.qIndex < QUESTIONS.length-1){
+          state.qIndex += 1;
+        } else {
+          state.screen = 'lead';
+        }
+        render(); updateChrome();
+      }, 220);
+      render(); // re-render imediato p/ mostrar seleção antes do avanço
+    });
+  });
+}
+
+/* ---------- LEAD CAPTURE ---------- */
+function phoneMask(v){
+  v = v.replace(/\D/g,'').slice(0,11);
+  if(v.length>6) return `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+  if(v.length>2) return `(${v.slice(0,2)}) ${v.slice(2)}`;
+  return v;
+}
+function renderLead(){
+  const L = state.lead;
+  host.innerHTML = `
+    <div class="screen">
+      <div class="eyebrow">Captura de lead</div>
+      <h2 class="q-title">Quase lá! Pra onde enviamos sua rotina personalizada?</h2>
+      <div class="field">
+        <label for="fNome">Nome</label>
+        <input type="text" id="fNome" placeholder="Seu nome" value="${L.nome}">
+      </div>
+      <div class="field">
+        <label for="fEmail">E-mail</label>
+        <input type="email" id="fEmail" placeholder="seu@email.com" value="${L.email}">
+      </div>
+      <div class="field">
+        <label for="fWhats">WhatsApp <span style="font-weight:500;text-transform:none;">(opcional — canal de ofertas VIP)</span></label>
+        <input type="tel" id="fWhats" placeholder="(21) 99999-9999" value="${L.whatsapp}">
+      </div>
+      <label class="consent">
+        <input type="checkbox" id="fConsent" ${L.consent?'checked':''}>
+        <span>Quero receber minha rotina personalizada e novidades da Widi Care por e-mail e WhatsApp. Ao continuar, você concorda com nossa <a href="#" onclick="return false;">Política de Privacidade</a>.</span>
+      </label>
+      <button class="btn-primary" id="submitLead" disabled>Receber meu cronograma</button>
+      <div class="lead-note">Seus dados são usados só pra sua rotina — nada de spam, WidiLover 💗</div>
+    </div>`;
+
+  const nome = document.getElementById('fNome');
+  const email = document.getElementById('fEmail');
+  const whats = document.getElementById('fWhats');
+  const consent = document.getElementById('fConsent');
+  const submitBtn = document.getElementById('submitLead');
+
+  function validate(){
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim());
+    const ok = nome.value.trim().length>1 && emailOk && consent.checked;
+    submitBtn.disabled = !ok;
+    return ok;
+  }
+  nome.addEventListener('input', ()=>{ L.nome=nome.value; validate(); });
+  email.addEventListener('input', ()=>{ L.email=email.value; validate(); });
+  whats.addEventListener('input', ()=>{ whats.value = phoneMask(whats.value); L.whatsapp=whats.value; validate(); });
+  consent.addEventListener('change', ()=>{ L.consent=consent.checked; validate(); });
+  validate();
+
+  submitBtn.addEventListener('click', ()=>{
+    if(!validate()) return;
+    const result = computeResult(state.answers);
+    const tags = ['origem_quiz',
+      `cacho_${slug(state.answers.hairType)}`,
+      `necessidade_${slug(state.answers.need)}`,
+      `porosidade_${slug(state.answers.porosity)}`];
+    // Stub do envio pro Perfit (Myperfit) — em produção: POST via webhook/API com os campos abaixo
+    console.log('[perfit:lead_payload]', { nome:L.nome, email:L.email, whatsapp:L.whatsapp, tags, automation:'boas_vindas_quiz' });
+    trackEvent('quiz_lead_captured', {tags});
+    submitBtn.textContent = 'Enviando...';
+    submitBtn.disabled = true;
+    setTimeout(()=>{
+      state.screen='result';
+      state._result = result;
+      trackEvent('quiz_complete');
+      render(); updateChrome();
+    }, 550);
+  });
+}
+function slug(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''); }
+
+/* ============ MOTOR DE RECOMENDAÇÃO — 5 camadas (seção 4 do escopo) ============ */
+function computeResult(a){
+  let core, coreKey, reason, layer1Applied=false;
+
+  // Camada 1 — mood sobrepõe curvatura
+  if(a.mood==='Quimicamente Tratado'){ core=CATALOG.quimico; coreKey='quimico'; reason='cuidado pós-química é a prioridade agora'; layer1Applied=true; }
+  else if(a.mood==='Tingido'){ core=CATALOG.loiro_perfeito; coreKey='loiro_perfeito'; reason='proteção de cor é o foco principal'; layer1Applied=true; }
+  else if(a.mood==='Em transição'){ core=CATALOG.juba_transicao; coreKey='juba_transicao'; reason='sua transição capilar pede uma linha dedicada'; layer1Applied=true; }
+  else if(a.mood==='Grisalho/Platinado'){ core=CATALOG.loiro_perfeito; coreKey='loiro_perfeito'; reason='matização e reparação para fios grisalhos'; layer1Applied=true; }
+
+  // Camada 2 — tipo de cabelo define a linha core (quando camada 1 não se aplica)
+  if(!layer1Applied){
+    if(a.hairType==='Liso'){ core=CATALOG.liso; coreKey='liso'; reason='seu fio liso pede leveza e controle'; }
+    else if(a.hairType==='Ondulado'){ core=CATALOG.juba_ondulado; coreKey='juba_ondulado'; reason='sua onda pede definição sem pesar'; }
+    else if(a.hairType==='Cacheado'){ core=CATALOG.juba_cacheado; coreKey='juba_cacheado'; reason='seu cacho pede definição com nutrição'; }
+    else if(a.hairType==='Crespo'){ core=CATALOG.juba_crespo; coreKey='juba_crespo'; reason='seu crespo pede hidratação profunda e modelagem'; }
+  }
+
+  // Camada 3 — necessidade define a categoria dentro da linha core
+  let mainProducts = [];
+  const need = a.need;
+  if(need==='Hidratação'){
+    if(core.mascara) mainProducts.push(core.mascara);
+    mainProducts.push(CATALOG.reforco.caviar);
+  } else if(need==='Definição'){
+    if(core.gelatina) mainProducts.push(core.gelatina);
+    else if(core.creme) mainProducts.push(core.creme);
+    else if(core.mousse) mainProducts.push(core.mousse);
+  } else if(need==='Redução de frizz'){
+    mainProducts.push(CATALOG.crosssell.moroccan);
+    if(core.mascara) mainProducts.push(core.mascara);
+  } else if(need==='Volume e Movimento'){
+    mainProducts.push(CATALOG.cabeleira.shampoo, CATALOG.cabeleira.condicionador);
+  } else if(need==='Oleosidade na raiz'){
+    mainProducts.push(CATALOG.detox.shampoo);
+  } else if(need==='Crescimento'){
+    mainProducts.push(CATALOG.cabeleira.tonico, CATALOG.power_shot.kit);
+  } else if(need==='Cronograma Completo'){
+    mainProducts.push(CATALOG.super_poderosas.kit);
+  }
+  if(mainProducts.length===0 && core.shampoo) mainProducts.push(core.shampoo);
+
+  // Camada 4 — porosidade refina a fórmula
+  let porosityNote = '';
+  if(a.porosity==='Alta'){
+    porosityNote = 'fórmulas intensivas de reconstrução, sem medo de peso';
+    if(core.antiporosidade) mainProducts.unshift(core.antiporosidade);
+  } else if(a.porosity==='Baixa'){
+    porosityNote = 'fórmulas leves — nada de manteiga pesada, seu fio já é resistente à absorção';
+    mainProducts.push(CATALOG.entrada.sou10);
+  } else if(a.porosity==='Não sei'){
+    porosityNote = 'fórmula intermediária — no resultado, ensino como identificar sua porosidade em casa';
+  } else {
+    porosityNote = 'fórmula padrão, equilibrada pro seu fio';
+  }
+
+  // Camada 5 — rotina define o tamanho do kit
+  let kitLabel='', routineSteps=[], maxItems=3;
+  if(a.routine==='Só uso shampoo e condicionador'){
+    kitLabel = 'Kit essencial';
+    if(core.shampoo) mainProducts.unshift(core.shampoo);
+    if(core.condicionador) mainProducts.splice(1,0,core.condicionador);
+    mainProducts.push(CATALOG.entrada.sou10);
+    routineSteps = ['Shampoo — 2 a 3x por semana','Condicionador — todo banho','Leave-in — pra fixar o hábito de finalizar'];
+  } else if(a.routine==='Já uso leavein/creme'){
+    kitLabel = 'Kit intermediário';
+    if(core.shampoo) mainProducts.unshift(core.shampoo);
+    routineSteps = ['Shampoo — 2x por semana','Condicionador — todo banho','Máscara ou finalizador da sua necessidade — 1x por semana'];
+  } else if(a.routine==='Rotina completa'){
+    // Kit completo (shampoo + condicionador + item da necessidade) + produto complementar/upgrade pontual
+    kitLabel = 'Kit completo + upgrade pontual';
+    maxItems = 4;
+    if(core.condicionador) mainProducts.unshift(core.condicionador);
+    if(core.shampoo) mainProducts.unshift(core.shampoo);
+    let complement;
+    if(need==='Redução de frizz' || need==='Definição') complement = CATALOG.crosssell.supershine;
+    else if(need==='Crescimento' || need==='Cronograma Completo') complement = CATALOG.power_shot.kit;
+    else complement = CATALOG.reforco.argan;
+    mainProducts.push(complement);
+    routineSteps = ['Shampoo — 2x por semana','Condicionador — todo banho','Máscara/finalizador da sua necessidade — 1x por semana','Complemento pontual (ampola, óleo de finalização ou Super Shine) — reforço semanal ou quinzenal'];
+  } else {
+    kitLabel = 'Kit iniciante + modo de uso';
+    if(core.shampoo) mainProducts.unshift(core.shampoo);
+    if(core.condicionador) mainProducts.splice(1,0,core.condicionador);
+    routineSteps = ['Passo 1 — Shampoo pra limpar sem ressecar','Passo 2 — Condicionador pra desembaraçar','Passo 3 — Finalizador da sua necessidade, sempre com o fio molhado'];
+  }
+
+  // dedup + limita à quantidade de itens definida pela camada 5
+  const seen = new Set();
+  mainProducts = mainProducts.filter(p=>{ if(!p) return false; const k=p.name; if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,maxItems);
+
+  const crossSell = [CATALOG.crosssell.supershine, CATALOG.crosssell.hairbody, CATALOG.crosssell.lavemosol];
+
+  const diagLabel = a.hairType + (a.mood!=='Nenhum desses' ? ` (${a.mood.toLowerCase()})` : '');
+  const diagnosisText = `Seu cabelo é <b>${diagLabel}</b> com porosidade <b>${a.porosity.toLowerCase()}</b> — isso significa que ele pede ${porosityNote}, com foco em <b>${need.toLowerCase()}</b>.`;
+
+  return { core, coreKey, reason, mainProducts, crossSell, kitLabel, routineSteps, diagnosisText, porosityNote };
+}
+
+/* ---------- RESULT ---------- */
+function money(v){ return v==null ? '' : v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+function initials(name){ return name.split(' ').filter(w=>w.length>2).slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+
+function renderResult(){
+  const r = state._result;
+  host.innerHTML = `
+    <div class="screen">
+      <div class="diag-card">
+        <div class="diag-eyebrow">Seu diagnóstico</div>
+        <div class="diag-text">${r.diagnosisText}</div>
+      </div>
+
+      <div class="section-title">Recomendado pra você · ${r.kitLabel}</div>
+      ${r.mainProducts.map(p=>`
+        <div class="product-card">
+          <div class="product-swatch">${initials(p.name.replace('(referência)','').trim())}</div>
+          <div class="product-info">
+            <div class="product-name">${p.name}${p.mock?' <span style="color:var(--rose-deep);font-weight:700;">· sem SKU definido</span>':''}</div>
+            <div class="product-tag">${r.core.label}</div>
+            <div class="product-price">${p.promo?`<span class="old">${money(p.price)}</span>${money(p.promo)}`:(p.price!=null?money(p.price):'a definir')}</div>
+          </div>
+          <button class="add-btn" data-name="${p.name}">${p.mock?'Avisar quando tiver':'Adicionar'}</button>
+        </div>`).join('')}
+
+      <div class="section-title">Você também pode gostar</div>
+      <div class="crosssell">
+        ${r.crossSell.map(p=>`<div class="chip">${p.name.replace('(referência) ','')}${p.mock?' ·mock':''}</div>`).join('')}
+      </div>
+
+      <details class="routine">
+        <summary>Ver rotina completa sugerida <span>＋</span></summary>
+        <ul class="routine-list">
+          ${r.routineSteps.map((s,i)=>`<li><b>${i+1}.</b> ${s}</li>`).join('')}
+        </ul>
+      </details>
+
+      <div class="share-row">
+        <button id="shareIG">Compartilhar no Instagram</button>
+        <button id="shareWA">Compartilhar no WhatsApp</button>
+      </div>
+
+      <div class="restart"><button id="restartBtn">Refazer o quiz</button></div>
+
+      <div class="dev-note">
+        <b>Nota de desenvolvimento —</b> preços e nomes reais vêm do catálogo Nuvemshop via API/MCP.
+        Itens marcados <b>"sem SKU definido"</b> correspondem a linhas citadas no escopo (Blindando a Juba,
+        Juba Bond Define Repair, Bond Gloss Repair, Hair & Body Splash, Lá Vem o Sol) sem produto correspondente
+        encontrado no catálogo atual — ver seção 10 do escopo pra confirmar SKUs antes de ir pra produção.
+      </div>
+    </div>`;
+
+  host.querySelectorAll('.add-btn').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      trackEvent('quiz_add_to_cart_click', {product:b.getAttribute('data-name')});
+      toast('Em produção: isso adiciona o item ao carrinho da Nuvemshop ✨');
+    });
+  });
+  document.getElementById('shareIG').addEventListener('click', ()=> toast('Em produção: abre o compartilhamento do resultado no Instagram'));
+  document.getElementById('shareWA').addEventListener('click', ()=> toast('Em produção: abre o compartilhamento do resultado no WhatsApp'));
+  document.getElementById('restartBtn').addEventListener('click', ()=>{
+    state.screen='intro'; state.qIndex=0; state.answers={}; state.lead={nome:'',email:'',whatsapp:'',consent:false};
+    render(); updateChrome();
+  });
+}
+
+render(); updateChrome();
+</script>
+</body>
+</html>
