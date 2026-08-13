@@ -138,6 +138,27 @@
   .funnel-bar{height:100%;background:var(--coral);border-radius:8px;transition:width .6s ease;}
   .funnel-row .fval{width:44px;text-align:right;font-weight:600;font-size:14px;flex-shrink:0;color:var(--plum);}
 
+  .activity{display:flex;flex-direction:column;gap:2px;max-height:340px;overflow-y:auto;}
+  .activity-row{
+    display:flex;align-items:center;gap:12px;
+    padding:11px 4px;border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .activity-row:last-child{border-bottom:none;}
+  .activity-badge{
+    width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:700;font-size:15px;flex-shrink:0;
+  }
+  .activity-badge.plus{background:var(--gold-soft);color:var(--plum);}
+  .activity-badge.minus{background:var(--coral-soft);color:var(--coral);}
+  .activity-order{font-weight:600;color:var(--plum);}
+  .activity-value{margin-left:auto;font-weight:600;white-space:nowrap;}
+  .activity-value.plus{color:var(--plum);}
+  .activity-value.minus{color:var(--coral);text-decoration:line-through;opacity:0.7;}
+  .activity-date{color:var(--ink-soft);font-size:12px;white-space:nowrap;}
+  .activity-empty{color:var(--ink-soft);font-size:13px;padding:12px 4px;}
+
   canvas{max-height:280px;}
 
   .state{text-align:center;padding:60px 20px;color:var(--ink-soft);font-size:14px;}
@@ -196,6 +217,12 @@
       <h2>Funil de mensagens</h2>
       <p class="desc">Quantos clientes receberam cada etapa da cadência, no período selecionado</p>
       <div class="funnel" id="funnel"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Atividade recente</h2>
+      <p class="desc">Pedidos convertidos e cancelamentos, mais recentes primeiro</p>
+      <div class="activity" id="activity"></div>
     </div>
 
     <div class="panel">
@@ -297,7 +324,36 @@ function render(from, to){
     : `${formatDate(from)} até ${formatDate(to)} · sem dados no período`;
 }
 
-function setupFilters(){
+async function fetchAtividade(){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/dashboard_atividade?select=*&order=evento_em.desc&limit=20`, {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
+  });
+  if(!res.ok) throw new Error(`Falha ao buscar atividade (status ${res.status})`);
+  return res.json();
+}
+
+function formatDateTime(d){
+  return new Date(d).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+}
+
+function renderAtividade(rows){
+  const el = document.getElementById('activity');
+  if(!rows.length){
+    el.innerHTML = '<div class="activity-empty">Nenhuma conversão ou cancelamento ainda.</div>';
+    return;
+  }
+  el.innerHTML = rows.map(r => {
+    const isCancel = r.tipo === 'cancelado';
+    return `
+      <div class="activity-row">
+        <div class="activity-badge ${isCancel ? 'minus' : 'plus'}">${isCancel ? '−' : '+'}</div>
+        <div class="activity-order">Pedido #${r.order_number}</div>
+        <div class="activity-date">${formatDateTime(r.evento_em)}</div>
+        <div class="activity-value ${isCancel ? 'minus' : 'plus'}">${formatMoney(r.order_value)}</div>
+      </div>
+    `;
+  }).join('');
+}
   const chips = document.querySelectorAll('.chip');
   const rangeBox = document.getElementById('range-box');
 
@@ -326,7 +382,9 @@ function setupFilters(){
 
 async function init(){
   try{
-    allRows = await fetchAllDays();
+    const [dailyRows, atividadeRows] = await Promise.all([fetchAllDays(), fetchAtividade()]);
+    allRows = dailyRows;
+    renderAtividade(atividadeRows);
     setupFilters();
     const { from, to } = getRange('month');
     render(from, to);
