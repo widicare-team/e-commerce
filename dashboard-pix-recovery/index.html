@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Recuperação de PIX — Widi Care</title>
+<title>Recuperação — Widi Care</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -20,6 +20,8 @@
     --ink: #14213D;
     --ink-soft: #5A6178;
     --line: #E4E2DA;
+    --wpp: #25D366;
+    --wpp-soft: #E4F9EC;
   }
   *{box-sizing:border-box;}
   body{
@@ -30,12 +32,38 @@
     padding:32px 20px 60px;
   }
   .wrap{max-width:1080px;margin:0 auto;}
+
+  .top-tabs{
+    display:flex;
+    gap:6px;
+    margin-bottom:22px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:6px;
+    width:fit-content;
+  }
+  .top-tab{
+    border:none;
+    background:transparent;
+    color:var(--ink-soft);
+    padding:10px 18px;
+    border-radius:10px;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .top-tab.active{background:var(--plum);color:#fff;}
+  .top-tab:not(.active):hover{background:var(--bg);}
+
   header{margin-bottom:24px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:flex-end;}
   .eyebrow{
     font-size:12px;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    color:var(--coral);
+    color:var(--accent-eyebrow, var(--coral));
     font-weight:600;
     margin-bottom:6px;
   }
@@ -115,6 +143,7 @@
     font-weight:700;
     color:var(--accent-text, var(--plum));
   }
+  .card .note{font-size:11px;color:var(--ink-soft);margin-top:6px;}
 
   .panel{
     background:var(--card);
@@ -130,12 +159,20 @@
     color:var(--plum);
   }
   .panel .desc{color:var(--ink-soft);font-size:13px;margin:0 0 18px;}
+  .panel .banner{
+    background:var(--gold-soft);
+    color:var(--plum);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:13px;
+    margin-bottom:16px;
+  }
 
   .funnel{display:flex;flex-direction:column;gap:10px;}
   .funnel-row{display:flex;align-items:center;gap:14px;}
-  .funnel-row .fname{width:110px;font-size:13px;color:var(--ink-soft);flex-shrink:0;}
-  .funnel-bar-track{flex:1;background:var(--coral-soft);border-radius:8px;height:26px;overflow:hidden;}
-  .funnel-bar{height:100%;background:var(--coral);border-radius:8px;transition:width .6s ease;}
+  .funnel-row .fname{width:130px;font-size:13px;color:var(--ink-soft);flex-shrink:0;}
+  .funnel-bar-track{flex:1;background:var(--accent-track, var(--coral-soft));border-radius:8px;height:26px;overflow:hidden;}
+  .funnel-bar{height:100%;background:var(--accent-bar, var(--coral));border-radius:8px;transition:width .6s ease;}
   .funnel-row .fval{width:44px;text-align:right;font-weight:600;font-size:14px;flex-shrink:0;color:var(--plum);}
 
   .activity{display:flex;flex-direction:column;gap:2px;max-height:340px;overflow-y:auto;}
@@ -171,64 +208,144 @@
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <div>
-      <div class="eyebrow">Widi Care · Recuperação de carrinho via WhatsApp</div>
-      <h1>Recuperação de PIX</h1>
-      <p class="sub" id="periodo-label">Carregando…</p>
-    </div>
-    <div class="filters">
-      <button class="chip" data-range="today">Hoje</button>
-      <button class="chip" data-range="7d">7 dias</button>
-      <button class="chip active" data-range="month">Este mês</button>
-      <button class="chip" data-range="custom">Personalizado</button>
-      <div class="range-box" id="range-box">
-        <input type="date" id="date-from">
-        <input type="date" id="date-to">
-        <button id="apply-range">Aplicar</button>
+
+  <div class="top-tabs">
+    <button class="top-tab active" data-tab="pix">Recuperação de PIX</button>
+    <button class="top-tab" data-tab="carrinho">Recuperação de Carrinho</button>
+  </div>
+
+  <!-- ===================== PIX TAB ===================== -->
+  <div id="tab-pix" class="tab-content">
+    <header>
+      <div>
+        <div class="eyebrow" style="--accent-eyebrow:var(--coral)">Widi Care · Recuperação via WhatsApp</div>
+        <h1>Recuperação de PIX</h1>
+        <p class="sub" id="pix-periodo-label">Carregando…</p>
+      </div>
+      <div class="filters" id="pix-filters">
+        <button class="chip" data-range="today">Hoje</button>
+        <button class="chip" data-range="7d">7 dias</button>
+        <button class="chip active" data-range="month">Este mês</button>
+        <button class="chip" data-range="custom">Personalizado</button>
+        <div class="range-box" id="pix-range-box">
+          <input type="date" id="pix-date-from">
+          <input type="date" id="pix-date-to">
+          <button id="pix-apply-range">Aplicar</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="pix-loading" class="state">Carregando dados do Supabase…</div>
+    <div id="pix-error" class="state error hidden"></div>
+
+    <div id="pix-content" class="hidden">
+      <div class="cards">
+        <div class="card" style="--accent:var(--plum)">
+          <div class="label">Mensagens enviadas</div>
+          <div class="value" id="pix-v-mensagens">—</div>
+        </div>
+        <div class="card" style="--accent:var(--coral); --accent-text:var(--coral)">
+          <div class="label">Taxa de clique</div>
+          <div class="value" id="pix-v-clique">—</div>
+        </div>
+        <div class="card" style="--accent:var(--gold); --accent-text:var(--plum)">
+          <div class="label">Taxa de conversão</div>
+          <div class="value" id="pix-v-conversao">—</div>
+        </div>
+        <div class="card" style="--accent:var(--plum)">
+          <div class="label">Receita recuperada</div>
+          <div class="value" id="pix-v-receita">—</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Funil de mensagens</h2>
+        <p class="desc">Quantos clientes receberam cada etapa da cadência, no período selecionado</p>
+        <div class="funnel" id="pix-funnel"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Atividade recente</h2>
+        <p class="desc">Pedidos convertidos e cancelamentos, mais recentes primeiro</p>
+        <div class="activity" id="pix-activity"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Evolução diária</h2>
+        <p class="desc">Mensagens, cliques e pedidos convertidos por dia</p>
+        <canvas id="pix-chart-diario"></canvas>
       </div>
     </div>
-  </header>
+  </div>
 
-  <div id="loading" class="state">Carregando dados do Supabase…</div>
-  <div id="error" class="state error hidden"></div>
-
-  <div id="content" class="hidden">
-    <div class="cards">
-      <div class="card" style="--accent:var(--plum)">
-        <div class="label">Mensagens enviadas</div>
-        <div class="value" id="v-mensagens">—</div>
+  <!-- ===================== CARRINHO TAB ===================== -->
+  <div id="tab-carrinho" class="tab-content hidden">
+    <header>
+      <div>
+        <div class="eyebrow" style="--accent-eyebrow:var(--wpp)">Widi Care · Recuperação via WhatsApp</div>
+        <h1>Recuperação de Carrinho Abandonado</h1>
+        <p class="sub" id="cart-periodo-label">Carregando…</p>
       </div>
-      <div class="card" style="--accent:var(--coral); --accent-text:var(--coral)">
-        <div class="label">Taxa de clique</div>
-        <div class="value" id="v-clique">—</div>
+      <div class="filters" id="cart-filters">
+        <button class="chip" data-range="today">Hoje</button>
+        <button class="chip" data-range="7d">7 dias</button>
+        <button class="chip active" data-range="month">Este mês</button>
+        <button class="chip" data-range="custom">Personalizado</button>
+        <div class="range-box" id="cart-range-box">
+          <input type="date" id="cart-date-from">
+          <input type="date" id="cart-date-to">
+          <button id="cart-apply-range">Aplicar</button>
+        </div>
       </div>
-      <div class="card" style="--accent:var(--gold); --accent-text:var(--plum)">
-        <div class="label">Taxa de conversão</div>
-        <div class="value" id="v-conversao">—</div>
+    </header>
+
+    <div id="cart-loading" class="state">Carregando dados do Supabase…</div>
+    <div id="cart-error" class="state error hidden"></div>
+
+    <div id="cart-content" class="hidden">
+      <div class="panel banner" id="cart-setup-banner">
+        Cliques e conversões ainda não são rastreados para este fluxo — só "mensagens enviadas" está com dado real por enquanto.
+        Peça pro Claude configurar o rastreio (ver instruções no final do chat) pra completar as demais métricas.
       </div>
-      <div class="card" style="--accent:var(--plum)">
-        <div class="label">Receita recuperada</div>
-        <div class="value" id="v-receita">—</div>
+
+      <div class="cards">
+        <div class="card" style="--accent:var(--wpp)">
+          <div class="label">Mensagens enviadas</div>
+          <div class="value" id="cart-v-mensagens">—</div>
+        </div>
+        <div class="card" style="--accent:var(--coral); --accent-text:var(--coral)">
+          <div class="label">Taxa de clique</div>
+          <div class="value" id="cart-v-clique">—</div>
+          <div class="note" id="cart-clique-note"></div>
+        </div>
+        <div class="card" style="--accent:var(--gold); --accent-text:var(--plum)">
+          <div class="label">Taxa de conversão</div>
+          <div class="value" id="cart-v-conversao">—</div>
+          <div class="note" id="cart-conversao-note"></div>
+        </div>
+        <div class="card" style="--accent:var(--plum)">
+          <div class="label">Receita recuperada</div>
+          <div class="value" id="cart-v-receita">—</div>
+        </div>
       </div>
-    </div>
 
-    <div class="panel">
-      <h2>Funil de mensagens</h2>
-      <p class="desc">Quantos clientes receberam cada etapa da cadência, no período selecionado</p>
-      <div class="funnel" id="funnel"></div>
-    </div>
+      <div class="panel">
+        <h2>Funil</h2>
+        <p class="desc">Notificados → clicaram no link → finalizaram a compra, no período selecionado</p>
+        <div class="funnel" id="cart-funnel" style="--accent-bar:var(--wpp); --accent-track:var(--wpp-soft)"></div>
+      </div>
 
-    <div class="panel">
-      <h2>Atividade recente</h2>
-      <p class="desc">Pedidos convertidos e cancelamentos, mais recentes primeiro</p>
-      <div class="activity" id="activity"></div>
-    </div>
+      <div class="panel">
+        <h2>Atividade recente</h2>
+        <p class="desc">Pedidos convertidos por WhatsApp, mais recentes primeiro</p>
+        <div class="activity" id="cart-activity"></div>
+      </div>
 
-    <div class="panel">
-      <h2>Evolução diária</h2>
-      <p class="desc">Mensagens, cliques e pedidos convertidos por dia</p>
-      <canvas id="chart-diario"></canvas>
+      <div class="panel">
+        <h2>Evolução diária</h2>
+        <p class="desc">Mensagens, cliques e pedidos convertidos por dia</p>
+        <canvas id="cart-chart-diario"></canvas>
+      </div>
     </div>
   </div>
 
@@ -239,19 +356,7 @@
 const SUPABASE_URL = 'https://vomuotdwcfqixkxghpye.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZvbXVvdGR3Y2ZxaXhreGdocHllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1Mzk1MDAsImV4cCI6MjEwMjExNTUwMH0.sEaV-aXE3UDpuZyB2jb9biADxb0nYAzDhWJSmEXKPYU';
 
-let allRows = [];
-let chartInstance = null;
-
-async function fetchAllDays(){
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/dashboard_diario?select=*&order=dia.asc`, {
-    headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
-  });
-  if(!res.ok) throw new Error(`Falha ao buscar dados (status ${res.status})`);
-  return res.json();
-}
-
 function toISODate(d){ return d.toISOString().slice(0,10); }
-
 function getRange(kind){
   const today = new Date();
   const end = new Date(today);
@@ -261,145 +366,182 @@ function getRange(kind){
   else if(kind === 'month'){ start = new Date(today.getFullYear(), today.getMonth(), 1); }
   return { from: toISODate(start), to: toISODate(end) };
 }
-
-function filterRows(from, to){
-  return allRows.filter(r => {
-    const d = r.dia.slice(0,10);
-    return d >= from && d <= to;
-  });
-}
-
 function formatMoney(v){ return (v || 0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'}); }
 function formatPct(part, total){ if(!total) return '0%'; return ((part/total)*100).toFixed(1).replace('.0','') + '%'; }
 function formatDate(d){ return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}); }
+function formatDateTime(d){ return new Date(d).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}); }
 
-function render(from, to){
-  const rows = filterRows(from, to);
-
-  const sum = (key) => rows.reduce((a,r) => a + Number(r[key] || 0), 0);
-  const mensagens = sum('mensagens');
-  const cliques = sum('cliques');
-  const pedidos = sum('pedidos');
-  const convertidos = sum('convertidos');
-  const receita = sum('receita');
-  const msg1 = sum('msg1'), msg2 = sum('msg2'), msg3 = sum('msg3');
-
-  document.getElementById('v-mensagens').textContent = mensagens.toLocaleString('pt-BR');
-  document.getElementById('v-clique').textContent = formatPct(cliques, mensagens);
-  document.getElementById('v-conversao').textContent = formatPct(convertidos, pedidos);
-  document.getElementById('v-receita').textContent = formatMoney(receita);
-
-  const funnelEl = document.getElementById('funnel');
-  const stages = [{label:'Mensagem 1', val:msg1}, {label:'Mensagem 2', val:msg2}, {label:'Mensagem 3', val:msg3}];
-  const maxVal = Math.max(1, ...stages.map(s => s.val));
-  funnelEl.innerHTML = stages.map(st => `
-    <div class="funnel-row">
-      <div class="fname">${st.label}</div>
-      <div class="funnel-bar-track"><div class="funnel-bar" style="width:${(st.val/maxVal*100)}%"></div></div>
-      <div class="fval">${st.val}</div>
-    </div>
-  `).join('');
-
-  if(chartInstance) chartInstance.destroy();
-  const labels = rows.map(r => formatDate(r.dia.slice(0,10)));
-  chartInstance = new Chart(document.getElementById('chart-diario'), {
-    type: 'line',
-    data: {
-      labels,
-      datasets: [
-        {label:'Mensagens', data: rows.map(r=>r.mensagens), borderColor:'#0F6E56', backgroundColor:'#0F6E5622', tension:0.3},
-        {label:'Cliques', data: rows.map(r=>r.cliques), borderColor:'#E8593C', backgroundColor:'#E8593C22', tension:0.3},
-        {label:'Convertidos', data: rows.map(r=>r.convertidos), borderColor:'#14213D', backgroundColor:'#14213D22', tension:0.3}
-      ]
-    },
-    options: {
-      responsive:true,
-      plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{family:'Inter', size:12}}}},
-      scales:{ y:{beginAtZero:true, ticks:{precision:0}}, x:{grid:{display:false}} }
-    }
-  });
-
-  document.getElementById('periodo-label').textContent = rows.length
-    ? `${formatDate(from)} até ${formatDate(to)}`
-    : `${formatDate(from)} até ${formatDate(to)} · sem dados no período`;
-}
-
-async function fetchAtividade(){
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/dashboard_atividade?select=*&order=evento_em.desc&limit=20`, {
+async function sbFetch(path){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` }
   });
-  if(!res.ok) throw new Error(`Falha ao buscar atividade (status ${res.status})`);
+  if(!res.ok) throw new Error(`Falha ao buscar dados (status ${res.status})`);
   return res.json();
 }
 
-function formatDateTime(d){
-  return new Date(d).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
-}
+/* ---------- Módulo genérico de painel (reusado por PIX e Carrinho) ---------- */
+function createDashboard({ prefix, dailyTable, activityTable, funnelStages, chartColor, trackColor, hasClickNote }){
+  let allRows = [];
+  let chartInstance = null;
 
-function renderAtividade(rows){
-  const el = document.getElementById('activity');
-  if(!rows.length){
-    el.innerHTML = '<div class="activity-empty">Nenhuma conversão ou cancelamento ainda.</div>';
-    return;
+  function filterRows(from, to){
+    return allRows.filter(r => {
+      const d = r.dia.slice(0,10);
+      return d >= from && d <= to;
+    });
   }
-  el.innerHTML = rows.map(r => {
-    const isCancel = r.tipo === 'cancelado';
-    return `
-      <div class="activity-row">
-        <div class="activity-badge ${isCancel ? 'minus' : 'plus'}">${isCancel ? '−' : '+'}</div>
-        <div class="activity-order">Pedido #${r.order_number}</div>
-        <div class="activity-date">${formatDateTime(r.evento_em)}</div>
-        <div class="activity-value ${isCancel ? 'minus' : 'plus'}">${formatMoney(r.order_value)}</div>
+
+  function render(from, to){
+    const rows = filterRows(from, to);
+    const sum = (key) => rows.reduce((a,r) => a + Number(r[key] || 0), 0);
+    const mensagens = sum('mensagens');
+    const cliques = sum('cliques');
+    const pedidos = sum('pedidos');
+    const convertidos = sum('convertidos');
+    const receita = sum('receita');
+
+    document.getElementById(`${prefix}-v-mensagens`).textContent = mensagens.toLocaleString('pt-BR');
+    document.getElementById(`${prefix}-v-clique`).textContent = formatPct(cliques, mensagens);
+    document.getElementById(`${prefix}-v-conversao`).textContent = formatPct(convertidos, pedidos || mensagens);
+    document.getElementById(`${prefix}-v-receita`).textContent = formatMoney(receita);
+
+    const funnelEl = document.getElementById(`${prefix}-funnel`);
+    const stageVals = funnelStages.map(key => sum(key.key));
+    const maxVal = Math.max(1, ...stageVals);
+    funnelEl.innerHTML = funnelStages.map((st, i) => `
+      <div class="funnel-row">
+        <div class="fname">${st.label}</div>
+        <div class="funnel-bar-track"><div class="funnel-bar" style="width:${(stageVals[i]/maxVal*100)}%"></div></div>
+        <div class="fval">${stageVals[i]}</div>
       </div>
-    `;
-  }).join('');
-}
+    `).join('');
 
-function setupFilters(){
-  const chips = document.querySelectorAll('.chip');
-  const rangeBox = document.getElementById('range-box');
-
-  chips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      chips.forEach(c => c.classList.remove('active'));
-      chip.classList.add('active');
-      const kind = chip.dataset.range;
-      if(kind === 'custom'){
-        rangeBox.classList.add('show');
-        return;
+    if(chartInstance) chartInstance.destroy();
+    const labels = rows.map(r => formatDate(r.dia.slice(0,10)));
+    chartInstance = new Chart(document.getElementById(`${prefix}-chart-diario`), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {label:'Mensagens', data: rows.map(r=>r.mensagens), borderColor: chartColor.mensagens, backgroundColor: chartColor.mensagens+'22', tension:0.3},
+          {label:'Cliques', data: rows.map(r=>r.cliques), borderColor: chartColor.cliques, backgroundColor: chartColor.cliques+'22', tension:0.3},
+          {label:'Convertidos', data: rows.map(r=>r.convertidos), borderColor: chartColor.convertidos, backgroundColor: chartColor.convertidos+'22', tension:0.3}
+        ]
+      },
+      options: {
+        responsive:true,
+        plugins:{legend:{position:'bottom', labels:{boxWidth:10, font:{family:'Inter', size:12}}}},
+        scales:{ y:{beginAtZero:true, ticks:{precision:0}}, x:{grid:{display:false}} }
       }
-      rangeBox.classList.remove('show');
-      const { from, to } = getRange(kind);
+    });
+
+    document.getElementById(`${prefix}-periodo-label`).textContent = rows.length
+      ? `${formatDate(from)} até ${formatDate(to)}`
+      : `${formatDate(from)} até ${formatDate(to)} · sem dados no período`;
+
+    if(hasClickNote){
+      const note = document.getElementById(`${prefix}-clique-note`);
+      if(note && cliques === 0) note.textContent = 'rastreio de clique ainda não configurado';
+      const noteConv = document.getElementById(`${prefix}-conversao-note`);
+      if(noteConv && convertidos === 0) noteConv.textContent = 'rastreio de conversão ainda não configurado';
+    }
+  }
+
+  function renderAtividade(rows){
+    const el = document.getElementById(`${prefix}-activity`);
+    if(!rows.length){
+      el.innerHTML = '<div class="activity-empty">Nenhuma conversão ou cancelamento ainda.</div>';
+      return;
+    }
+    el.innerHTML = rows.map(r => {
+      const isCancel = r.tipo === 'cancelado';
+      return `
+        <div class="activity-row">
+          <div class="activity-badge ${isCancel ? 'minus' : 'plus'}">${isCancel ? '−' : '+'}</div>
+          <div class="activity-order">Pedido #${r.order_number}</div>
+          <div class="activity-date">${formatDateTime(r.evento_em)}</div>
+          <div class="activity-value ${isCancel ? 'minus' : 'plus'}">${formatMoney(r.order_value)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function setupFilters(){
+    const chips = document.querySelectorAll(`#${prefix}-filters .chip`);
+    const rangeBox = document.getElementById(`${prefix}-range-box`);
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const kind = chip.dataset.range;
+        if(kind === 'custom'){ rangeBox.classList.add('show'); return; }
+        rangeBox.classList.remove('show');
+        const { from, to } = getRange(kind);
+        render(from, to);
+      });
+    });
+    document.getElementById(`${prefix}-apply-range`).addEventListener('click', () => {
+      const from = document.getElementById(`${prefix}-date-from`).value;
+      const to = document.getElementById(`${prefix}-date-to`).value;
+      if(!from || !to){ return; }
       render(from, to);
     });
-  });
-
-  document.getElementById('apply-range').addEventListener('click', () => {
-    const from = document.getElementById('date-from').value;
-    const to = document.getElementById('date-to').value;
-    if(!from || !to){ return; }
-    render(from, to);
-  });
-}
-
-async function init(){
-  try{
-    const [dailyRows, atividadeRows] = await Promise.all([fetchAllDays(), fetchAtividade()]);
-    allRows = dailyRows;
-    renderAtividade(atividadeRows);
-    setupFilters();
-    const { from, to } = getRange('month');
-    render(from, to);
-    document.getElementById('loading').classList.add('hidden');
-    document.getElementById('content').classList.remove('hidden');
-  }catch(err){
-    document.getElementById('loading').classList.add('hidden');
-    const errEl = document.getElementById('error');
-    errEl.textContent = 'Não foi possível carregar os dados: ' + err.message;
-    errEl.classList.remove('hidden');
   }
+
+  async function init(){
+    try{
+      const [dailyRows, atividadeRows] = await Promise.all([
+        sbFetch(`${dailyTable}?select=*&order=dia.asc`),
+        sbFetch(`${activityTable}?select=*&order=evento_em.desc&limit=20`)
+      ]);
+      allRows = dailyRows;
+      renderAtividade(atividadeRows);
+      setupFilters();
+      const { from, to } = getRange('month');
+      render(from, to);
+      document.getElementById(`${prefix}-loading`).classList.add('hidden');
+      document.getElementById(`${prefix}-content`).classList.remove('hidden');
+    }catch(err){
+      document.getElementById(`${prefix}-loading`).classList.add('hidden');
+      const errEl = document.getElementById(`${prefix}-error`);
+      errEl.textContent = 'Não foi possível carregar os dados: ' + err.message;
+      errEl.classList.remove('hidden');
+    }
+  }
+
+  return { init };
 }
-init();
+
+/* ---------- Instâncias ---------- */
+const pixDashboard = createDashboard({
+  prefix: 'pix',
+  dailyTable: 'dashboard_diario',
+  activityTable: 'dashboard_atividade',
+  funnelStages: [{key:'msg1', label:'Mensagem 1'}, {key:'msg2', label:'Mensagem 2'}, {key:'msg3', label:'Mensagem 3'}],
+  chartColor: { mensagens:'#0F6E56', cliques:'#E8593C', convertidos:'#14213D' }
+});
+
+const cartDashboard = createDashboard({
+  prefix: 'cart',
+  dailyTable: 'dashboard_diario_carrinho',
+  activityTable: 'dashboard_atividade_carrinho',
+  funnelStages: [{key:'mensagens', label:'Notificados'}, {key:'cliques', label:'Clicaram'}, {key:'convertidos', label:'Compraram'}],
+  chartColor: { mensagens:'#25D366', cliques:'#E8593C', convertidos:'#14213D' },
+  hasClickNote: true
+});
+
+pixDashboard.init();
+cartDashboard.init();
+
+/* ---------- Troca de abas ---------- */
+document.querySelectorAll('.top-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.top-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById(`tab-${tab.dataset.tab}`).classList.remove('hidden');
+  });
+});
 </script>
 </body>
 </html>
