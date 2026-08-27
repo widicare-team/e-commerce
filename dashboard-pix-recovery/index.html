@@ -190,6 +190,7 @@
   .activity-badge.plus{background:var(--gold-soft);color:var(--plum);}
   .activity-badge.minus{background:var(--coral-soft);color:var(--coral);}
   .activity-order{font-weight:600;color:var(--plum);}
+  .activity-msg{font-size:11px;color:var(--ink-soft);margin-top:1px;}
   .activity-value{margin-left:auto;font-weight:600;white-space:nowrap;}
   .activity-value.plus{color:var(--plum);}
   .activity-value.minus{color:var(--coral);text-decoration:line-through;opacity:0.7;}
@@ -331,6 +332,21 @@
       </div>
 
       <div class="panel">
+        <h2>Tempo de resposta</h2>
+        <p class="desc">Quanto tempo os clientes levam para agir depois da mensagem, em média</p>
+        <div class="cards" style="margin:0">
+          <div class="card" style="--accent:var(--coral); --accent-text:var(--coral)">
+            <div class="label">Até clicar</div>
+            <div class="value" id="cart-v-tempo-clique" style="font-size:22px">—</div>
+          </div>
+          <div class="card" style="--accent:var(--wpp); --accent-text:var(--plum)">
+            <div class="label">Até comprar</div>
+            <div class="value" id="cart-v-tempo-conversao" style="font-size:22px">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
         <h2>Atividade recente</h2>
         <p class="desc">Pedidos convertidos por WhatsApp, mais recentes primeiro</p>
         <div class="activity" id="cart-activity"></div>
@@ -403,11 +419,12 @@ function createDashboard({ prefix, dailyTable, activityTable, funnelStages, char
     const funnelEl = document.getElementById(`${prefix}-funnel`);
     const stageVals = funnelStages.map(key => sum(key.key));
     const maxVal = Math.max(1, ...stageVals);
+    const base = stageVals[0] || 1;
     funnelEl.innerHTML = funnelStages.map((st, i) => `
       <div class="funnel-row">
         <div class="fname">${st.label}</div>
         <div class="funnel-bar-track"><div class="funnel-bar" style="width:${(stageVals[i]/maxVal*100)}%"></div></div>
-        <div class="fval">${stageVals[i]}</div>
+        <div class="fval">${stageVals[i]} <span style="font-weight:500;font-size:11px;color:var(--ink-soft)">(${formatPct(stageVals[i], base)})</span></div>
       </div>
     `).join('');
 
@@ -450,10 +467,17 @@ function createDashboard({ prefix, dailyTable, activityTable, funnelStages, char
     }
     el.innerHTML = rows.map(r => {
       const isCancel = r.tipo === 'cancelado';
+      const pedidoLabel = (r.converted_order_number && String(r.converted_order_number) !== String(r.order_number))
+        ? `Pedido #${r.order_number} → #${r.converted_order_number}`
+        : `Pedido #${r.order_number}`;
+      const msgLabel = r.message_number ? `<div class="activity-msg">via Mensagem ${r.message_number}</div>` : '';
       return `
         <div class="activity-row">
           <div class="activity-badge ${isCancel ? 'minus' : 'plus'}">${isCancel ? '−' : '+'}</div>
-          <div class="activity-order">Pedido #${r.order_number}</div>
+          <div>
+            <div class="activity-order">${pedidoLabel}</div>
+            ${msgLabel}
+          </div>
           <div class="activity-date">${formatDateTime(r.evento_em)}</div>
           <div class="activity-value ${isCancel ? 'minus' : 'plus'}">${formatMoney(r.order_value)}</div>
         </div>
@@ -504,7 +528,45 @@ function createDashboard({ prefix, dailyTable, activityTable, funnelStages, char
     }
   }
 
-  return { init };
+  async function initTimingStats(){
+    try{
+      const [notificados, cliques, conversoes] = await Promise.all([
+        sbFetch(`checkouts_notificados?select=checkout_id,notified_at`),
+        sbFetch(`carrinho_cliques?select=checkout_id,clicked_at`),
+        sbFetch(`carrinho_conversoes?select=checkout_id,converted_at`)
+      ]);
+      const notifMap = {};
+      notificados.forEach(n => { notifMap[n.checkout_id] = new Date(n.notified_at); });
+
+      const deltasClique = cliques
+        .filter(c => notifMap[c.checkout_id])
+        .map(c => (new Date(c.clicked_at) - notifMap[c.checkout_id]) / 60000)
+        .filter(m => m >= 0);
+
+      const deltasConversao = conversoes
+        .filter(c => notifMap[c.checkout_id])
+        .map(c => (new Date(c.converted_at) - notifMap[c.checkout_id]) / 60000)
+        .filter(m => m >= 0);
+
+      function formatMinutos(mins){
+        if(mins < 60) return `${Math.round(mins)} min`;
+        if(mins < 1440) return `${(mins/60).toFixed(1)} h`;
+        return `${(mins/1440).toFixed(1)} dias`;
+      }
+      function media(arr){ return arr.length ? arr.reduce((a,b)=>a+b,0)/arr.length : null; }
+
+      const medC = media(deltasClique);
+      const medConv = media(deltasConversao);
+      document.getElementById('cart-v-tempo-clique').textContent = medC !== null ? formatMinutos(medC) : 'sem dados ainda';
+      document.getElementById('cart-v-tempo-conversao').textContent = medConv !== null ? formatMinutos(medConv) : 'sem dados ainda';
+    }catch(err){
+      // não bloqueia o resto do dashboard se essa parte falhar
+      document.getElementById('cart-v-tempo-clique').textContent = '—';
+      document.getElementById('cart-v-tempo-conversao').textContent = '—';
+    }
+  }
+
+  return { init, initTimingStats };
 }
 
 /* ---------- Instâncias ---------- */
@@ -527,6 +589,7 @@ const cartDashboard = createDashboard({
 
 pixDashboard.init();
 cartDashboard.init();
+cartDashboard.initTimingStats();
 
 /* ---------- Troca de abas ---------- */
 document.querySelectorAll('.top-tab').forEach(tab => {
