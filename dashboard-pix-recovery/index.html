@@ -191,6 +191,8 @@
   .activity-badge.minus{background:var(--coral-soft);color:var(--coral);}
   .activity-order{font-weight:600;color:var(--plum);}
   .activity-msg{font-size:11px;color:var(--ink-soft);margin-top:1px;}
+  .activity-msg.confirmed{color:var(--gold);font-weight:600;}
+  .activity-msg.estimated{color:var(--ink-soft);font-style:italic;}
   .activity-value{margin-left:auto;font-weight:600;white-space:nowrap;}
   .activity-value.plus{color:var(--plum);}
   .activity-value.minus{color:var(--coral);text-decoration:line-through;opacity:0.7;}
@@ -470,7 +472,7 @@ function createDashboard({ prefix, dailyTable, activityTable, funnelStages, char
       const pedidoLabel = (r.converted_order_number && String(r.converted_order_number) !== String(r.order_number))
         ? `Pedido #${r.order_number} → #${r.converted_order_number}`
         : `Pedido #${r.order_number}`;
-      const msgLabel = r.message_number ? `<div class="activity-msg">via Mensagem ${r.message_number}</div>` : '';
+      const msgLabel = r.message_number ? `<div class="activity-msg confirmed">✓ via Mensagem ${r.message_number}</div>` : '';
       return `
         <div class="activity-row">
           <div class="activity-badge ${isCancel ? 'minus' : 'plus'}">${isCancel ? '−' : '+'}</div>
