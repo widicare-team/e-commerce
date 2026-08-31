@@ -177,7 +177,7 @@
 
   .activity{display:flex;flex-direction:column;gap:2px;max-height:340px;overflow-y:auto;}
   .activity-row{
-    display:flex;align-items:center;gap:12px;
+    display:flex;align-items:flex-start;gap:12px;
     padding:11px 4px;border-bottom:1px solid var(--line);
     font-size:14px;
   }
@@ -186,17 +186,37 @@
     width:26px;height:26px;border-radius:50%;
     display:flex;align-items:center;justify-content:center;
     font-weight:700;font-size:15px;flex-shrink:0;
+    margin-top:2px;
   }
   .activity-badge.plus{background:var(--gold-soft);color:var(--plum);}
   .activity-badge.minus{background:var(--coral-soft);color:var(--coral);}
   .activity-order{font-weight:600;color:var(--plum);}
+  .activity-main{flex:1;min-width:0;}
   .activity-msg{font-size:11px;color:var(--ink-soft);margin-top:1px;}
   .activity-msg.confirmed{color:var(--gold);font-weight:600;}
   .activity-msg.estimated{color:var(--ink-soft);font-style:italic;}
-  .activity-value{margin-left:auto;font-weight:600;white-space:nowrap;}
+  .activity-timing{
+    font-size:11px;color:var(--ink-soft);margin-top:3px;
+    display:flex;gap:6px;align-items:center;flex-wrap:wrap;row-gap:2px;
+  }
+  .activity-timing span{white-space:nowrap;}
+  .activity-timing .arrow{color:var(--line);font-size:10px;}
+  .activity-timing .miss{opacity:0.4;}
+  .timing-help{
+    font-size:12px;
+    color:var(--ink-soft);
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin:14px 0 0;
+    line-height:1.5;
+  }
+  .timing-help strong{color:var(--plum);}
+  .activity-value{margin-left:auto;font-weight:600;white-space:nowrap;margin-top:2px;}
   .activity-value.plus{color:var(--plum);}
   .activity-value.minus{color:var(--coral);text-decoration:line-through;opacity:0.7;}
-  .activity-date{color:var(--ink-soft);font-size:12px;white-space:nowrap;}
+  .activity-date{color:var(--ink-soft);font-size:12px;white-space:nowrap;margin-top:2px;}
   .activity-empty{color:var(--ink-soft);font-size:13px;padding:12px 4px;}
 
   canvas{max-height:280px;}
@@ -213,12 +233,12 @@
 <div class="wrap">
 
   <div class="top-tabs">
-    <button class="top-tab active" data-tab="pix">Recuperação de PIX</button>
-    <button class="top-tab" data-tab="carrinho">Recuperação de Carrinho</button>
+    <button class="top-tab active" data-tab="carrinho">Recuperação de Carrinho</button>
+    <button class="top-tab" data-tab="pix">Recuperação de PIX</button>
   </div>
 
   <!-- ===================== PIX TAB ===================== -->
-  <div id="tab-pix" class="tab-content">
+  <div id="tab-pix" class="tab-content hidden">
     <header>
       <div>
         <div class="eyebrow" style="--accent-eyebrow:var(--coral)">Widi Care · Recuperação via WhatsApp</div>
@@ -227,6 +247,7 @@
       </div>
       <div class="filters" id="pix-filters">
         <button class="chip" data-range="today">Hoje</button>
+        <button class="chip" data-range="yesterday">Ontem</button>
         <button class="chip" data-range="7d">7 dias</button>
         <button class="chip active" data-range="month">Este mês</button>
         <button class="chip" data-range="custom">Personalizado</button>
@@ -269,7 +290,7 @@
 
       <div class="panel">
         <h2>Atividade recente</h2>
-        <p class="desc">Pedidos convertidos e cancelamentos, mais recentes primeiro</p>
+        <p class="desc">Pedidos convertidos e cancelamentos no período selecionado, mais recentes primeiro</p>
         <div class="activity" id="pix-activity"></div>
       </div>
 
@@ -282,7 +303,7 @@
   </div>
 
   <!-- ===================== CARRINHO TAB ===================== -->
-  <div id="tab-carrinho" class="tab-content hidden">
+  <div id="tab-carrinho" class="tab-content">
     <header>
       <div>
         <div class="eyebrow" style="--accent-eyebrow:var(--wpp)">Widi Care · Recuperação via WhatsApp</div>
@@ -291,6 +312,7 @@
       </div>
       <div class="filters" id="cart-filters">
         <button class="chip" data-range="today">Hoje</button>
+        <button class="chip" data-range="yesterday">Ontem</button>
         <button class="chip" data-range="7d">7 dias</button>
         <button class="chip active" data-range="month">Este mês</button>
         <button class="chip" data-range="custom">Personalizado</button>
@@ -346,11 +368,15 @@
             <div class="value" id="cart-v-tempo-conversao" style="font-size:22px">—</div>
           </div>
         </div>
+        <p class="timing-help">
+          <strong>Até clicar</strong>: tempo médio entre o envio da mensagem e o primeiro clique do cliente no link do WhatsApp.<br>
+          <strong>Até comprar</strong>: tempo médio entre o envio da mensagem e a confirmação do pagamento do pedido.
+        </p>
       </div>
 
       <div class="panel">
         <h2>Atividade recente</h2>
-        <p class="desc">Pedidos convertidos por WhatsApp, mais recentes primeiro</p>
+        <p class="desc">Pedidos convertidos por WhatsApp no período selecionado, mais recentes primeiro</p>
         <div class="activity" id="cart-activity"></div>
       </div>
 
@@ -375,6 +401,7 @@ function getRange(kind){
   const end = new Date(today);
   let start = new Date(today);
   if(kind === 'today'){ /* start = today */ }
+  else if(kind === 'yesterday'){ start.setDate(start.getDate() - 1); end.setDate(end.getDate() - 1); }
   else if(kind === '7d'){ start.setDate(start.getDate() - 6); }
   else if(kind === 'month'){ start = new Date(today.getFullYear(), today.getMonth(), 1); }
   return { from: toISODate(start), to: toISODate(end) };
@@ -383,6 +410,47 @@ function formatMoney(v){ return (v || 0).toLocaleString('pt-BR', {style:'currenc
 function formatPct(part, total){ if(!total) return '0%'; return ((part/total)*100).toFixed(1).replace('.0','') + '%'; }
 function formatDate(d){ return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'}); }
 function formatDateTime(d){ return new Date(d).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}); }
+function formatTimeOnly(d){ return new Date(d).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}); }
+function formatSmartTime(d, prevDateKey){
+  const dateKey = String(d).slice(0,10);
+  const time = formatTimeOnly(d);
+  return { text: dateKey !== prevDateKey ? `${formatDate(dateKey)} ${time}` : time, dateKey };
+}
+
+/* ---------- Mapas de horário por pedido (notificado / clicou / converteu) ---------- */
+async function fetchPixTimings(){
+  const rows = await sbFetch(`pix_recovery_events?select=order_number,sent_at,clicked_at,converted,converted_at&order=sent_at.asc`);
+  const map = {};
+  rows.forEach(r => {
+    const key = String(r.order_number);
+    if(!map[key]) map[key] = { notified: null, clicked: null, converted: null };
+    if(!map[key].notified && r.sent_at) map[key].notified = r.sent_at;
+    if(!map[key].clicked && r.clicked_at) map[key].clicked = r.clicked_at;
+    if(r.converted && r.converted_at) map[key].converted = r.converted_at;
+  });
+  return map;
+}
+
+async function fetchCartTimings(){
+  const [notificados, cliques, conversoes] = await Promise.all([
+    sbFetch(`checkouts_notificados?select=checkout_id,notified_at`),
+    sbFetch(`carrinho_cliques?select=checkout_id,clicked_at`),
+    sbFetch(`carrinho_conversoes?select=checkout_id,order_number,converted_at`)
+  ]);
+  const notifMap = {};
+  notificados.forEach(n => { notifMap[n.checkout_id] = n.notified_at; });
+  const clickMap = {};
+  cliques.forEach(c => { if(!clickMap[c.checkout_id]) clickMap[c.checkout_id] = c.clicked_at; });
+  const map = {};
+  conversoes.forEach(c => {
+    map[String(c.order_number)] = {
+      notified: notifMap[c.checkout_id] || null,
+      clicked: clickMap[c.checkout_id] || null,
+      converted: c.converted_at || null
+    };
+  });
+  return map;
+}
 
 async function sbFetch(path){
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
@@ -393,13 +461,22 @@ async function sbFetch(path){
 }
 
 /* ---------- Módulo genérico de painel (reusado por PIX e Carrinho) ---------- */
-function createDashboard({ prefix, dailyTable, activityTable, funnelStages, chartColor, trackColor, hasClickNote }){
+function createDashboard({ prefix, dailyTable, activityTable, funnelStages, chartColor, trackColor, hasClickNote, timingsFetcher }){
   let allRows = [];
+  let allActivity = [];
   let chartInstance = null;
+  let timingsMap = {};
 
   function filterRows(from, to){
     return allRows.filter(r => {
       const d = r.dia.slice(0,10);
+      return d >= from && d <= to;
+    });
+  }
+
+  function filterActivity(from, to){
+    return allActivity.filter(r => {
+      const d = String(r.evento_em).slice(0,10);
       return d >= from && d <= to;
     });
   }
@@ -459,12 +536,14 @@ function createDashboard({ prefix, dailyTable, activityTable, funnelStages, char
       const noteConv = document.getElementById(`${prefix}-conversao-note`);
       if(noteConv && convertidos === 0) noteConv.textContent = 'rastreio de conversão ainda não configurado';
     }
+
+    renderAtividade(filterActivity(from, to));
   }
 
   function renderAtividade(rows){
     const el = document.getElementById(`${prefix}-activity`);
     if(!rows.length){
-      el.innerHTML = '<div class="activity-empty">Nenhuma conversão ou cancelamento ainda.</div>';
+      el.innerHTML = '<div class="activity-empty">Nenhuma conversão ou cancelamento no período selecionado.</div>';
       return;
     }
     el.innerHTML = rows.map(r => {
@@ -473,14 +552,31 @@ function createDashboard({ prefix, dailyTable, activityTable, funnelStages, char
         ? `Pedido #${r.order_number} → #${r.converted_order_number}`
         : `Pedido #${r.order_number}`;
       const msgLabel = r.message_number ? `<div class="activity-msg confirmed">✓ via Mensagem ${r.message_number}</div>` : '';
+      const t = timingsMap[String(r.order_number)] || timingsMap[String(r.converted_order_number)];
+      let timingLine = '';
+      if(t){
+        let prevDateKey = null;
+        const parts = [];
+        if(t.notified){ const s = formatSmartTime(t.notified, prevDateKey); parts.push(`<span title="Mensagem enviada">Mensagem ${s.text}</span>`); prevDateKey = s.dateKey; }
+        else parts.push(`<span class="miss" title="Mensagem enviada">Mensagem —</span>`);
+        parts.push(`<span class="arrow">→</span>`);
+        if(t.clicked){ const s = formatSmartTime(t.clicked, prevDateKey); parts.push(`<span title="Clicou no link">Clique ${s.text}</span>`); prevDateKey = s.dateKey; }
+        else parts.push(`<span class="miss" title="Clicou no link">Clique —</span>`);
+        parts.push(`<span class="arrow">→</span>`);
+        if(t.converted){ const s = formatSmartTime(t.converted, prevDateKey); parts.push(`<span title="Compra confirmada">Compra ${s.text}</span>`); }
+        else parts.push(`<span class="miss" title="Compra confirmada">Compra —</span>`);
+        timingLine = `<div class="activity-timing">${parts.join('')}</div>`;
+      } else {
+        timingLine = `<div class="activity-timing">${formatDateTime(r.evento_em)}</div>`;
+      }
       return `
         <div class="activity-row">
           <div class="activity-badge ${isCancel ? 'minus' : 'plus'}">${isCancel ? '−' : '+'}</div>
-          <div>
+          <div class="activity-main">
             <div class="activity-order">${pedidoLabel}</div>
             ${msgLabel}
+            ${timingLine}
           </div>
-          <div class="activity-date">${formatDateTime(r.evento_em)}</div>
           <div class="activity-value ${isCancel ? 'minus' : 'plus'}">${formatMoney(r.order_value)}</div>
         </div>
       `;
@@ -513,10 +609,20 @@ function createDashboard({ prefix, dailyTable, activityTable, funnelStages, char
     try{
       const [dailyRows, atividadeRows] = await Promise.all([
         sbFetch(`${dailyTable}?select=*&order=dia.asc`),
-        sbFetch(`${activityTable}?select=*&order=evento_em.desc&limit=20`)
+        sbFetch(`${activityTable}?select=*&order=evento_em.desc&limit=5000`)
       ]);
       allRows = dailyRows;
-      renderAtividade(atividadeRows);
+      allActivity = atividadeRows;
+
+      if(timingsFetcher){
+        try{
+          timingsMap = await timingsFetcher();
+        }catch(timingErr){
+          console.warn(`[${prefix}] Não foi possível carregar horários detalhados por pedido:`, timingErr.message);
+          timingsMap = {};
+        }
+      }
+
       setupFilters();
       const { from, to } = getRange('month');
       render(from, to);
@@ -577,7 +683,8 @@ const pixDashboard = createDashboard({
   dailyTable: 'dashboard_diario',
   activityTable: 'dashboard_atividade',
   funnelStages: [{key:'msg1', label:'Mensagem 1'}, {key:'msg2', label:'Mensagem 2'}, {key:'msg3', label:'Mensagem 3'}],
-  chartColor: { mensagens:'#0F6E56', cliques:'#E8593C', convertidos:'#14213D' }
+  chartColor: { mensagens:'#0F6E56', cliques:'#E8593C', convertidos:'#14213D' },
+  timingsFetcher: fetchPixTimings
 });
 
 const cartDashboard = createDashboard({
@@ -586,7 +693,8 @@ const cartDashboard = createDashboard({
   activityTable: 'dashboard_atividade_carrinho',
   funnelStages: [{key:'mensagens', label:'Notificados'}, {key:'cliques', label:'Clicaram'}, {key:'convertidos', label:'Compraram'}],
   chartColor: { mensagens:'#25D366', cliques:'#E8593C', convertidos:'#14213D' },
-  hasClickNote: true
+  hasClickNote: true,
+  timingsFetcher: fetchCartTimings
 });
 
 pixDashboard.init();
