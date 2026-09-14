@@ -412,7 +412,8 @@ function formatDate(d){ return new Date(d + 'T00:00:00').toLocaleDateString('pt-
 function formatDateTime(d){ return new Date(d).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}); }
 function formatTimeOnly(d){ return new Date(d).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}); }
 function formatSmartTime(d, prevDateKey){
-  const dateKey = String(d).slice(0,10);
+  const dateObj = new Date(d);
+  const dateKey = dateObj.toLocaleDateString('sv-SE'); // formato YYYY-MM-DD, já no fuso local do navegador
   const time = formatTimeOnly(d);
   return { text: dateKey !== prevDateKey ? `${formatDate(dateKey)} ${time}` : time, dateKey };
 }
@@ -426,7 +427,6 @@ async function fetchPixTimings(){
   rows.forEach(r => {
     const key = String(r.order_number);
     if(!map[key]) map[key] = { notified: null, clicked: null, converted: null };
-    // Guarda sempre o MENOR sent_at/clicked_at encontrado (primeiro evento real), não o primeiro que aparece na lista
     if(r.sent_at && (!map[key].notified || new Date(r.sent_at) < new Date(map[key].notified))) map[key].notified = r.sent_at;
     if(r.clicked_at && (!map[key].clicked || new Date(r.clicked_at) < new Date(map[key].clicked))) map[key].clicked = r.clicked_at;
     if(r.converted && r.converted_at) map[key].converted = r.converted_at;
