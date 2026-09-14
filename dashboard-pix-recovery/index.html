@@ -412,36 +412,42 @@ function formatDate(d){ return new Date(d + 'T00:00:00').toLocaleDateString('pt-
 function formatDateTime(d){ return new Date(d).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}); }
 function formatTimeOnly(d){ return new Date(d).toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}); }
 function formatSmartTime(d, prevDateKey){
-  const dateObj = new Date(d);
-  const dateKey = dateObj.toLocaleDateString('sv-SE'); // formato YYYY-MM-DD, já no fuso local do navegador
+  const dateKey = String(d).slice(0,10);
   const time = formatTimeOnly(d);
   return { text: dateKey !== prevDateKey ? `${formatDate(dateKey)} ${time}` : time, dateKey };
 }
 
 /* ---------- Mapas de horário por pedido (notificado / clicou / converteu) ---------- */
 async function fetchPixTimings(){
-  const rows = await sbFetch(`pix_recovery_events?select=order_number,sent_at,clicked_at,converted,converted_at&order=sent_at.asc`);
+  // order=desc + limit alto garante que, mesmo com teto de linhas no Supabase,
+  // os pedidos mais RECENTES sejam sempre incluídos (não os mais antigos).
+  const rows = await sbFetch(`pix_recovery_events?select=order_number,sent_at,clicked_at,converted,converted_at&order=sent_at.desc&limit=10000`);
   const map = {};
   rows.forEach(r => {
     const key = String(r.order_number);
     if(!map[key]) map[key] = { notified: null, clicked: null, converted: null };
-    if(!map[key].notified && r.sent_at) map[key].notified = r.sent_at;
-    if(!map[key].clicked && r.clicked_at) map[key].clicked = r.clicked_at;
+    // Guarda sempre o MENOR sent_at/clicked_at encontrado (primeiro evento real), não o primeiro que aparece na lista
+    if(r.sent_at && (!map[key].notified || new Date(r.sent_at) < new Date(map[key].notified))) map[key].notified = r.sent_at;
+    if(r.clicked_at && (!map[key].clicked || new Date(r.clicked_at) < new Date(map[key].clicked))) map[key].clicked = r.clicked_at;
     if(r.converted && r.converted_at) map[key].converted = r.converted_at;
   });
   return map;
 }
 
 async function fetchCartTimings(){
+  // order=desc + limit alto em todas as consultas: garante que pedidos recentes não fiquem
+  // de fora caso a tabela tenha crescido além de um teto padrão de linhas no Supabase.
   const [notificados, cliques, conversoes] = await Promise.all([
-    sbFetch(`checkouts_notificados?select=checkout_id,notified_at`),
-    sbFetch(`carrinho_cliques?select=checkout_id,clicked_at`),
-    sbFetch(`carrinho_conversoes?select=checkout_id,order_number,converted_at`)
+    sbFetch(`checkouts_notificados?select=checkout_id,notified_at&order=notified_at.desc&limit=10000`),
+    sbFetch(`carrinho_cliques?select=checkout_id,clicked_at&order=clicked_at.desc&limit=10000`),
+    sbFetch(`carrinho_conversoes?select=checkout_id,order_number,converted_at&order=converted_at.desc&limit=10000`)
   ]);
   const notifMap = {};
   notificados.forEach(n => { notifMap[n.checkout_id] = n.notified_at; });
   const clickMap = {};
-  cliques.forEach(c => { if(!clickMap[c.checkout_id]) clickMap[c.checkout_id] = c.clicked_at; });
+  cliques.forEach(c => {
+    if(!clickMap[c.checkout_id] || new Date(c.clicked_at) < new Date(clickMap[c.checkout_id])) clickMap[c.checkout_id] = c.clicked_at;
+  });
   const map = {};
   conversoes.forEach(c => {
     map[String(c.order_number)] = {
@@ -640,9 +646,9 @@ function createDashboard({ prefix, dailyTable, activityTable, funnelStages, char
   async function initTimingStats(){
     try{
       const [notificados, cliques, conversoes] = await Promise.all([
-        sbFetch(`checkouts_notificados?select=checkout_id,notified_at`),
-        sbFetch(`carrinho_cliques?select=checkout_id,clicked_at`),
-        sbFetch(`carrinho_conversoes?select=checkout_id,converted_at`)
+        sbFetch(`checkouts_notificados?select=checkout_id,notified_at&order=notified_at.desc&limit=10000`),
+        sbFetch(`carrinho_cliques?select=checkout_id,clicked_at&order=clicked_at.desc&limit=10000`),
+        sbFetch(`carrinho_conversoes?select=checkout_id,converted_at&order=converted_at.desc&limit=10000`)
       ]);
       const notifMap = {};
       notificados.forEach(n => { notifMap[n.checkout_id] = new Date(n.notified_at); });
