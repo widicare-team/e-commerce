@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Disparos Suri – custo e retorno</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#FFF8F5;--card:#fff;--ink:#4A1D35;--mute:#8a6277;--pink:#E6007E;--soft:#FDE4F0;--line:#F3B6D4;--in:#0000cc;
+--pos-bg:#C6EFCE;--pos:#006100;--neu-bg:#FFEB9C;--neu:#7F6000;--neg-bg:#FFC7CE;--neg:#9C0006;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1f1019;--card:#2b1722;--ink:#fbe8f2;--mute:#c79ab3;--pink:#ff4fa9;--soft:#3d1f2f;--line:#6b3350;--in:#8fb4ff;--pos-bg:#143d22;--pos:#9be7a9;--neu-bg:#4a3d10;--neu:#f2d977;--neg-bg:#4d1820;--neg:#ffaab5}}
+:root[data-theme="dark"]{--bg:#1f1019;--card:#2b1722;--ink:#fbe8f2;--mute:#c79ab3;--pink:#ff4fa9;--soft:#3d1f2f;--line:#6b3350;--in:#8fb4ff;--pos-bg:#143d22;--pos:#9be7a9;--neu-bg:#4a3d10;--neu:#f2d977;--neg-bg:#4d1820;--neg:#ffaab5}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;line-height:1.45}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:1.7rem;font-weight:800;color:var(--pink);margin:0 0 4px}
+h2{font-size:1.05rem;font-weight:800;margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 20px;font-size:.92rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.top{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+@media(max-width:760px){.top{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.kpi{background:var(--soft);border-radius:10px;padding:10px 12px}
+.kpi small{display:block;color:var(--mute);font-size:.78rem}
+.kpi b{font-size:1.15rem}
+.roas{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+.roas .n{font-size:2.6rem;font-weight:800;color:var(--pink);line-height:1}
+.pill{display:inline-block;padding:3px 10px;border-radius:999px;font-weight:800;font-size:.82rem;white-space:nowrap}
+.Positivo{background:var(--pos-bg);color:var(--pos)}.Neutro{background:var(--neu-bg);color:var(--neu)}.Negativo{background:var(--neg-bg);color:var(--neg)}.Aguardando{background:transparent;color:var(--mute);font-weight:600;font-style:italic}
+.params{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{font-size:.82rem;color:var(--mute);display:block}
+input,select{font:inherit;color:var(--in);background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:6px 8px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--pink);outline-offset:1px}
+.hint{font-size:.78rem;color:var(--mute);margin:8px 0 0}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+button{font:inherit;font-weight:800;border:0;border-radius:10px;padding:8px 14px;cursor:pointer;background:var(--pink);color:#fff}
+button.ghost{background:transparent;color:var(--pink);border:1px solid var(--pink)}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:980px;font-size:.9rem}
+th{background:var(--pink);color:#fff;padding:8px;font-size:.8rem;text-align:center;font-weight:800}
+td{border-bottom:1px solid var(--line);padding:4px;text-align:center}
+td.calc{padding:4px 8px;white-space:nowrap}
+td input,td select{padding:5px 6px}
+td.x button{background:transparent;color:var(--mute);padding:2px 8px;font-size:1.1rem}
+.sum td,.sum th{text-align:left}.sum td{padding:6px 8px}.sum td:not(:first-child),.sum th:not(:first-child){text-align:right}
+.sum table{min-width:0}
+.warn{background:var(--neg-bg);color:var(--neg);border-radius:10px;padding:8px 12px;font-weight:600}
+.ro #add,.ro [data-del]{display:none}
+.bars{display:grid;gap:8px}
+.br{display:grid;grid-template-columns:minmax(90px,200px) 1fr 64px;gap:10px;align-items:center;font-size:.88rem}
+.br .t{position:relative;height:18px;background:var(--soft);border-radius:6px}
+.br .f{position:absolute;left:0;top:0;bottom:0;border-radius:6px}
+.br .m{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);opacity:.6}
+.br .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.br .v{text-align:right;font-weight:800}
+.empty{color:var(--mute);text-align:center;padding:22px}
+</style>
+</head>
+<body>
+<main>
+<h1>Disparos Suri: custo e retorno</h1>
+<p class="sub">Adicione cada campanha, informe a receita atribuída via UTM e veja se o ROAS ficou negativo, neutro ou positivo. <span id="sync"></span></p>
+<p id="note" class="warn" role="status" hidden></p>
+<p id="imp" class="panel" hidden>Há campanhas salvas só neste navegador. <button id="imp-btn" class="ghost">Importar para o banco do time</button></p>
+
+<div class="top">
+  <section class="panel">
+    <h2>Resultado geral</h2>
+    <div class="roas"><span class="n" id="roas">–</span><span id="gstatus" class="pill Aguardando">Aguardando receita</span></div>
+    <div class="kpis">
+      <div class="kpi"><small>Campanhas</small><b id="k-camp">0</b></div>
+      <div class="kpi"><small>Contatos enviados</small><b id="k-cont">0</b></div>
+      <div class="kpi"><small>Custo total</small><b id="k-custo">R$ 0,00</b></div>
+      <div class="kpi"><small>Receita (UTM)</small><b id="k-rec">R$ 0,00</b></div>
+      <div class="kpi"><small>Resultado</small><b id="k-res">R$ 0,00</b></div>
+    </div>
+    <p class="hint">O ROAS geral usa apenas campanhas com receita informada (custo delas: <span id="k-cr">R$ 0,00</span>).</p>
+  </section>
+  <section class="panel">
+    <h2>Tarifas e critério</h2>
+    <div class="params">
+      <div><label for="p-u">Utilidade (R$/envio)</label><input id="p-u" type="number" step="0.001" min="0"></div>
+      <div><label for="p-m">Marketing (R$/envio)</label><input id="p-m" type="number" step="0.001" min="0"></div>
+      <div><label for="p-f">Fora da franquia (R$/envio)</label><input id="p-f" type="number" step="0.001" min="0"></div>
+      <div><label for="p-t">Margem de neutralidade (%)</label><input id="p-t" type="number" step="1" min="0"></div>
+    </div>
+    <p class="hint">ROAS = receita ÷ custo do disparo. Neutro: ROAS entre 1 − margem e 1 + margem. Fora da franquia substitui a tarifa da categoria em todos os contatos do disparo.</p>
+  </section>
+</div>
+
+<section class="panel">
+  <h2>ROAS por campanha</h2>
+  <div id="chart" class="bars"></div>
+  <p class="hint">A linha vertical marca ROAS 1,00x (receita igual ao custo do disparo). Verde: positivo, amarelo: neutro, vermelho: negativo.</p>
+</section>
+
+<section class="panel">
+  <h2>Campanhas</h2>
+  <div class="bar">
+    <button id="add">Adicionar campanha</button>
+    <button id="csv" class="ghost">Exportar CSV</button>
+    <button id="save" class="ghost">Salvar dados (JSON)</button>
+    <button id="load" class="ghost">Carregar dados</button>
+    <input id="file" type="file" accept=".json,application/json" hidden>
+    <button id="theme" class="ghost">Tema claro/escuro</button>
+  </div>
+  <div class="wrap">
+  <table>
+    <thead><tr><th>Data</th><th>Campanha</th><th>Categoria</th><th>Contatos enviados</th><th>Excedeu franquia?</th><th>Tarifa</th><th>Custo</th><th>Receita UTM (R$)</th><th>Resultado</th><th>ROAS</th><th>Status</th><th>Observações</th><th></th></tr></thead>
+    <tbody id="body"></tbody>
+  </table>
+  </div>
+  <div id="empty" class="empty" hidden>Nenhuma campanha ainda. Clique em “Adicionar campanha” para começar.</div>
+</section>
+
+<section class="panel sum">
+  <h2>Por categoria</h2>
+  <div class="wrap">
+  <table>
+    <thead><tr><th>Grupo</th><th>Campanhas</th><th>Contatos</th><th>Custo</th><th>Receita</th><th>ROAS</th></tr></thead>
+    <tbody id="cat"></tbody>
+  </table>
+  </div>
+  <p class="hint">“Fora da franquia” se sobrepõe às categorias: um disparo fora da franquia também tem categoria.</p>
+</section>
+</main>
+
+<script>
+const KEY="widi-suri-v1", TKEY="widi-suri-theme";
+const brl=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const brl3=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL",minimumFractionDigits:3});
+const int=n=>n.toLocaleString("pt-BR");
+const $=id=>document.getElementById(id);
+const num=v=>(v===""||v==null||isNaN(+v))?null:+v;
+const today=()=>new Date().toISOString().slice(0,10);
+let S={params:{u:0.25,m:0.49,f:1.5,t:5},rows:[],dark:null};
+let LOCAL=null,DB=null,CAN=true,focusId=null;
+try{LOCAL=JSON.parse(localStorage.getItem(KEY)||"null");if(LOCAL){S.params=Object.assign(S.params,LOCAL.params||{});S.rows=LOCAL.rows||[]}
+ const t=localStorage.getItem(TKEY);S.dark=t==="dark"?true:t==="light"?false:(LOCAL&&LOCAL.dark!=null?LOCAL.dark:null)}catch(e){}
+const persist=()=>{if(DB)return;try{localStorage.setItem(KEY,JSON.stringify({params:S.params,rows:S.rows}))}catch(e){}};
+const note=t=>{$("note").textContent=t;$("note").hidden=!t};
+function setSync(){$("sync").textContent=DB?"Compartilhado com o time e atualizado ao vivo."+(CAN?"":" Você tem acesso somente para leitura."):"Os dados ficam salvos neste navegador. Use “Salvar dados” e “Carregar dados” para passar para outra pessoa."}
+
+function calc(r){
+  const q=num(r.qty); let tar=null;
+  if(r.over==="Sim") tar=S.params.f; else if(r.cat==="Utilidade") tar=S.params.u; else if(r.cat==="Marketing") tar=S.params.m;
+  const custo=(q!=null&&tar!=null)?q*tar:null, rec=num(r.rev);
+  const res=(custo!=null&&rec!=null)?rec-custo:null;
+  const roas=(custo&&rec!=null)?rec/custo:null;
+  let st="";
+  if(custo!=null){ if(rec==null) st="Aguardando receita"; else if(roas!=null) st=statusOf(roas); }
+  return {tar,custo,rec,res,roas,st,q};
+}
+function statusOf(roas){const t=S.params.t/100;return roas>1+t?"Positivo":roas<1-t?"Negativo":"Neutro"}
+const pill=st=>st?`<span class="pill ${st.split(" ")[0]}">${st}</span>`:"";
+const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+
+function rowHTML(r){
+  return `<td><input type="date" data-k="date" value="${esc(r.date)}"></td>
+  <td><input type="text" data-k="name" value="${esc(r.name)}" placeholder="Nome da campanha" style="min-width:170px"></td>
+  <td><select data-k="cat"><option value=""></option><option${r.cat==="Utilidade"?" selected":""}>Utilidade</option><option${r.cat==="Marketing"?" selected":""}>Marketing</option></select></td>
+  <td><input type="number" min="0" data-k="qty" value="${esc(r.qty)}" style="width:100px"></td>
+  <td><select data-k="over"><option${r.over!=="Sim"?" selected":""}>Não</option><option${r.over==="Sim"?" selected":""}>Sim</option></select></td>
+  <td class="calc" data-c="tar"></td><td class="calc" data-c="custo"></td>
+  <td><input type="number" min="0" step="0.01" data-k="rev" value="${esc(r.rev)}" style="width:120px"></td>
+  <td class="calc" data-c="res"></td><td class="calc" data-c="roas"></td><td class="calc" data-c="st"></td>
+  <td><input type="text" data-k="obs" value="${esc(r.obs)}" style="min-width:140px"></td>
+  <td class="x"><button title="Remover campanha" aria-label="Remover campanha" data-del>×</button></td>`;
+}
+function applyRO(){
+  document.body.classList.toggle("ro",!CAN);
+  document.querySelectorAll("#body input,#body select,.params input").forEach(e=>e.disabled=!CAN);
+}
+function build(){
+  const a=document.activeElement, aid=a&&a.closest&&a.closest("tr")?a.closest("tr").dataset.id:null, ak=a&&a.dataset?a.dataset.k:null;
+  const b=$("body"); b.innerHTML="";
+  S.rows.forEach(r=>{const tr=document.createElement("tr");tr.dataset.id=r.id;tr.innerHTML=rowHTML(r);b.appendChild(tr)});
+  $("empty").hidden=S.rows.length>0; applyRO(); update();
+  const fid=focusId||aid, fk=focusId?"name":ak;
+  if(fid&&fk){const el=document.querySelector(`tr[data-id="${fid}"] [data-k="${fk}"]`);if(el)el.focus()}
+  focusId=null;
+}
+function update(){
+  let n=0,cont=0,custo=0,custoR=0,rec=0;
+  const g={Utilidade:[0,0,0,0,0],Marketing:[0,0,0,0,0],"Fora da franquia":[0,0,0,0,0]};
+  S.rows.forEach(r=>{
+    const c=calc(r), tr=document.querySelector(`tr[data-id="${r.id}"]`);
+    if(tr){
+      tr.querySelector('[data-c=tar]').textContent=c.tar!=null&&c.custo!=null?brl3(c.tar):"";
+      tr.querySelector('[data-c=custo]').textContent=c.custo!=null?brl(c.custo):"";
+      const re=tr.querySelector('[data-c=res]');re.textContent=c.res!=null?brl(c.res):"";re.style.color=c.res!=null&&c.res<0?"var(--neg)":"";
+      tr.querySelector('[data-c=roas]').textContent=c.roas!=null?c.roas.toFixed(2).replace(".",",")+"x":"";
+      tr.querySelector('[data-c=st]').innerHTML=pill(c.st);
+    }
+    if(c.q!=null){n++;cont+=c.q}
+    if(c.custo!=null){custo+=c.custo; if(c.rec!=null){custoR+=c.custo}}
+    if(c.rec!=null)rec+=c.rec;
+    const add=k=>{const a=g[k];if(c.q!=null)a[0]++;a[1]+=c.q||0;a[2]+=c.custo||0;a[3]+=c.rec||0;if(c.custo!=null&&c.rec!=null)a[4]+=c.custo};
+    if(r.cat&&g[r.cat])add(r.cat); if(r.over==="Sim")add("Fora da franquia");
+  });
+  $("k-camp").textContent=int(n);$("k-cont").textContent=int(cont);$("k-custo").textContent=brl(custo);
+  $("k-rec").textContent=brl(rec);$("k-cr").textContent=brl(custoR);
+  $("k-res").textContent=brl(rec-custoR);
+  const roas=custoR>0?rec/custoR:null;
+  $("roas").textContent=roas!=null?roas.toFixed(2).replace(".",",")+"x":"–";
+  const st=roas!=null?statusOf(roas):"Aguardando receita";
+  const gs=$("gstatus");gs.textContent=st;gs.className="pill "+st.split(" ")[0];
+  $("cat").innerHTML=Object.entries(g).map(([k,a])=>`<tr><td>${k}</td><td>${a[0]}</td><td>${int(a[1])}</td><td>${brl(a[2])}</td><td>${brl(a[3])}</td><td>${a[4]>0?(a[3]/a[4]).toFixed(2).replace(".",",")+"x":"–"}</td></tr>`).join("");
+}
+
+/* ---- gravação no banco compartilhado (agrupa digitação, uma escrita por vez) ---- */
+const pend={},timers={},busy={};
+function queue(id,patch){
+  pend[id]=Object.assign(pend[id]||{},patch); clearTimeout(timers[id]); timers[id]=setTimeout(()=>flush(id),600);
+}
+async function flush(id){
+  if(busy[id]){timers[id]=setTimeout(()=>flush(id),300);return}
+  const p=pend[id]; if(!p)return; delete pend[id]; busy[id]=true;
+  try{
+    if(id==="__params")await DB.doc("config/params").set(p);
+    else await DB.doc("campanhas/"+id).update(p);
+    note("");
+  }catch(e){note("Não foi possível salvar a última alteração ("+(e.code||"erro")+"). Atualize a página e tente de novo.")}
+  busy[id]=false;
+}
+$("body").addEventListener("input",e=>{
+  const k=e.target.dataset.k; if(!k||!CAN)return;
+  const id=e.target.closest("tr").dataset.id, r=S.rows.find(x=>x.id===id); if(!r)return;
+  r[k]=e.target.value; update();
+  if(DB)queue(id,{[k]:e.target.value}); else persist();
+});
+$("body").addEventListener("click",async e=>{
+  if(!e.target.matches("[data-del]")||!CAN)return;
+  const id=e.target.closest("tr").dataset.id;
+  if(!confirm("Remover esta campanha para todo o time?"))return;
+  if(DB){try{await DB.doc("campanhas/"+id).delete()}catch(err){note("Não foi possível remover ("+(err.code||"erro")+").")}}
+  else{S.rows=S.rows.filter(x=>x.id!==id);persist();build()}
+});
+$("add").onclick=async()=>{
+  const r={date:today(),name:"",cat:"Marketing",qty:"",over:"Não",rev:"",obs:"",ts:Date.now()};
+  if(DB){try{const ref=await DB.collection("campanhas").add(r);focusId=ref.id}catch(e){note("Não foi possível adicionar ("+(e.code||"erro")+").")}}
+  else{r.id="r"+Date.now();S.rows.push(r);focusId=r.id;persist();build()}
+};
+[["p-u","u"],["p-m","m"],["p-f","f"],["p-t","t"]].forEach(([id,k])=>{
+  $(id).value=S.params[k];
+  $(id).addEventListener("input",e=>{const v=num(e.target.value);if(v==null||!CAN)return;S.params[k]=v;update();if(DB)queue("__params",Object.assign({},S.params));else persist()});
+});
+
+/* ---- sincronização ao vivo ---- */
+function applySnap(snap){
+  const rows=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+  const same=rows.length===S.rows.length&&rows.every((r,i)=>r.id===S.rows[i].id)&&$("body").children.length===rows.length;
+  S.rows=rows;
+  if(!same)build();
+  else{
+    rows.forEach(r=>{const tr=document.querySelector(`tr[data-id="${r.id}"]`);
+      if(tr)tr.querySelectorAll("[data-k]").forEach(el=>{const v=String(r[el.dataset.k]??"");if(el!==document.activeElement&&el.value!==v)el.value=v})});
+    update();
+  }
+  if(focusId){const el=document.querySelector(`tr[data-id="${focusId}"] [data-k="name"]`);if(el){el.focus();focusId=null}}
+  $("imp").hidden=!(rows.length===0&&CAN&&LOCAL&&LOCAL.rows&&LOCAL.rows.length);
+}
+$("imp-btn").onclick=async()=>{
+  $("imp").hidden=true;
+  try{
+    let t=Date.now();
+    for(const r of LOCAL.rows){const o=Object.assign({},r);delete o.id;o.ts=t++;await DB.collection("campanhas").add(o)}
+    if(LOCAL.params)await DB.doc("config/params").set(Object.assign({},S.params,LOCAL.params));
+    LOCAL=null;try{localStorage.removeItem(KEY)}catch(e){}
+  }catch(e){note("Não foi possível importar ("+(e.code||"erro")+").")}
+};
+(async()=>{
+  try{
+    if(!window.claude||!claude.use)return;
+    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+    if(!db)return;
+    DB=db; CAN=user?((await user.can("data.write"))!==false):true;
+    setSync(); applyRO();
+    DB.collection("campanhas").orderBy("ts","asc").onSnapshot(applySnap,e=>note("Conexão com o banco interrompida ("+(e.code||"erro")+"). Atualize a página."));
+    DB.doc("config/params").onSnapshot(s=>{
+      if(!s.exists)return; S.params=Object.assign(S.params,s.data());
+      [["p-u","u"],["p-m","m"],["p-f","f"],["p-t","t"]].forEach(([id,k])=>{const el=$(id);if(el!==document.activeElement)el.value=S.params[k]});
+      update();
+    },()=>{});
+  }catch(e){}
+})();
+
+$("csv").onclick=()=>{
+  const h=["Data","Campanha","Categoria","Contatos","Excedeu franquia","Tarifa","Custo","Receita UTM","Resultado","ROAS","Status","Observações"];
+  const q=v=>`"${String(v??"").replace(/"/g,'""')}"`;
+  const lines=[h.map(q).join(";")].concat(S.rows.map(r=>{const c=calc(r);
+    return [r.date,r.name,r.cat,r.qty,r.over,c.tar??"",c.custo??"",r.rev,c.res??"",c.roas!=null?c.roas.toFixed(2):"",c.st,r.obs].map(q).join(";")}));
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob(["\ufeff"+lines.join("\n")],{type:"text/csv;charset=utf-8"}));
+  a.download="disparos-suri.csv";a.click();
+};
+function applyTheme(){if(S.dark===true)document.documentElement.dataset.theme="dark";else if(S.dark===false)document.documentElement.dataset.theme="light";else delete document.documentElement.dataset.theme}
+$("theme").onclick=()=>{const d=document.documentElement.dataset.theme==="dark"||(S.dark===null&&matchMedia("(prefers-color-scheme:dark)").matches);S.dark=!d;applyTheme();try{localStorage.setItem(TKEY,S.dark?"dark":"light")}catch(e){}};
+function drawChart(){
+  const rows=S.rows.map(r=>({n:r.name||"(sem nome)",c:calc(r)})).filter(x=>x.c.roas!=null);
+  const box=$("chart");
+  if(!rows.length){box.innerHTML='<div class="empty">Informe a receita de uma campanha para ver o ROAS aqui.</div>';return}
+  const max=Math.max(2,...rows.map(x=>x.c.roas));
+  const col={Positivo:"#2e9e5b",Neutro:"#d9a400",Negativo:"#d6455d"};
+  box.innerHTML=rows.map(x=>`<div class="br"><span class="l" title="${esc(x.n)}">${esc(x.n)}</span><span class="t"><span class="f" style="width:${Math.min(100,x.c.roas/max*100)}%;background:${col[x.c.st]}"></span><span class="m" style="left:${100/max}%"></span></span><span class="v">${x.c.roas.toFixed(2).replace(".",",")}x</span></div>`).join("");
+}
+const _upd=update; update=function(){_upd();drawChart()};
+$("save").onclick=()=>{
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify({params:S.params,rows:S.rows},null,1)],{type:"application/json"}));
+  a.download="dados-disparos-suri.json";a.click();
+};
+$("load").onclick=()=>$("file").click();
+$("file").onchange=async e=>{
+  const f=e.target.files[0]; if(!f)return;
+  try{
+    const d=JSON.parse(await f.text());
+    if(!Array.isArray(d.rows))throw 0;
+    if(!confirm("Carregar este arquivo substitui as campanhas atuais. Continuar?"))return;
+    S.rows=d.rows.map((r,i)=>({id:"r"+Date.now()+i,date:r.date||"",name:r.name||"",cat:r.cat||"",qty:r.qty??"",over:r.over==="Sim"?"Sim":"Não",rev:r.rev??"",obs:r.obs||"",ts:i}));
+    if(d.params)S.params=Object.assign(S.params,d.params);
+    [["p-u","u"],["p-m","m"],["p-f","f"],["p-t","t"]].forEach(([id,k])=>$(id).value=S.params[k]);
+    persist();build();note("");
+  }catch(err){note("Arquivo inválido. Use um JSON gerado por “Salvar dados (JSON)”.")}
+  e.target.value="";
+};
+applyTheme(); setSync(); build();
+</script>
+</body>
+</html>
