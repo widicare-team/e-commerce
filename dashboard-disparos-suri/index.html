@@ -126,7 +126,55 @@ td.x button{background:transparent;color:var(--mute);padding:2px 8px;font-size:1
 </section>
 </main>
 
+<!-- Banco compartilhado (Supabase). Preencha SUPABASE_URL e SUPABASE_KEY logo abaixo. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* ===== COLE AQUI OS DADOS DO SEU PROJETO SUPABASE =====
+   Supabase > Project Settings > API (ou "Data API" / "API Keys")
+   SUPABASE_URL = Project URL   |   SUPABASE_KEY = chave "anon public" (ou "publishable")
+   Enquanto ficarem vazios, o dashboard salva só no navegador de cada pessoa. */
+const SUPABASE_URL = "https://ebhsohxlkttwdvqekqxa.supabase.co/rest/v1/";
+const SUPABASE_KEY = "sb_publishable_EKOXt5BpIJLfZS4eZ3rr-w_EY3UWNvo";
+
+/* Adaptador: expõe para o restante do código a mesma interface simples
+   (collection/doc, add/update/set/delete, onSnapshot) usando tabelas do Supabase. */
+function supaDB(sb){
+  const fromDb=r=>{const o={};for(const k in r){if(k==="id")continue;o[k==="excedeu"?"over":k]=r[k]}return o};
+  const toDb=o=>{const r={};for(const k in o){if(k==="id")continue;r[k==="over"?"excedeu":k]=o[k]}return r};
+  const fail=e=>{throw {code:e.code||e.message||"erro"}};
+  const subs={campanhas:[],config:[]}, timers={};
+  const refresh=t=>{clearTimeout(timers[t]);timers[t]=setTimeout(()=>subs[t].forEach(f=>f()),120)};
+  ["campanhas","config"].forEach(t=>sb.channel("rt-"+t)
+    .on("postgres_changes",{event:"*",schema:"public",table:t},()=>refresh(t)).subscribe());
+  const campanhasSnap=(cb,err)=>{
+    const load=async()=>{const {data,error}=await sb.from("campanhas").select("*").order("ts",{ascending:true});
+      if(error){err&&err({code:error.message});return}
+      cb({docs:data.map(r=>{const o=fromDb(r);return{id:r.id,data:()=>o}})})};
+    subs.campanhas.push(load); load();
+  };
+  const paramsSnap=(cb,err)=>{
+    const load=async()=>{const {data,error}=await sb.from("config").select("data").eq("id","params").maybeSingle();
+      if(error){err&&err({code:error.message});return}
+      cb({exists:!!data,data:()=>data?data.data:{}})};
+    subs.config.push(load); load();
+  };
+  return{
+    collection:()=>({
+      orderBy:()=>({onSnapshot:campanhasSnap}),
+      add:async r=>{const {data,error}=await sb.from("campanhas").insert(toDb(r)).select("id").single();
+        if(error)fail(error); refresh("campanhas"); return{id:data.id}}
+    }),
+    doc:path=>{
+      const [t,id]=path.split("/");
+      if(t==="config")return{
+        set:async p=>{const {error}=await sb.from("config").upsert({id,data:p});if(error)fail(error);refresh("config")},
+        onSnapshot:paramsSnap};
+      return{
+        update:async p=>{const {error}=await sb.from("campanhas").update(toDb(p)).eq("id",id);if(error)fail(error)},
+        delete:async()=>{const {error}=await sb.from("campanhas").delete().eq("id",id);if(error)fail(error);refresh("campanhas")}};
+    }
+  };
+}
 const KEY="widi-suri-v1", TKEY="widi-suri-theme";
 const brl=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const brl3=n=>n.toLocaleString("pt-BR",{style:"currency",currency:"BRL",minimumFractionDigits:3});
@@ -249,7 +297,7 @@ $("add").onclick=async()=>{
 
 /* ---- sincronização ao vivo ---- */
 function applySnap(snap){
-  const rows=snap.docs.map(d=>Object.assign({id:d.id},d.data()));
+  const rows=snap.docs.map(d=>Object.assign({id:d.id},d.data(),pend[d.id]||{}));
   const same=rows.length===S.rows.length&&rows.every((r,i)=>r.id===S.rows[i].id)&&$("body").children.length===rows.length;
   S.rows=rows;
   if(!same)build();
@@ -272,10 +320,14 @@ $("imp-btn").onclick=async()=>{
 };
 (async()=>{
   try{
-    if(!window.claude||!claude.use)return;
-    const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
-    if(!db)return;
-    DB=db; CAN=user?((await user.can("data.write"))!==false):true;
+    if(SUPABASE_URL&&SUPABASE_KEY&&window.supabase){
+      DB=supaDB(supabase.createClient(SUPABASE_URL,SUPABASE_KEY)); CAN=true;
+    }else{
+      if(!window.claude||!claude.use)return;
+      const [db,user]=await Promise.all([claude.use("db"),claude.use("user")]);
+      if(!db)return;
+      DB=db; CAN=user?((await user.can("data.write"))!==false):true;
+    }
     setSync(); applyRO();
     DB.collection("campanhas").orderBy("ts","asc").onSnapshot(applySnap,e=>note("Conexão com o banco interrompida ("+(e.code||"erro")+"). Atualize a página."));
     DB.doc("config/params").onSnapshot(s=>{
@@ -317,6 +369,14 @@ $("file").onchange=async e=>{
   try{
     const d=JSON.parse(await f.text());
     if(!Array.isArray(d.rows))throw 0;
+    if(DB){
+      if(!CAN)return;
+      if(!confirm("Adicionar as campanhas deste arquivo ao banco do time?"))return;
+      let t=Date.now();
+      for(const r of d.rows){await DB.collection("campanhas").add({date:r.date||"",name:r.name||"",cat:r.cat||"",qty:r.qty??"",over:r.over==="Sim"?"Sim":"Não",rev:r.rev??"",obs:r.obs||"",ts:t++})}
+      if(d.params)await DB.doc("config/params").set(Object.assign({},S.params,d.params));
+      note("");e.target.value="";return;
+    }
     if(!confirm("Carregar este arquivo substitui as campanhas atuais. Continuar?"))return;
     S.rows=d.rows.map((r,i)=>({id:"r"+Date.now()+i,date:r.date||"",name:r.name||"",cat:r.cat||"",qty:r.qty??"",over:r.over==="Sim"?"Sim":"Não",rev:r.rev??"",obs:r.obs||"",ts:i}));
     if(d.params)S.params=Object.assign(S.params,d.params);
