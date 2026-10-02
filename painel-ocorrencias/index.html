@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Painel de Ocorrências | Widi Care</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBF6F3;--card:#fff;--ink:#3A1F2B;--mut:#8A6F7A;--line:#EBDDE2;--pink:#D9487E;--soft:#FBE3EC;--amber:#E9A23B;--plum:#8E4A9E;--green:#3F9B74;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#21141A;--card:#2D1C24;--ink:#F7E9EE;--mut:#B59AA6;--line:#47303A;--soft:#4A2636}}
+:root[data-theme="dark"]{--bg:#21141A;--card:#2D1C24;--ink:#F7E9EE;--mut:#B59AA6;--line:#47303A;--soft:#4A2636}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1180px;margin:0 auto;padding:24px 18px 60px}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+h1{font-size:28px;font-weight:800;margin:0;letter-spacing:-.02em}
+h1 small{display:block;font-size:14px;font-weight:500;color:var(--mut);letter-spacing:0}
+button,select,input,textarea{font:inherit;color:inherit}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:700;font-size:13px}
+.btn.p{background:var(--pink);border-color:var(--pink);color:#fff}
+.btn:focus-visible,.seg:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.top{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px;margin-bottom:20px}
+@media(max-width:820px){.top{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.ring{display:flex;align-items:center;gap:16px}
+.ring svg{width:130px;height:130px;flex:none}
+.ring b{font-size:34px;font-weight:800;display:block;line-height:1}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.kpi{border-radius:12px;background:var(--soft);padding:10px 12px}
+.kpi b{font-size:24px;font-weight:800;display:block;line-height:1.1}
+.kpi span{font-size:12px;color:var(--mut)}
+@media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.trow{margin-top:12px}
+.thead{display:flex;justify-content:space-between;font-weight:700;font-size:14px;margin-bottom:5px}
+.thead span{color:var(--mut);font-weight:500}
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line)}
+.bar i{display:block;transition:width .3s}
+.leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;color:var(--mut);margin-top:5px}
+.leg u{text-decoration:none;display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:500}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.search{flex:1;min-width:160px;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px}
+.list{display:grid;gap:10px}
+.row{display:grid;grid-template-columns:130px minmax(0,1.2fr) minmax(0,1.3fr) minmax(0,1.4fr) auto;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.row.done{opacity:.72}
+@media(max-width:900px){.row{grid-template-columns:1fr 1fr}.row>*{min-width:0}}
+.ped{font-weight:800;font-size:17px}
+.tag{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;background:var(--soft);color:var(--pink)}
+.meta{font-size:13px;color:var(--mut);overflow-wrap:anywhere}
+.meta b{color:var(--ink);font-weight:700}
+.steps{display:flex;gap:4px}
+.seg{flex:1;height:12px;border:0;border-radius:6px;background:var(--line);cursor:pointer;padding:0}
+.seg.on{background:var(--c)}
+.st{font-size:13px;font-weight:700;margin-top:5px}
+.ib{border:0;background:none;cursor:pointer;font-size:16px;padding:4px 6px;border-radius:8px}
+.ib:hover{background:var(--soft)}
+.empty{text-align:center;color:var(--mut);padding:40px}
+dialog{border:1px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);width:min(520px,94vw);padding:22px}
+dialog::backdrop{background:rgba(40,15,28,.45)}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 4px}
+dialog input,dialog select,dialog textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 11px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.sync{margin:-12px 0 14px}
+.note{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+.note[hidden]{display:none}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <h1>Painel de Ocorrências<small>Acompanhamento das tratativas, Widi Care</small></h1>
+  <div class="tools">
+    <button class="btn" data-act="theme" id="theme" aria-label="Alternar modo claro e escuro"></button>
+    <button class="btn" data-act="csv">Exportar CSV</button>
+    <button class="btn" data-act="bkp">Backup JSON</button>
+    <button class="btn" data-act="imp">Importar JSON</button>
+    <button class="btn p" data-act="new">+ Nova ocorrência</button>
+    <input type="file" id="file" accept=".json" hidden>
+  </div>
+</header>
+<div class="meta sync" id="sync"></div>
+<div class="note" id="note" hidden></div>
+
+<section class="top">
+  <div class="card ring" id="ring"></div>
+  <div class="card"><div class="kpis" id="kpis"></div><div id="types"></div></div>
+</section>
+
+<div class="filters" id="filters"></div>
+<div class="list" id="list"></div>
+</main>
+
+<dialog id="dlg">
+  <h2 id="dt" style="margin:0 0 4px;font-size:20px"></h2>
+  <div class="two">
+    <div><label for="f-tipo">Tipo</label><select id="f-tipo"></select></div>
+    <div><label for="f-ped">Pedido</label><input id="f-ped" inputmode="numeric"></div>
+  </div>
+  <div class="two">
+    <div><label for="f-nome">Cliente</label><input id="f-nome"></div>
+    <div><label for="f-cod">Código (rastreio ou devolução)</label><input id="f-cod"></div>
+  </div>
+  <div class="two">
+    <div><label for="f-status">Status</label><select id="f-status"></select></div>
+    <div><label for="f-trat">Tratativa</label><input id="f-trat" placeholder="Ex.: Cancelar"></div>
+  </div>
+  <div id="integral"><label for="f-int">Devolução integral</label><select id="f-int"><option>Sim</option><option>Não</option></select></div>
+  <label for="f-obs">Observações</label><textarea id="f-obs" rows="2"></textarea>
+  <div class="acts"><button class="btn" data-act="del" id="bdel" style="margin-right:auto;color:#c0392b">Excluir</button><button class="btn" data-act="cancel">Cancelar</button><button class="btn p" data-act="save">Salvar</button></div>
+</dialog>
+
+<!-- Banco compartilhado (Supabase): mesmo projeto do dashboard de disparos -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://ebhsohxlkttwdvqekqxa.supabase.co";
+const SUPABASE_KEY = "sb_publishable_EKOXt5BpIJLfZS4eZ3rr-w_EY3UWNvo";
+let SB=null;
+try{if(SUPABASE_URL&&SUPABASE_KEY&&window.supabase)SB=supabase.createClient(SUPABASE_URL,SUPABASE_KEY)}catch(e){}
+const COLS=["id","tipo","pedido","nome","cod","status","trat","integral","obs","upd"];
+const toRow=o=>{const r={};COLS.forEach(k=>{const v=o[k];r[k]=v==null||v===""?null:String(v)});return r};
+const fromRow=r=>{const o={};COLS.forEach(k=>{if(r[k]!=null)o[k]=r[k]});return o};
+const newId=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():"n"+Date.now();
+const FLOW={
+ "Devolução":["Aguardando postagem","Postado","Aguardando confirmação da Unilog","Concluído"],
+ "Pedido em atraso":["Aguardando manifestação","Em tratativa","Resolvido"],
+ "Acareação":["Aguardando manifestação","Em análise","Resolvido"],
+ "Reenvio":["Pendente","Feito"]};
+const TIPOS=Object.keys(FLOW), KEY="widi-ocorrencias-v1";
+const D=(p,c,s)=>({tipo:"Devolução",pedido:p,cod:c,status:s,trat:"Cancelar",integral:"Sim"});
+const A=(n,c,p)=>({tipo:"Pedido em atraso",pedido:p,nome:n,cod:c,status:"Aguardando manifestação"});
+const SEED=[
+ D(62259,"AD955579561BR","Aguardando postagem"),D(61331,"AP551517367BR","Aguardando postagem"),D(60707,"AP562382011BR","Aguardando postagem"),
+ D(61150,"AP555595016BR","Postado"),D(61937,"AP554734051BR","Postado"),D(60612,"AP504808043BR","Aguardando confirmação da Unilog"),
+ A("Fabiana Souza e Silva","AP474540967BR",60802),A("Roberta de Souza Félix","AP456663338BR",60347),A("Adriana Goes","AP477371247BR",61260),
+ A("Maria Eduarda Guimarães","AP477370096BR",61037),A("Mayara Almeida","AP495079653BR",61663),A("Kethelyn Lima","AP477368013BR",61201),
+ A("Clara Virgínia Felix Aciole","AP477368852BR",61128),A("Saionara Rodrigues","AP449399880BR",60110),A("Ademar Antonio Da Costa","AP475254631BR",60532),
+ A("Andressa Silva","AP477367097BR",61237),A("Andreia Lopes","AP463637404BR",60165),
+ ...[59950,60440,60937].map(p=>({tipo:"Acareação",pedido:p,status:"Aguardando manifestação"})),
+ ...[61934,61012,61192].map(p=>({tipo:"Reenvio",pedido:p,status:"Feito"}))
+].map((o,i)=>({id:"s"+i,...o}));
+
+let S=SB?[]:load(), fTipo="Todos", fSt="Todos", q="", editing=null;
+function load(){try{const j=localStorage.getItem(KEY);if(j)return JSON.parse(j)}catch(e){}return SEED}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const $=s=>document.querySelector(s), esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const idx=o=>Math.max(0,FLOW[o.tipo].indexOf(o.status)), last=o=>FLOW[o.tipo].length-1, done=o=>idx(o)===last(o);
+function col(t,i){const n=FLOW[t].length-1;if(i===n)return"var(--green)";if(i===0)return"var(--amber)";return i===1?"var(--pink)":"var(--plum)"}
+
+function render(){
+  const tot=S.length, dn=S.filter(done).length, open=tot-dn;
+  const avg=tot?Math.round(S.reduce((a,o)=>a+idx(o)/last(o),0)/tot*100):0, pc=tot?Math.round(dn/tot*100):0;
+  const C=2*Math.PI*52;
+  $("#ring").innerHTML=`<svg viewBox="0 0 130 130" role="img" aria-label="${pc}% concluído"><circle cx="65" cy="65" r="52" fill="none" stroke="var(--line)" stroke-width="13"/><circle cx="65" cy="65" r="52" fill="none" stroke="var(--green)" stroke-width="13" stroke-linecap="round" stroke-dasharray="${C*pc/100} ${C}" transform="rotate(-90 65 65)"/></svg><div><b>${pc}%</b><span class="meta">das ocorrências concluídas</span></div>`;
+  $("#kpis").innerHTML=[[tot,"Total"],[open,"Em andamento"],[dn,"Concluídas"],[avg+"%","Andamento médio"]].map(k=>`<div class="kpi"><b>${k[0]}</b><span>${k[1]}</span></div>`).join("");
+  $("#types").innerHTML=TIPOS.map(t=>{
+    const it=S.filter(o=>o.tipo===t), n=it.length;
+    const cnt=FLOW[t].map((s,i)=>({s,i,c:it.filter(o=>o.status===s).length}));
+    return `<div class="trow"><div class="thead">${t}<span>${it.filter(done).length} de ${n} concluídas</span></div>
+    <div class="bar">${cnt.map(x=>`<i style="width:${n?x.c/n*100:0}%;background:${col(t,x.i)}" title="${x.s}: ${x.c}"></i>`).join("")}</div>
+    <div class="leg">${cnt.map(x=>`<span><u style="background:${col(t,x.i)}"></u>${x.s} (${x.c})</span>`).join("")}</div></div>`}).join("");
+  $("#filters").innerHTML=["Todos",...TIPOS].map(t=>`<button class="chip ${fTipo===t?"on":""}" data-act="ft" data-v="${t}">${t} (${t==="Todos"?tot:S.filter(o=>o.tipo===t).length})</button>`).join("")
+   +`<select class="chip" id="fs" aria-label="Situação"><option>Todos</option><option ${fSt==="Em andamento"?"selected":""}>Em andamento</option><option ${fSt==="Concluídas"?"selected":""}>Concluídas</option></select><input class="search" id="q" placeholder="Buscar pedido, cliente ou código" value="${esc(q)}">`;
+  const L=S.filter(o=>(fTipo==="Todos"||o.tipo===fTipo)&&(fSt==="Todos"||(fSt==="Concluídas")===done(o))&&(!q||[o.pedido,o.nome,o.cod,o.trat,o.obs].join(" ").toLowerCase().includes(q.toLowerCase())))
+   .sort((a,b)=>done(a)-done(b)||idx(a)/last(a)-idx(b)/last(b));
+  $("#list").innerHTML=L.length?L.map(o=>{
+    const f=FLOW[o.tipo],i=idx(o);
+    return `<div class="row ${done(o)?"done":""}"><div><span class="tag">${o.tipo}</span></div>
+    <div><div class="ped">#${esc(o.pedido)}</div><div class="meta">${esc(o.nome||"")}</div></div>
+    <div class="meta">${o.cod?`<b>${esc(o.cod)}</b><br>`:""}${o.trat?`Tratativa: ${esc(o.trat)}`:""}${o.tipo==="Devolução"&&o.integral?` (integral: ${esc(o.integral)})`:""}${o.obs?`<br>${esc(o.obs)}`:""}</div>
+    <div><div class="steps">${f.map((s,k)=>`<button class="seg ${k<=i?"on":""}" style="--c:${col(o.tipo,i)}" data-act="set" data-id="${o.id}" data-i="${k}" title="${s}" aria-label="Definir status: ${s}"></button>`).join("")}</div><div class="st" style="color:${col(o.tipo,i)}">${f[i]}</div></div>
+    <div><button class="ib" data-act="adv" data-id="${o.id}" title="Avançar etapa" ${done(o)?"disabled":""}>⏭</button><button class="ib" data-act="edit" data-id="${o.id}" title="Editar">✏️</button></div></div>`}).join(""):`<div class="empty">Nenhuma ocorrência encontrada.</div>`;
+}
+function touch(o){o.upd=new Date().toISOString();if(SB)push(SB.from("ocorrencias").update(toRow(o)).eq("id",o.id));else save();render()}
+/* ===== Banco compartilhado ===== */
+function note(html){const n=$("#note");n.hidden=!html;n.innerHTML=html||""}
+let pulling=null,ready=false;
+async function pull(){
+  const {data,error}=await SB.from("ocorrencias").select("*").order("created_at",{ascending:true}).order("id",{ascending:true});
+  if(error){note("Não foi possível ler o banco do time ("+esc(error.message)+"). Atualize a página.");return}
+  S=data.map(fromRow);ready=true;
+  if(!S.length)note('<span>O banco do time ainda está vazio. Envie as ocorrências que estão neste navegador para todo mundo ver.</span><button class="btn p" data-act="seed">Enviar para o banco do time</button>');
+  else if($("#note").querySelector("[data-act=seed]"))note("");
+  render();
+}
+function later(){clearTimeout(pulling);pulling=setTimeout(pull,150)}
+async function push(q){
+  const {error}=await q;
+  if(error)note("Não foi possível salvar ("+esc(error.message)+"). Confira a conexão e tente de novo.");
+  later();
+}
+async function replaceAll(list){
+  const {error}=await SB.from("ocorrencias").delete().neq("id","");
+  if(error){note("Não foi possível substituir ("+esc(error.message)+").");return later()}
+  await push(SB.from("ocorrencias").insert(list.map(o=>toRow({...o,id:o.id||newId()}))));
+}
+function fillStatus(t,sel){$("#f-status").innerHTML=FLOW[t].map(s=>`<option ${s===sel?"selected":""}>${s}</option>`).join("");$("#integral").style.display=t==="Devolução"?"":"none"}
+function openDlg(o){
+  editing=o?o.id:null;$("#dt").textContent=o?"Editar ocorrência":"Nova ocorrência";$("#bdel").style.display=o?"":"none";
+  $("#f-tipo").innerHTML=TIPOS.map(t=>`<option ${o&&o.tipo===t?"selected":""}>${t}</option>`).join("");
+  $("#f-ped").value=o?.pedido??"";$("#f-nome").value=o?.nome??"";$("#f-cod").value=o?.cod??"";$("#f-trat").value=o?.trat??"";$("#f-obs").value=o?.obs??"";$("#f-int").value=o?.integral||"Sim";
+  fillStatus($("#f-tipo").value,o?.status);$("#dlg").showModal();
+}
+$("#f-tipo").addEventListener("change",e=>fillStatus(e.target.value));
+function dl(name,text,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act,o=S.find(x=>x.id===b.dataset.id);
+  if(a==="ft"){fTipo=b.dataset.v;render()}
+  else if(a==="set"&&o){o.status=FLOW[o.tipo][+b.dataset.i];touch(o)}
+  else if(a==="adv"&&o){o.status=FLOW[o.tipo][Math.min(idx(o)+1,last(o))];touch(o)}
+  else if(a==="edit")openDlg(o);
+  else if(a==="new")openDlg(null);
+  else if(a==="cancel")$("#dlg").close();
+  else if(a==="del"){if(confirm("Excluir esta ocorrência?")){const id=editing;S=S.filter(x=>x.id!==id);if(SB)push(SB.from("ocorrencias").delete().eq("id",id));else save();render();$("#dlg").close()}}
+  else if(a==="save"){
+    const p=$("#f-ped").value.trim();if(!p){$("#f-ped").focus();return}
+    const t=$("#f-tipo").value,d={tipo:t,pedido:p,nome:$("#f-nome").value.trim(),cod:$("#f-cod").value.trim(),status:$("#f-status").value,trat:$("#f-trat").value.trim(),obs:$("#f-obs").value.trim()};
+    if(t==="Devolução")d.integral=$("#f-int").value;
+    let o;if(editing){o=S.find(x=>x.id===editing);Object.assign(o,d);if(t!=="Devolução")delete o.integral}else{o={id:newId(),...d};S.push(o)}
+    if(SB)push(editing?SB.from("ocorrencias").update(toRow(o)).eq("id",o.id):SB.from("ocorrencias").insert(toRow(o)));
+    $("#dlg").close();if(!SB)save();render();
+  }
+  else if(a==="theme"){const t=isDark()?"light":"dark";document.documentElement.dataset.theme=t;try{localStorage.setItem(KEY+"-theme",t)}catch(x){}themeBtn()}
+  else if(a==="csv"){const h=["Tipo","Pedido","Cliente","Código","Status","Tratativa","Observações"];
+    dl("ocorrencias.csv","\ufeff"+[h,...S.map(o=>[o.tipo,o.pedido,o.nome,o.cod,o.status,o.trat,o.obs])].map(r=>r.map(c=>`"${String(c??"").replace(/"/g,'""')}"`).join(";")).join("\n"),"text/csv")}
+  else if(a==="bkp")dl("ocorrencias-backup.json",JSON.stringify(S,null,1),"application/json");
+  else if(a==="imp")$("#file").click();
+  else if(a==="seed"&&SB){b.disabled=true;note("Enviando…");replaceAll(load())}
+});
+document.addEventListener("input",e=>{if(e.target.id==="q"){q=e.target.value;const p=e.target.selectionStart;render();const n=$("#q");n.focus();n.setSelectionRange(p,p)}});
+document.addEventListener("change",e=>{if(e.target.id==="fs"){fSt=e.target.value;render()}});
+$("#file").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{const j=JSON.parse(t);if(Array.isArray(j)&&j.every(o=>FLOW[o.tipo])){const list=j.map((o,i)=>({...o,id:o.id||"i"+i}));
+      if(SB){if(confirm("Substituir TODAS as ocorrências do time pelas do arquivo?"))replaceAll(list)}else{S=list;save();render()}}else alert("Arquivo inválido.")}catch(x){alert("Arquivo inválido.")}});e.target.value=""});
+function isDark(){const t=document.documentElement.dataset.theme;return t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches}
+function themeBtn(){$("#theme").textContent=isDark()?"☀️ Modo claro":"🌙 Modo escuro"}
+try{const t=localStorage.getItem(KEY+"-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+themeBtn();
+$("#sync").textContent=SB?"Compartilhado com o time e atualizado ao vivo.":"Os dados ficam salvos só neste navegador.";
+if(SB){$("#list").innerHTML='<div class="empty">Carregando…</div>';pull();
+  SB.channel("rt-ocorrencias").on("postgres_changes",{event:"*",schema:"public",table:"ocorrencias"},later).subscribe()}
+else render();
+</script>
+</body>
+</html>
