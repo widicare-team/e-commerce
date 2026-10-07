@@ -899,6 +899,8 @@ var BN_TYPE_LABELS={'all':'Todos','home_banner':'Full Banner Home','middle_banne
 var BN_TYPE_ICONS={'home_banner':'🎠','middle_banner':'📌','banner_bottom':'🏷','home_promotional':'🧩','contador_home':'⏱'};
 var BN_TYPE_COLORS={'home_banner':'#c8f060','middle_banner':'#60c8f0','banner_bottom':'#f0c060','home_promotional':'#c060f0','contador_home':'#f06060'};
 /* ordenação da lista "Performance por banner" (padrão: receita) */
+/* último dia em que os banners ainda tinham UTM (modelo antigo). Depois dessa data o histórico UTM é ignorado. */
+var BN_UTM_FIM='2026-10-06';
 var BN_SORT='r';
 var BN_SORT_OPTS=[['r','Receita'],['v','Impressões'],['c','Cliques'],['ctr','CTR'],['atc','Add-to-cart'],['pur','Itens comprados']];
 function bnSortVal(b,k){return k==='ctr'?(b.v>0?b.c/b.v:0):(b[k]||0);}
@@ -960,7 +962,7 @@ function _renderBannerContent(){
   /* histórico do modelo antigo (UTM nos banners) */
   var utm={s:0,es:0,r:0},byCampUtm={};
   (DB.campanha_raw||[]).forEach(function(x){
-    if(x.d<F||x.d>T||!_bnUtmMatch(x.medium,type))return;
+    if(x.d<F||x.d>T||x.d>BN_UTM_FIM||!_bnUtmMatch(x.medium,type))return;
     utm.s+=x.s;utm.es+=x.es;utm.r+=x.r;
     if(!byCampUtm[x.campaign])byCampUtm[x.campaign]={campaign:x.campaign,medium:x.medium,s:0,es:0,r:0};
     byCampUtm[x.campaign].s+=x.s;byCampUtm[x.campaign].es+=x.es;byCampUtm[x.campaign].r+=x.r;
@@ -992,8 +994,8 @@ function _renderBannerContent(){
   if(hasUTM){
     var campRows=Object.keys(byCampUtm).map(function(k){return byCampUtm[k];}).sort(function(a,b){return b.r-a.r||b.s-a.s;});
     var er0=utm.s>0?Math.round(utm.es/utm.s*1000)/10:0;
-    utmHtml='<div class="cc" style="margin-bottom:10px;border-style:dashed">'+
-      '<div class="cct">Histórico — modelo antigo (UTM nos banners)</div>'+
+    utmHtml='<div class="cc" style="margin-top:10px;border-style:dashed;opacity:.85">'+
+      '<div class="cct">Histórico — modelo antigo (UTM nos banners, até '+fmtD(BN_UTM_FIM)+')</div>'+
       '<div class="ccs">'+fmt(utm.s)+' sessões · '+fmt(utm.es)+' engajadas ('+er0.toFixed(1)+'%) · '+fmtR(utm.r)+' de receita da sessão. Não é comparável com a receita por item acima.</div>'+
       '<table class="dt"><thead><tr><th>Campanha</th><th>Medium</th><th>Sessões</th><th>Engajadas</th><th>Eng%</th><th>Receita</th></tr></thead><tbody>'+
       campRows.map(function(c){
@@ -1009,7 +1011,9 @@ function _renderBannerContent(){
   var hasRevDaily=bdFilt.some(function(r){return r.r>0;});
   var tLabel=type==='all'?'Todos os banners':(BN_TYPE_LABELS[type]||type);
   var charts=document.getElementById('bn-charts');
-  if(charts)charts.innerHTML=utmHtml+(bdFilt.length?
+  var utmBox=document.getElementById('bn-utm');
+  if(utmBox)utmBox.innerHTML=utmHtml;
+  if(charts)charts.innerHTML=(bdFilt.length?
     '<div class="row r2">'+
       '<div class="cc"><div class="cct">Impressões diárias'+tip('banner_view')+'</div><div class="ccs">'+esc(tLabel)+'</div><div style="height:200px"><canvas id="c_bnv"></canvas></div></div>'+
       '<div class="cc"><div class="cct">Cliques diários'+tip('banner_click')+'</div><div class="ccs">'+esc(tLabel)+'</div><div style="height:200px"><canvas id="c_bnc"></canvas></div></div>'+
@@ -1086,8 +1090,7 @@ function renderAbaBanners(){
     (!DB.banners.length?'<div class="cfg-box">⚙️ Sem dados de <strong>banners</strong> no Supabase. Confira a última execução do workflow no n8n.</div>':'')+
     btns+
     '<div class="g g4" id="bnm" style="grid-template-columns:repeat(4,1fr)"></div>'+
-    '<div id="bn-charts"></div>'+
-    '<div class="cc">'+
+    '<div class="cc" style="margin-bottom:10px">'+
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:10px">'+
         '<div><div class="cct">Performance por banner</div><div class="ccs" id="bn-list-subtitle" style="margin-bottom:0"></div></div>'+
         '<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center"><span class="dfl">Ordenar por:</span>'+
@@ -1095,7 +1098,9 @@ function renderAbaBanners(){
         '</div>'+
       '</div>'+
       '<div id="bn-list"></div>'+
-    '</div>';
+    '</div>'+
+    '<div id="bn-charts"></div>'+
+    '<div id="bn-utm"></div>';
 
   _renderBannerContent();
 }
