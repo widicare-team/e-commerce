@@ -200,7 +200,8 @@ a:hover{color:inherit}
 .ben-i small{font-size:12px}
 }
 @media (max-width:1500px){
-.regua{flex-direction:column;align-items:stretch;gap:18px}
+.regua{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:18px}
+.chips{min-width:0}
 }
 @media (max-width:1040px){
 .hero-grid{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:26px 24px;grid-template-areas:"a b" "c c" "d d" "e e"}
@@ -296,6 +297,8 @@ a:hover{color:inherit}
 .type{flex:0 0 auto}
 .news-f input,.news-f .cta{width:100%;flex:1 1 100% !important;max-width:none !important}
 .vip .news-f{grid-template-columns:minmax(0,1fr)}
+.shelf,.lngrid,.trio,.tiers,.ben{scroll-snap-type:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.chips,.types{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
 .foot-grid{grid-template-columns:minmax(0,1fr);gap:22px}
 .foot-b{align-items:flex-start !important;text-align:left !important}
 .m-selos{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 0}
