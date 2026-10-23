@@ -1,0 +1,1462 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lista VIP Black Friday 2026 | Widi Care (protótipo)</title>
+<meta name="description" content="Protótipo da LP e do popup da Lista VIP Black Friday 2026 da Widi Care.">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body style="margin:0;background:#000">
+<main id="main-content"><div class="mt-4"><section class="user-content pt-4 pb-5">
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Playfair+Display:ital,wght@1,400;1,700&family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,300&display=swap">
+
+<style>
+    /* Zera os espaçamentos do tema só nesta página */
+    body { background-color: #000; }
+
+    /* esconde a newsletter só na LP */
+    section[data-store="home-newsletter"] { display: none !important; }
+
+    #main-content > .mt-4 { margin-top: 0 !important; }
+    section.user-content.pt-4.pb-5 { padding-top: 0 !important; padding-bottom: 0 !important; }
+
+    .bfv, .bfv * { box-sizing: border-box; }
+    .bfv {
+        --bfv-pink: #ff1d8e;
+        --bfv-pink-dark: #d90f74;
+        --bfv-bg: #0a0407;
+        --bfv-input: #f2f2f2;
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+        background: var(--bfv-bg);
+        overflow: hidden;
+    }
+
+     /* ---------- LOGO (leva para a home) ---------- */
+    .bfv-logo-widi { position: absolute; top: 0; left: 0; z-index: 5; display: block; line-height: 0; transition: opacity .2s; }
+    .bfv-logo-widi:hover { opacity: .8; }
+    .bfv-logo-widi img { display: block; width: 100%; height: auto; cursor: pointer; }
+
+    /* ---------- TEXTOS ---------- */
+    .bfv-intro { font-weight: 300; line-height: 1.17; margin: 0; color: #fff; }
+    .bfv-intro em { font-style: italic; text-decoration: underline; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+    .bfv-intro strong { font-weight: 700; }
+    .bfv-widi { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; letter-spacing: -.5px; }
+    .bfv-titulo { display: block; height: auto; }
+
+    /* ---------- CARD / FORM ---------- */
+    .bfv-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    .bfv-card-title {
+        font-family: 'Anton', sans-serif;
+        font-weight: 400;
+        color: var(--bfv-pink);
+        text-transform: uppercase;
+        line-height: 1.1;
+        letter-spacing: .2px;
+        margin: 0;
+    }
+    .bfv-card-sub { font-weight: 300; line-height: 1.3; margin: 0; color: #fff; }
+    .bfv-card-sub strong { font-weight: 700; }
+
+    .bfv-form { width: 100%; display: flex; flex-direction: column; align-items: center; }
+    .bfv-fields { width: 100%; display: flex; flex-direction: column; }
+    .bfv-input {
+        width: 100%;
+        border: 2px solid transparent;
+        border-radius: 0;
+        background: var(--bfv-input);
+        color: #222;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 300;
+        outline: none;
+        transition: border-color .2s;
+        -webkit-appearance: none;
+    }
+    .bfv-input::placeholder { color: #333; opacity: 1; }
+    .bfv-input:focus { border-color: var(--bfv-pink); }
+    .bfv-input.is-invalid { border-color: #ff4d4d; }
+
+    /* ---------- CARROSSEL TIPO DE CABELO ---------- */
+    .bfv-hair { width: 100%; }
+    .bfv-hair-q { margin: 0; line-height: 1.15; color: #fff; }
+    .bfv-hair-q span:first-child { font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; }
+    .bfv-hair-q .bfv-hair-sel { font-family: 'Anton', sans-serif; color: var(--bfv-pink); margin-left: 4px; display: inline-block; text-align: left; white-space: nowrap; }
+
+    .bfv-carousel { position: relative; width: 100%; margin: 0 auto; touch-action: pan-y; }
+    .bfv-slide {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 31%;
+        aspect-ratio: 155 / 205;
+        border: 0;
+        padding: 0;
+        background: none;
+        cursor: pointer;
+        overflow: hidden;
+        border-radius: 12px;
+        transition: transform .7s ease, filter .7s ease, opacity .7s ease, box-shadow .3s;
+        transform: translate(-50%, -50%) scale(.6);
+        opacity: 0;
+        pointer-events: none;
+        filter: grayscale(1);
+    }
+    .bfv-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* as fotos vieram com borda transparente no PNG: amplia a imagem para preencher a caixa
+    (se exportarem as fotos sem essa borda, é só apagar a linha abaixo) */
+    .bfv-slide img { transform-origin: 50% 53%; transform: scale(1.47); }
+    /* 5 fotos em profundidade: centro > 2 do lado (desfoque leve) > 2 da ponta (mais desfocadas e mais atrás) */
+    .bfv-slide.is-prev2 { transform: translate(-175%, -50%) scale(.7); opacity: .8; pointer-events: auto; z-index: 1; filter: grayscale(1) blur(3px) brightness(.6); }
+    .bfv-slide.is-next2 { transform: translate(75%, -50%) scale(.7); opacity: .8; pointer-events: auto; z-index: 1; filter: grayscale(1) blur(3px) brightness(.6); }
+    .bfv-slide.is-prev  { transform: translate(-120%, -50%) scale(.85); opacity: 1; pointer-events: auto; z-index: 2; filter: grayscale(1) blur(1.2px) brightness(.85); }
+    .bfv-slide.is-next  { transform: translate(20%, -50%) scale(.85); opacity: 1; pointer-events: auto; z-index: 2; filter: grayscale(1) blur(1.2px) brightness(.85); }
+    /* foto do centro: em destaque, salta para a frente + sombra esfumaçada */
+    .bfv-slide.is-active {
+        transform: translate(-50%, -50%) scale(1.12);
+        opacity: 1;
+        pointer-events: auto;
+        filter: none;
+        z-index: 3;
+        box-shadow: 0 14px 34px rgba(0, 0, 0, .6), 0 0 26px 6px rgba(0, 0, 0, .45), 0 0 18px rgba(255, 255, 255, .08);
+    }
+    .bfv-slide:focus-visible { outline: 2px solid var(--bfv-pink); outline-offset: 2px; }
+    /* se tentar enviar sem escolher: brilho avermelhado suave na foto do centro */
+    .bfv-carousel.is-invalid .bfv-slide.is-active { box-shadow: 0 14px 34px rgba(0, 0, 0, .6), 0 0 22px 6px rgba(255, 77, 77, .55); }
+
+    .bfv-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: 0;
+        color: #bbb;
+        line-height: 1;
+        padding: 6px;
+        cursor: pointer;
+        z-index: 3;
+    }
+    .bfv-arrow:hover { color: #fff; }
+    .bfv-arrow-prev { left: -12%; }
+    .bfv-arrow-next { right: -12%; }
+
+    /* ---------- BOTÃO / TERMOS ---------- */
+    .bfv-btn {
+        min-width: 66%;
+        border: 0;
+        border-radius: 40px;
+        background: var(--bfv-pink);
+        color: #fff;
+        font-family: 'Anton', sans-serif;
+        letter-spacing: .4px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: background .2s, transform .2s;
+    }
+    .bfv-btn:hover { background: var(--bfv-pink-dark); transform: translateY(-1px); }
+    .bfv-btn[disabled] { opacity: .7; cursor: wait; transform: none; }
+
+    .bfv-terms { font-weight: 300; margin: 0; }
+    .bfv-terms a { color: #2aa3ff; text-decoration: underline; text-underline-offset: 3px; }
+    .bfv-terms a:hover { color: #6cc0ff; }
+
+    .bfv-error { display: none; margin: 10px 0 0; font-size: 13px; color: #ff8a8a; }
+    .bfv-error.is-visible { display: block; }
+
+    .bfv-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+
+    /* ---------- SUCESSO ---------- */
+    .bfv-success { display: none; }
+    .bfv-card.is-done .bfv-form,
+    .bfv-card.is-done .bfv-card-sub,
+    .bfv-card.is-done .bfv-card-title { display: none; }
+    .bfv-card.is-done .bfv-success { display: block; }
+    .bfv-success p { font-weight: 300; line-height: 1.45; margin: 0 0 10px; }
+    .bfv-success p strong { font-weight: 700; }
+    .bfv-success .bfv-success-title { font-family: 'Anton', sans-serif; font-weight: 400; color: var(--bfv-pink); text-transform: uppercase; line-height: 1.1; }
+    .bfv-success .bfv-btn { display: inline-block; text-decoration: none; color: #fff; }
+    .bfv-btn-whats { font-family: 'Poppins', sans-serif !important; font-weight: 700; text-transform: none !important; line-height: 1.3; }
+
+    /* =================================================================
+       COMPUTADOR (1200px ou mais): fundo inteiro com a modelo e o contorno
+       já desenhados; título, texto e formulário posicionados em % por cima.
+       Tamanhos em vw = tudo encolhe junto com a imagem.
+       ================================================================= */
+    @media (min-width: 1200px) {
+        div#lista-vip-bf {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bfv-hero {
+            position: relative;
+            width: 81%;
+            aspect-ratio: 1920 / 1212;
+            background: var(--bfv-bg) url("images/lp-bf-26/background-desk.png") center / cover no-repeat;
+            
+        }
+        .bfv-logo-widi { left: 7%; top: 2%; width: 9vw; padding: 1vw; }
+        .bfv-logo-widi img { width: 70%; }
+        .bfv-titulo { position: absolute; left: 7.86%; top: 27.2%; width: 23.43%; margin: 0; }
+        .bfv-intro  { position: absolute; left: 9.06%; top: 66.9%; width: 24%; font-size: 1.3vw; }
+
+        /* área exatamente dentro do contorno rosa do fundo */
+        .bfv-card {
+            position: absolute;
+            left: 52.4%;
+            top: 9.65%;
+            width: 37.92%;
+            height: 81.11%;
+            padding: 2.4vw 3.9vw 1.8vw;
+        }
+        .bfv-card-title { font-size: 1.72vw; margin-bottom: 1.45vw; }
+        .bfv-card-sub   { display: none; }
+        .bfv-fields     { gap: .9vw; }
+        .bfv-input      { height: 2.7vw; font-size: max(13px, .95vw); }
+        .bfv-hair       { margin-top: 1.7vw; }
+        .bfv-hair-q     { font-size: 1.5vw; margin: .9vw 0 1.2vw 0; }
+        .bfv-carousel   { max-width: 24vw; height: 13.4vw; }
+        .bfv-slide      { border-radius: .65vw; }
+        .bfv-arrow      { font-size: 1.55vw; }
+        .bfv-btn        { padding: .40vw 1.2vw; font-size: 1.3vw; margin-top: 1vw; }
+        .bfv-terms      { margin-top: 1.1vw; font-size: max(8px, .68vw); }
+        .bfv-error      { font-size: max(12px, .7vw); margin-top: .5vw; }
+        .bfv-success p  { font-size: max(13px, .9vw); }
+        .bfv-success .bfv-success-title { font-size: 2.3vw; margin-bottom: .95vw; }
+        .bfv-success .bfv-btn { margin-top: 1.15vw; }
+        .bfv-btn-whats  { font-size: max(14px, 1vw) !important; padding: .85vw 1.5vw !important; }
+    }
+
+    /* =================================================================
+       CELULAR E TABLET (até 1199px): igual ao computador — fundo mobile inteiro
+       (modelo + contorno já desenhados) e título, texto e formulário por cima.
+       Fundo mobile: 820x2000 | contorno: x 70–763, y 857–1919
+       Tamanhos em cqw = % da largura do fundo, então tudo encolhe junto.
+       ================================================================= */
+    @media (max-width: 1199px) {
+        .bfv-hero {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            aspect-ratio: 820 / 2000;
+            container-type: inline-size;
+            background: var(--bfv-bg) url("images/lp-bf-26/background-mob.png") center top / 100% 100% no-repeat;
+        }
+        .bfv-logo-widi { left: 2cqw; top: 2cqw; width: 30cqw; padding: 3cqw; }
+        .bfv-logo-widi img { width: 65% }
+        .bfv-grid { padding: 0; }
+        .bfv-titulo { position: absolute; left: 3%; top: 20.5%; width: 49%; margin: 0; }
+        .bfv-intro  { display: none; }
+
+        /* área exatamente dentro do contorno rosa do fundo */
+        .bfv-card {
+            position: absolute;
+            left: 8.54%;
+            top: 42.85%;
+            width: 84.51%;
+            height: 53.1%;
+            padding: 4cqw 6cqw 3.5cqw;
+        }
+        .bfv-card-title { font-size: 5.2cqw; margin-bottom: 1.5cqw; }
+        .bfv-card-sub   { font-size: 2.69cqw; margin-bottom: 3cqw; }
+        .bfv-fields     { gap: 2cqw; }
+        .bfv-input      { height: 9.5cqw; font-size: max(16px, 3.6cqw); } /* mínimo de 16px evita o zoom automático do iPhone ao digitar */
+        .bfv-hair       { margin-top: 3.5cqw; }
+        .bfv-hair-q     { font-size: 4.5cqw; margin-bottom: 5.5cqw; }
+        .bfv-carousel   { max-width: 100%; height: 31cqw; }
+        /* no celular as setas ficam por cima das fotos, em bolinhas escuras */
+        .bfv-arrow { font-size: 3.6cqw; width: 7.5cqw; height: 7.5cqw; padding: 0; border-radius: 50%; background: rgba(0, 0, 0, .6); color: #fff; display: flex; align-items: center; justify-content: center; }
+        .bfv-arrow-prev { left: -2cqw; }
+        .bfv-arrow-next { right: -2cqw; }
+        .bfv-btn        { width: 86%; margin-top: 6.5cqw; padding: 2.2cqw 4cqw; font-size: 4.5cqw; }
+        .bfv-terms      { margin-top: 2.5cqw; font-size: 2.5cqw; }
+        .bfv-error      { font-size: 2.8cqw; margin: 1.5cqw 0 -9px 0; }
+        .bfv-success p  { font-size: 3.6cqw; }
+        .bfv-success .bfv-success-title { font-size: 7cqw; margin-bottom: 3cqw; }
+        .bfv-success .bfv-btn { margin-top: 4cqw; }
+        .bfv-btn-whats  { font-size: 3.8cqw !important; padding: 3cqw 4cqw !important; }
+    }
+
+    /* =================================================================
+       CABEÇALHO E RODAPÉ PRETOS (só nesta LP)
+       ================================================================= */
+
+    header.js-head-main.head-main.head-light.head-fix.transition-soft.logo-desktop-center,
+    footer.js-hide-footer-while-scrolling.display-when-content-ready {
+        display: none !important;
+    }
+
+</style>
+
+<div class="bfv" id="lista-vip-bf">
+    <section class="bfv-hero">
+        <a class="bfv-logo-widi" href="https://lojawidicare.com.br/" aria-label="Widi Care - ir para a página inicial">
+            <img src="images/lp-bf-26/logo-widi.png" alt="Widi Care" width="1000" height="700">
+        </a>
+        <div class="bfv-grid">
+
+            
+            <div class="bfv-left">
+                <img class="bfv-titulo" src="images/lp-bf-26/logo-black-desk.png" alt="Black Friday vem aí!" width="2000" height="2000" fetchpriority="high">
+                <p class="bfv-intro">
+                    <em>Cadastre-se</em> para garantir seu acesso ao nosso canal de transmissão no WhatsApp e receber em primeira mão as ofertas e novidades da <strong>Black Friday</strong> da <span class="bfv-widi">Widi Care</span>.
+                </p>
+            </div>
+
+            
+            <div class="bfv-card" id="bfv-card">
+                <h1 class="bfv-card-title">Entre para a lista VIP da Black</h1>
+                <p class="bfv-card-sub">Entre para o nosso canal de transmissão e receba as ofertas da <strong>Black Friday</strong> <span class="bfv-widi">Widi Care</span> em primeira mão.</p>
+
+                <form class="bfv-form" id="bfv-form" novalidate>
+                    <div class="bfv-fields">
+                        <input class="bfv-input" type="text" name="nome" placeholder="Seu nome completo" autocomplete="name" aria-label="Seu nome completo" required>
+                        <input class="bfv-input" type="email" name="email" placeholder="Seu melhor e-mail" autocomplete="email" aria-label="Seu melhor e-mail" required>
+                        <input class="bfv-input" type="tel" name="whatsapp" placeholder="Seu WhatsApp" autocomplete="tel-national" inputmode="numeric" maxlength="15" aria-label="Seu WhatsApp" required>
+                    </div>
+
+                    <div class="bfv-hp" aria-hidden="true">
+                        <label>Não preencher <input type="text" name="winnie-pooh" tabindex="-1" autocomplete="off"></label>
+                    </div>
+                    <input type="hidden" name="tipo_cabelo" id="bfv-tipo-cabelo">
+
+                    
+                    <div class="bfv-hair">
+                        <p class="bfv-hair-q"><span>Qual seu tipo de cabelo?</span> <span class="bfv-hair-sel" id="bfv-hair-sel"></span></p>
+                        <div class="bfv-carousel" id="bfv-carousel" role="radiogroup" aria-label="Tipo de cabelo">
+                            <button type="button" class="bfv-arrow bfv-arrow-prev" aria-label="Anterior">&#10094;</button>
+                            <button type="button" class="bfv-slide" data-value="Ondulado" data-label="Ondulado" role="radio"><img src="images/lp-bf-26/ondulado.png" alt="Cabelo ondulado" loading="lazy"></button>
+                            <button type="button" class="bfv-slide" data-value="Liso" data-label="Liso" role="radio"><img src="images/lp-bf-26/liso.png" alt="Cabelo liso" loading="lazy"></button>
+                            <button type="button" class="bfv-slide" data-value="Crespo" data-label="Crespo" role="radio"><img src="images/lp-bf-26/crespo.png" alt="Cabelo crespo" loading="lazy"></button>
+                            <button type="button" class="bfv-slide" data-value="Cacheado" data-label="Cacheado" role="radio"><img src="images/lp-bf-26/cacheado.png" alt="Cabelo cacheado" loading="lazy"></button>
+                            <button type="button" class="bfv-slide" data-value="Quimicamente Tratado" data-label="Com Química" role="radio"><img src="images/lp-bf-26/com-quimica.png" alt="Cabelo com química" loading="lazy"></button>
+                            <button type="button" class="bfv-slide" data-value="Tingido" data-label="Tingido" role="radio"><img src="images/lp-bf-26/tingido.png" alt="Cabelo tingido" loading="lazy"></button>
+                            <button type="button" class="bfv-arrow bfv-arrow-next" aria-label="Próximo">&#10095;</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="bfv-btn" id="bfv-btn">Quero entrar no canal</button>
+                    <p class="bfv-error" id="bfv-error" role="alert"></p>
+                    <p class="bfv-terms">*Li e aceito os <a href="/regulamento-promocional/" target="_blank" rel="noopener">Termos de Uso</a> e o <a href="/aviso-de-privacidade/" target="_blank" rel="noopener">Aviso de Privacidade</a>.</p>
+                </form>
+
+                <div class="bfv-success" id="bfv-success" aria-live="polite">
+                    <p class="bfv-success-title">Obrigada, <span id="bfv-success-nome">você</span>!</p>
+                    <p>Seu cadastro na lista VIP da Black Friday está feito. 💖</p>
+                    <p>Agora falta só um passo: <strong>entre no nosso canal do WhatsApp</strong> para receber as ofertas em primeira mão.</p>
+                    <a class="bfv-btn bfv-btn-whats" id="bfv-whats-link" href="#"></a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+
+<script>
+window.WidiVipBF = window.WidiVipBF || (function () {
+    var CONFIG = {
+        // >>> LANÇAMENTO: troque 'teste' por 'ativo' <<<
+        //  'teste' = popup invisível para clientes (só abre com ?teste-vip=1 no endereço)
+        //            e todo cadastro vai para a campanha "teste" do painel
+        //  'ativo' = popup no ar para todo mundo e cadastros na campanha da BF
+        modo: 'ativo',
+        // Supabase > Project Settings > API Keys
+        supabaseUrl: 'https://prototipo.invalid',
+        // Use a chave PÚBLICA: "publishable" (sb_publishable_...) ou a "anon" antiga. NUNCA a service_role/secret.
+        supabaseKey: '',
+        // Canal do WhatsApp da BF
+        whatsappUrl: 'https://www.whatsapp.com/channel/0029Vb8pbXIDDmFd6rpUjq2W',
+        whatsappLabel: 'Entrar no canal da BF 📢',
+        campanha: 'bf-2026'
+    };
+
+    var STORAGE_LEAD = 'widi_vip_bf_lead';
+    var STORAGE_UTM = 'widi_vip_bf_utm';
+    var STORAGE_TESTE = 'widi_vip_bf_teste';
+
+    // Sessão de teste: abrir qualquer página com ?teste-vip=1 (vale até fechar a aba). ?teste-vip=0 desliga.
+    var sessaoTeste = false;
+    try {
+        var qp = new URLSearchParams(window.location.search).get('teste-vip');
+        if (qp === '1') sessionStorage.setItem(STORAGE_TESTE, '1');
+        if (qp === '0') sessionStorage.removeItem(STORAGE_TESTE);
+        sessaoTeste = sessionStorage.getItem(STORAGE_TESTE) === '1';
+    } catch (e) {}
+    var emTeste = CONFIG.modo !== 'ativo' || sessaoTeste;
+
+    var CABELO_PLURAL = {
+        'Liso': 'Lisos', 'Ondulado': 'Ondulados', 'Cacheado': 'Cacheados', 'Crespo': 'Crespos',
+        'Quimicamente Tratado': 'Quimicamente Tratados', 'Tingido': 'Tingidos'
+    };
+
+    function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function ssGet(k) { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } }
+    function ssSet(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+    // Guarda as UTMs da primeira página da visita (o popup pode abrir em outra página)
+    (function guardarUtms() {
+        try {
+            var p = new URLSearchParams(window.location.search);
+            var utm = {};
+            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (k) {
+                if (p.get(k)) utm[k] = p.get(k);
+            });
+            if (Object.keys(utm).length) {
+                utm.referrer = document.referrer || '';
+                ssSet(STORAGE_UTM, utm);
+            } else if (!ssGet(STORAGE_UTM)) {
+                ssSet(STORAGE_UTM, { referrer: document.referrer || '' });
+            }
+        } catch (e) {}
+    })();
+
+    function headers() {
+        var h = { 'Content-Type': 'application/json', 'apikey': CONFIG.supabaseKey };
+        if (CONFIG.supabaseKey.indexOf('sb_') !== 0) h['Authorization'] = 'Bearer ' + CONFIG.supabaseKey;
+        return h;
+    }
+
+    function rpc(nome, corpo, keepalive) {
+        return fetch(CONFIG.supabaseUrl.replace(/\/$/, '') + '/rest/v1/rpc/' + nome, {
+            method: 'POST',
+            headers: headers(),
+            body: JSON.stringify(corpo),
+            keepalive: !!keepalive
+        }).then(function (r) {
+            return r.text().then(function (t) {
+                var data = null;
+                try { data = t ? JSON.parse(t) : null; } catch (e) {}
+                if (!r.ok) {
+                    var err = new Error((data && data.message) || ('http_' + r.status));
+                    err.code = (data && data.message) || '';
+                    throw err;
+                }
+                return data;
+            });
+        });
+    }
+
+    function dispositivo() {
+        var ua = navigator.userAgent || '';
+        if (/iPad|Tablet/i.test(ua)) return 'tablet';
+        if (/Mobi|Android|iPhone/i.test(ua)) return 'mobile';
+        return 'desktop';
+    }
+
+    function mensagemErro(err) {
+        var c = (err && err.code) || '';
+        if (c.indexOf('email_invalido') > -1) return 'Confira seu e-mail.';
+        if (c.indexOf('whatsapp_invalido') > -1) return 'Confira seu WhatsApp com DDD.';
+        if (c.indexOf('nome_obrigatorio') > -1) return 'Preencha seu nome.';
+        if (c.indexOf('campos_obrigatorios') > -1) return 'Preencha todos os campos.';
+        return 'Não conseguimos enviar agora. Tente novamente em instantes.';
+    }
+
+    function registrar(origem, dados) {
+        var utm = ssGet(STORAGE_UTM) || {};
+        var payload = {
+            campanha: emTeste ? 'teste' : CONFIG.campanha,
+            origem: origem,
+            nome: dados.nome,
+            sobrenome: dados.sobrenome || '',
+            email: dados.email,
+            whatsapp: dados.whatsapp,
+            cidade: dados.cidade || '',
+            uf: dados.uf || '',
+            aniversario: dados.aniversario || '',
+            tipos_cabelo: (dados.tipos_cabelo || []).map(function (c) { return CABELO_PLURAL[c] || c; }),
+            pagina: window.location.href,
+            referrer: utm.referrer || document.referrer || '',
+            utm_source: utm.utm_source || '',
+            utm_medium: utm.utm_medium || '',
+            utm_campaign: utm.utm_campaign || '',
+            utm_content: utm.utm_content || '',
+            utm_term: utm.utm_term || '',
+            dispositivo: dispositivo()
+        };
+        return rpc('bf_registrar_lead', { dados: payload }).then(function (id) {
+            if (!emTeste) lsSet(STORAGE_LEAD, { id: id, em: Date.now() });
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ event: 'lead_lista_vip_bf', origem_form: origem });
+            if (typeof window.fbq === 'function') {
+                window.fbq('track', 'Lead', { content_name: 'Lista VIP Black Friday', content_category: origem });
+            }
+            return id;
+        });
+    }
+
+    // Registra o clique no botão do canal (keepalive = chega mesmo se a página sair)
+    function clique(id) {
+        var lead = id || (lsGet(STORAGE_LEAD) || {}).id;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'clique_canal_whatsapp_bf' });
+        if (!lead) return;
+        rpc('bf_registrar_clique_whatsapp', { lead_id: lead }, true).catch(function () {});
+    }
+
+    // Prepara um <a> como botão do canal
+    function prepararBotaoCanal(a, getId) {
+        a.href = CONFIG.whatsappUrl;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = CONFIG.whatsappLabel;
+        a.addEventListener('click', function () { clique(getId ? getId() : null); });
+    }
+
+    function mascaraWhats(input) {
+        input.addEventListener('input', function () {
+            var d = input.value.replace(/\D/g, '').slice(0, 11);
+            var out = d;
+            if (d.length > 2) out = '(' + d.slice(0, 2) + ') ' + d.slice(2);
+            if (d.length > 10) out = '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+            else if (d.length > 6) out = '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6);
+            input.value = out;
+        });
+    }
+
+    function emailValido(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+    function whatsValido(v) { var d = v.replace(/\D/g, ''); return d.length === 10 || d.length === 11; }
+
+    return {
+        config: CONFIG,
+        registrar: registrar,
+        clique: clique,
+        prepararBotaoCanal: prepararBotaoCanal,
+        mascaraWhats: mascaraWhats,
+        emailValido: emailValido,
+        whatsValido: whatsValido,
+        mensagemErro: mensagemErro,
+        jaCadastrado: function () { return !!(lsGet(STORAGE_LEAD) || {}).id; },
+        emTeste: emTeste,
+        sessaoTeste: sessaoTeste,
+        popupLiberado: CONFIG.modo === 'ativo' || sessaoTeste
+    };
+})();
+</script>
+
+<script>
+(function () {
+    var VIP = window.WidiVipBF;
+    var form = document.getElementById('bfv-form');
+    if (!form || !VIP) return;
+
+    var card = document.getElementById('bfv-card');
+    var btn = document.getElementById('bfv-btn');
+    var errorBox = document.getElementById('bfv-error');
+    var hairInput = document.getElementById('bfv-tipo-cabelo');
+    var hairLabel = document.getElementById('bfv-hair-sel');
+    var carousel = document.getElementById('bfv-carousel');
+    var slides = Array.prototype.slice.call(carousel.querySelectorAll('.bfv-slide'));
+    var total = slides.length;
+    var current = 0;
+    var TIPO_INICIAL = 'Crespo';
+    var leadId = null;
+
+    function rotulo(s) { return s.getAttribute('data-label') || s.getAttribute('data-value'); }
+
+    VIP.prepararBotaoCanal(document.getElementById('bfv-whats-link'), function () { return leadId; });
+
+    /* ---------- Carrossel ---------- */
+    function render() {
+        slides.forEach(function (s, i) {
+            s.classList.remove('is-active', 'is-prev', 'is-next', 'is-prev2', 'is-next2');
+            s.setAttribute('aria-checked', 'false');
+            s.tabIndex = -1;
+            var d = (i - current + total) % total;   // distância até a foto do centro
+            if (d === 0) { s.classList.add('is-active'); s.setAttribute('aria-checked', 'true'); s.tabIndex = 0; }
+            else if (d === 1) s.classList.add('is-next');
+            else if (d === total - 1) s.classList.add('is-prev');
+            else if (d === 2) s.classList.add('is-next2');
+            else if (d === total - 2) s.classList.add('is-prev2');
+        });
+        // depois que a cliente escolhe, o tipo escolhido fica guardado mesmo com o carrossel girando
+        if (!escolhido) mostrarTipo(slides[current]);
+    }
+    function mostrarTipo(s) {
+        hairInput.value = s.getAttribute('data-value');
+        hairLabel.textContent = rotulo(s);
+    }
+    function go(step) { current = (current + step + total) % total; render(); }
+
+    /* Passa sozinho devagar. Para ao passar o mouse ou ao escolher,
+       e volta a girar depois de um tempo sem mexer no carrossel. */
+    var GIRO_MS = 3500;
+    var VOLTA_A_GIRAR_MS = 6000;   // tempo parado até voltar a girar
+    var retomada = null;
+    var escolhido = false;   // só conta o tipo que a cliente escolheu de verdade
+    var timer = null;
+    var mouseEmCima = false;
+    var reduzirMovimento = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function iniciarGiro() {
+        if (timer || reduzirMovimento) return;
+        timer = setInterval(function () { if (!mouseEmCima && !document.hidden) go(1); }, GIRO_MS);
+    }
+    function pararGiro() { clearInterval(timer); timer = null; clearTimeout(retomada); }
+    function voltarAGirarDepois() {
+        clearTimeout(retomada);
+        retomada = setTimeout(iniciarGiro, VOLTA_A_GIRAR_MS);
+    }
+    function escolher() {
+        escolhido = true;
+        mostrarTipo(slides[current]);
+        pararGiro();
+        voltarAGirarDepois();
+        carousel.classList.add('is-escolhido');
+        carousel.classList.remove('is-invalid');
+        errorBox.classList.remove('is-visible');
+    }
+
+    carousel.addEventListener('mouseenter', function () { mouseEmCima = true; });
+    carousel.addEventListener('mouseleave', function () { mouseEmCima = false; });
+
+    carousel.querySelector('.bfv-arrow-prev').addEventListener('click', function () { go(-1); escolher(); });
+    carousel.querySelector('.bfv-arrow-next').addEventListener('click', function () { go(1); escolher(); });
+    slides.forEach(function (s, i) {
+        s.addEventListener('click', function () { current = i; render(); escolher(); });
+    });
+    carousel.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); escolher(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); go(1); escolher(); }
+    });
+    var touchX = null;
+    carousel.addEventListener('touchstart', function (e) { touchX = e.touches[0].clientX; pararGiro(); }, { passive: true });
+    carousel.addEventListener('touchend', function (e) {
+        if (touchX === null) return;
+        var dx = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(dx) > 40) { go(dx < 0 ? 1 : -1); escolher(); }
+        else voltarAGirarDepois();
+        touchX = null;
+    });
+    slides.forEach(function (s, i) { if (s.getAttribute('data-value') === TIPO_INICIAL) current = i; });
+    render();
+    iniciarGiro();
+
+    // Reserva a largura da maior opção para a pergunta não "andar" quando o tipo muda
+    function fixarLarguraTipo() {
+        var atual = hairLabel.textContent, maior = 0;
+        hairLabel.style.minWidth = '';
+        slides.forEach(function (s) {
+            hairLabel.textContent = rotulo(s);
+            maior = Math.max(maior, hairLabel.getBoundingClientRect().width);
+        });
+        hairLabel.textContent = atual;
+        hairLabel.style.minWidth = Math.ceil(maior) + 'px';
+    }
+    fixarLarguraTipo();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fixarLarguraTipo);
+    window.addEventListener('resize', fixarLarguraTipo);
+
+    /* ---------- Validação ---------- */
+    VIP.mascaraWhats(form.querySelector('[name="whatsapp"]'));
+
+    /* ---------- Celular: ao tocar num campo, desce até o fim para mostrar o formulário todo ---------- */
+    form.addEventListener('focusin', function (e) {
+        if (window.innerWidth > 1199 || !e.target.matches('.bfv-input')) return;
+        setTimeout(function () { descerSuave(1100); }, 350); // espera o teclado abrir
+    });
+
+    function descerSuave(duracao) {
+        var inicio = window.pageYOffset;
+        var fim = document.documentElement.scrollHeight - window.innerHeight;
+        var distancia = fim - inicio;
+        if (distancia <= 0) return;
+        var t0 = null;
+        function passo(agora) {
+            if (!t0) t0 = agora;
+            var p = Math.min((agora - t0) / duracao, 1);
+            var ease = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2; // começa e termina devagar
+            window.scrollTo(0, inicio + distancia * ease);
+            if (p < 1) requestAnimationFrame(passo);
+        }
+        requestAnimationFrame(passo);
+    }
+
+    function showError(msg) { errorBox.textContent = msg; errorBox.classList.add('is-visible'); }
+    form.addEventListener('input', function (e) { e.target.classList.remove('is-invalid'); errorBox.classList.remove('is-visible'); });
+
+    function validate() {
+        var first = null;
+        ['nome', 'email', 'whatsapp'].forEach(function (n) {
+            var el = form.querySelector('[name="' + n + '"]');
+            var v = el.value.trim();
+            var bad = !v || (n === 'email' && !VIP.emailValido(v)) || (n === 'whatsapp' && !VIP.whatsValido(v));
+            el.classList.toggle('is-invalid', bad);
+            if (bad && !first) first = el;
+        });
+        if (first) { showError('Preencha todos os campos corretamente.'); first.focus(); return false; }
+        if (!escolhido) {
+            pararGiro();
+            voltarAGirarDepois();
+            carousel.classList.add('is-invalid');
+            showError('Toque na foto do seu tipo de cabelo para escolher.');
+            return false;
+        }
+        return true;
+    }
+
+    /* ---------- Envio ---------- */
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (form.querySelector('[name="winnie-pooh"]').value) return; // bot
+        if (!validate()) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+
+        var partes = form.nome.value.trim().split(/\s+/);
+        VIP.registrar('lp', {
+            nome: partes.shift(),
+            sobrenome: partes.join(' '),
+            email: form.email.value.trim(),
+            whatsapp: form.whatsapp.value,
+            tipos_cabelo: [hairInput.value]
+        }).then(function (id) {
+            leadId = id;
+            pararGiro();
+            document.getElementById('bfv-success-nome').textContent = form.nome.value.trim().split(' ')[0];
+            card.classList.add('is-done');
+            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }).catch(function (err) {
+            showError(VIP.mensagemErro(err));
+            btn.disabled = false;
+            btn.textContent = 'Quero entrar no canal';
+        });
+    });
+})();
+</script>
+</section></div></main>
+
+
+<script>
+window.WidiVipBF = window.WidiVipBF || (function () {
+    var CONFIG = {
+        // >>> LANÇAMENTO: troque 'teste' por 'ativo' <<<
+        //  'teste' = popup invisível para clientes (só abre com ?teste-vip=1 no endereço)
+        //            e todo cadastro vai para a campanha "teste" do painel
+        //  'ativo' = popup no ar para todo mundo e cadastros na campanha da BF
+        modo: 'ativo',
+        // Supabase > Project Settings > API Keys
+        supabaseUrl: 'https://prototipo.invalid',
+        // Use a chave PÚBLICA: "publishable" (sb_publishable_...) ou a "anon" antiga. NUNCA a service_role/secret.
+        supabaseKey: '',
+        // Canal do WhatsApp da BF
+        whatsappUrl: 'https://www.whatsapp.com/channel/0029Vb8pbXIDDmFd6rpUjq2W',
+        whatsappLabel: 'Entrar no canal da BF 📢',
+        campanha: 'bf-2026'
+    };
+
+    var STORAGE_LEAD = 'widi_vip_bf_lead';
+    var STORAGE_UTM = 'widi_vip_bf_utm';
+    var STORAGE_TESTE = 'widi_vip_bf_teste';
+
+    // Sessão de teste: abrir qualquer página com ?teste-vip=1 (vale até fechar a aba). ?teste-vip=0 desliga.
+    var sessaoTeste = false;
+    try {
+        var qp = new URLSearchParams(window.location.search).get('teste-vip');
+        if (qp === '1') sessionStorage.setItem(STORAGE_TESTE, '1');
+        if (qp === '0') sessionStorage.removeItem(STORAGE_TESTE);
+        sessaoTeste = sessionStorage.getItem(STORAGE_TESTE) === '1';
+    } catch (e) {}
+    var emTeste = CONFIG.modo !== 'ativo' || sessaoTeste;
+
+    var CABELO_PLURAL = {
+        'Liso': 'Lisos', 'Ondulado': 'Ondulados', 'Cacheado': 'Cacheados', 'Crespo': 'Crespos',
+        'Quimicamente Tratado': 'Quimicamente Tratados', 'Tingido': 'Tingidos'
+    };
+
+    function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function ssGet(k) { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } }
+    function ssSet(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+    // Guarda as UTMs da primeira página da visita (o popup pode abrir em outra página)
+    (function guardarUtms() {
+        try {
+            var p = new URLSearchParams(window.location.search);
+            var utm = {};
+            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (k) {
+                if (p.get(k)) utm[k] = p.get(k);
+            });
+            if (Object.keys(utm).length) {
+                utm.referrer = document.referrer || '';
+                ssSet(STORAGE_UTM, utm);
+            } else if (!ssGet(STORAGE_UTM)) {
+                ssSet(STORAGE_UTM, { referrer: document.referrer || '' });
+            }
+        } catch (e) {}
+    })();
+
+    function headers() {
+        var h = { 'Content-Type': 'application/json', 'apikey': CONFIG.supabaseKey };
+        if (CONFIG.supabaseKey.indexOf('sb_') !== 0) h['Authorization'] = 'Bearer ' + CONFIG.supabaseKey;
+        return h;
+    }
+
+    function rpc(nome, corpo, keepalive) {
+        return fetch(CONFIG.supabaseUrl.replace(/\/$/, '') + '/rest/v1/rpc/' + nome, {
+            method: 'POST',
+            headers: headers(),
+            body: JSON.stringify(corpo),
+            keepalive: !!keepalive
+        }).then(function (r) {
+            return r.text().then(function (t) {
+                var data = null;
+                try { data = t ? JSON.parse(t) : null; } catch (e) {}
+                if (!r.ok) {
+                    var err = new Error((data && data.message) || ('http_' + r.status));
+                    err.code = (data && data.message) || '';
+                    throw err;
+                }
+                return data;
+            });
+        });
+    }
+
+    function dispositivo() {
+        var ua = navigator.userAgent || '';
+        if (/iPad|Tablet/i.test(ua)) return 'tablet';
+        if (/Mobi|Android|iPhone/i.test(ua)) return 'mobile';
+        return 'desktop';
+    }
+
+    function mensagemErro(err) {
+        var c = (err && err.code) || '';
+        if (c.indexOf('email_invalido') > -1) return 'Confira seu e-mail.';
+        if (c.indexOf('whatsapp_invalido') > -1) return 'Confira seu WhatsApp com DDD.';
+        if (c.indexOf('nome_obrigatorio') > -1) return 'Preencha seu nome.';
+        if (c.indexOf('campos_obrigatorios') > -1) return 'Preencha todos os campos.';
+        return 'Não conseguimos enviar agora. Tente novamente em instantes.';
+    }
+
+    function registrar(origem, dados) {
+        var utm = ssGet(STORAGE_UTM) || {};
+        var payload = {
+            campanha: emTeste ? 'teste' : CONFIG.campanha,
+            origem: origem,
+            nome: dados.nome,
+            sobrenome: dados.sobrenome || '',
+            email: dados.email,
+            whatsapp: dados.whatsapp,
+            cidade: dados.cidade || '',
+            uf: dados.uf || '',
+            aniversario: dados.aniversario || '',
+            tipos_cabelo: (dados.tipos_cabelo || []).map(function (c) { return CABELO_PLURAL[c] || c; }),
+            pagina: window.location.href,
+            referrer: utm.referrer || document.referrer || '',
+            utm_source: utm.utm_source || '',
+            utm_medium: utm.utm_medium || '',
+            utm_campaign: utm.utm_campaign || '',
+            utm_content: utm.utm_content || '',
+            utm_term: utm.utm_term || '',
+            dispositivo: dispositivo()
+        };
+        return rpc('bf_registrar_lead', { dados: payload }).then(function (id) {
+            if (!emTeste) lsSet(STORAGE_LEAD, { id: id, em: Date.now() });
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ event: 'lead_lista_vip_bf', origem_form: origem });
+            if (typeof window.fbq === 'function') {
+                window.fbq('track', 'Lead', { content_name: 'Lista VIP Black Friday', content_category: origem });
+            }
+            return id;
+        });
+    }
+
+    // Registra o clique no botão do canal (keepalive = chega mesmo se a página sair)
+    function clique(id) {
+        var lead = id || (lsGet(STORAGE_LEAD) || {}).id;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'clique_canal_whatsapp_bf' });
+        if (!lead) return;
+        rpc('bf_registrar_clique_whatsapp', { lead_id: lead }, true).catch(function () {});
+    }
+
+    // Prepara um <a> como botão do canal
+    function prepararBotaoCanal(a, getId) {
+        a.href = CONFIG.whatsappUrl;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = CONFIG.whatsappLabel;
+        a.addEventListener('click', function () { clique(getId ? getId() : null); });
+    }
+
+    function mascaraWhats(input) {
+        input.addEventListener('input', function () {
+            var d = input.value.replace(/\D/g, '').slice(0, 11);
+            var out = d;
+            if (d.length > 2) out = '(' + d.slice(0, 2) + ') ' + d.slice(2);
+            if (d.length > 10) out = '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+            else if (d.length > 6) out = '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6);
+            input.value = out;
+        });
+    }
+
+    function emailValido(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+    function whatsValido(v) { var d = v.replace(/\D/g, ''); return d.length === 10 || d.length === 11; }
+
+    return {
+        config: CONFIG,
+        registrar: registrar,
+        clique: clique,
+        prepararBotaoCanal: prepararBotaoCanal,
+        mascaraWhats: mascaraWhats,
+        emailValido: emailValido,
+        whatsValido: whatsValido,
+        mensagemErro: mensagemErro,
+        jaCadastrado: function () { return !!(lsGet(STORAGE_LEAD) || {}).id; },
+        emTeste: emTeste,
+        sessaoTeste: sessaoTeste,
+        popupLiberado: CONFIG.modo === 'ativo' || sessaoTeste
+    };
+})();
+</script>
+
+<style>
+    .wvp-overlay, .wvp-overlay * { box-sizing: border-box; }
+    .wvp-overlay {
+        --wvp-pink: #ff1d8e;
+        --wvp-pink-dark: #d90f74;
+        position: fixed;
+        inset: 0;
+        z-index: 100000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(0, 0, 0, .72);
+        font-family: 'Poppins', sans-serif;
+        opacity: 0;
+        transition: opacity .25s ease;
+    }
+    .wvp-overlay.is-open { display: flex; }
+    .wvp-overlay.is-visible { opacity: 1; }
+    body.wvp-lock { overflow: hidden; }
+
+    .wvp-modal {
+        position: relative;
+        width: 100%;
+        max-height: calc(100vh - 32px);
+        max-height: calc(100dvh - 32px);
+        overflow-y: auto;
+        padding: 34px 36px 22px;
+        border-radius: 22px;
+        border: 1.5px solid var(--wvp-pink);
+        background:
+            radial-gradient(120% 60% at 100% 0%, rgba(255, 29, 142, .22), transparent 60%),
+            radial-gradient(90% 50% at 0% 100%, rgba(255, 29, 142, .14), transparent 60%),
+            #0a0407;
+        box-shadow: 0 0 0 1px rgba(255, 29, 142, .25), 0 0 28px rgba(255, 29, 142, .45), 0 20px 60px rgba(0, 0, 0, .6);
+        color: #fff;
+        text-align: center;
+        scrollbar-width: thin;
+        scrollbar-color: var(--wvp-pink) transparent;
+    }
+
+    /* moldura por fora do popup: segura o brilho sem ele ser cortado pela rolagem */
+    .wvp-frame {
+        position: relative;
+        width: 100%;
+        max-width: 520px;
+        transform: translateY(16px) scale(.98);
+        transition: transform .25s ease;
+    }
+    .wvp-overlay.is-visible .wvp-frame { transform: none; }
+
+    /* brilho no canto, igual ao contorno da LP */
+    .wvp-frame::before {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        top: -9px;
+        right: 64px;
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(circle, #fff 0 30%, rgba(255,255,255,.0) 70%);
+        box-shadow: 0 0 14px 4px rgba(255,255,255,.7);
+        clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
+        pointer-events: none;
+    }
+    /* halo suave em volta da estrelinha */
+    .wvp-frame::after {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: -16px;
+        right: 57px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, .55) 0, rgba(255, 120, 190, .25) 35%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .wvp-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .1);
+        color: #fff;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+    }
+    .wvp-close:hover { background: var(--wvp-pink); }
+
+    .wvp-title {
+        font-family: 'Anton', sans-serif;
+        font-weight: 400;
+        color: var(--wvp-pink);
+        text-transform: uppercase;
+        font-size: 28px;
+        line-height: 1.1;
+        margin: 0 0 8px;
+    }
+    .wvp-sub { font-size: 14px; font-weight: 300; line-height: 1.35; margin: 0 0 18px; }
+    .wvp-sub strong { font-weight: 700; }
+    .wvp-widi { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; }
+
+    .wvp-fields { display: grid; grid-template-columns: 1fr 96px; gap: 10px; }
+    .wvp-full { grid-column: 1 / -1; }
+    .wvp-input {
+        width: 100%;
+        height: 42px;
+        border: 2px solid transparent;
+        border-radius: 0;
+        background: #f2f2f2;
+        color: #222;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 300;
+        font-size: 15px;
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    .wvp-input::placeholder { color: #444; opacity: 1; }
+    .wvp-input:focus { border-color: var(--wvp-pink); }
+    .wvp-input.is-invalid { border-color: #ff4d4d; }
+    select.wvp-input { text-align-last: center; cursor: pointer; padding: 0 8px; }
+    select.wvp-input:invalid { color: #444; }
+
+    .wvp-hair-q { margin: 18px 0 10px; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 27px; line-height: 1.1; }
+    .wvp-hair { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .wvp-chip { position: relative; }
+    .wvp-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .wvp-chip span {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 14px 7px 10px;
+        border: 1.5px solid rgba(255, 255, 255, .45);
+        border-radius: 30px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background .15s, border-color .15s, color .15s;
+        user-select: none;
+    }
+    /* bolinha de seleção única (radio) */
+    .wvp-chip span::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255, 255, 255, .7);
+        box-sizing: border-box;
+        transition: background .15s, box-shadow .15s, border-color .15s;
+    }
+    .wvp-chip:hover span { border-color: rgba(255, 255, 255, .8); }
+    .wvp-chip input:checked + span { background: var(--wvp-pink); border-color: var(--wvp-pink); }
+    .wvp-chip input:checked + span::before { border-color: #fff; background: #fff; box-shadow: inset 0 0 0 2.5px var(--wvp-pink); }
+    .wvp-chip input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+    .wvp-hair.is-invalid .wvp-chip span { border-color: #ff4d4d; }
+
+    .wvp-btn {
+        display: inline-block;
+        margin-top: 20px;
+        width: 100%;
+        padding: 13px 24px;
+        border: 0;
+        border-radius: 40px;
+        background: var(--wvp-pink);
+        color: #fff;
+        font-family: 'Anton', sans-serif;
+        font-size: 21px;
+        letter-spacing: .4px;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .2s;
+    }
+    .wvp-btn:hover { background: var(--wvp-pink-dark); color: #fff; }
+    .wvp-btn[disabled] { opacity: .7; cursor: wait; }
+    .wvp-btn-whats { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 15px; text-transform: none; padding: 15px 20px; line-height: 1.3; }
+
+    .wvp-error { display: none; margin: 12px 0 0; font-size: 13px; color: #ff8a8a; }
+    .wvp-error.is-visible { display: block; }
+    .wvp-terms { margin: 14px 0 0; font-size: 12px; font-weight: 300; }
+    .wvp-terms a { color: #2aa3ff; text-decoration: underline; text-underline-offset: 3px; }
+    .wvp-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+
+    .wvp-success { display: none; padding: 10px 0 6px; }
+    .wvp-modal.is-done .wvp-form, .wvp-modal.is-done .wvp-head { display: none; }
+    .wvp-modal.is-done .wvp-success { display: block; }
+    .wvp-success .wvp-success-title { font-family: 'Anton', sans-serif; color: var(--wvp-pink); font-size: 32px; text-transform: uppercase; line-height: 1.1; margin: 0 0 14px; }
+    .wvp-success p { font-size: 15px; font-weight: 300; line-height: 1.45; margin: 0 0 8px; }
+    .wvp-success p strong { font-weight: 700; }
+
+    /* telas baixas (notebooks, Windows com zoom 125%/150%): tudo mais compacto para caber sem rolar */
+    @media (min-width: 561px) and (max-height: 760px) {
+        .wvp-modal { padding: 26px 32px 16px; }
+        .wvp-title { font-size: 25px; margin-bottom: 6px; }
+        .wvp-sub { font-size: 13px; margin-bottom: 14px; }
+        .wvp-fields { gap: 8px; }
+        .wvp-input { height: 38px; font-size: 14px; }
+        .wvp-hair-q { font-size: 24px; margin: 12px 0 8px; }
+        .wvp-chip span { padding: 5px 12px 5px 9px; font-size: 12.5px; }
+        .wvp-btn { margin-top: 16px; padding: 10px 24px; font-size: 19px; }
+        .wvp-terms { margin-top: 10px; }
+    }
+    @media (min-width: 561px) and (max-height: 620px) {
+        .wvp-overlay { padding: 8px; }
+        .wvp-modal { max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); padding: 20px 28px 12px; }
+        .wvp-title { font-size: 22px; }
+        .wvp-sub { font-size: 12.5px; margin-bottom: 10px; }
+        .wvp-input { height: 34px; font-size: 13.5px; }
+        .wvp-hair-q { font-size: 21px; margin: 8px 0 6px; }
+        .wvp-hair { gap: 6px; }
+        .wvp-chip span { padding: 4px 10px 4px 8px; font-size: 12px; }
+        .wvp-btn { margin-top: 12px; padding: 8px 20px; font-size: 18px; }
+        .wvp-terms { margin-top: 8px; font-size: 11px; }
+    }
+
+    /* celular: 1 coluna (cidade | UF lado a lado) */
+    @media (max-width: 560px) {
+        .wvp-overlay { padding: 10px; }
+        .wvp-modal { padding: 34px 18px 20px; border-radius: 18px; }
+        .wvp-title { font-size: 24px; padding: 0 20px; }
+        .wvp-sub { font-size: 13px; }
+        .wvp-fields { grid-template-columns: 1fr 84px; gap: 10px; }
+        .wvp-input { height: 42px; font-size: 16px; }
+        .wvp-hair-q { font-size: 25px; margin-top: 16px; }
+        .wvp-chip span { font-size: 12.5px; padding: 6px 11px 6px 9px; }
+    }
+    @media (max-width: 560px) and (max-height: 720px) {
+        .wvp-modal { padding: 24px 16px 12px; }
+        .wvp-title { font-size: 20px; }
+        .wvp-sub { font-size: 12px; margin-bottom: 10px; }
+        .wvp-fields { gap: 6px; }
+        .wvp-input { height: 36px; }
+        .wvp-hair-q { font-size: 22px; margin: 8px 0 6px; }
+        .wvp-hair { gap: 6px; }
+        .wvp-chip span { padding: 5px 10px 5px 8px; font-size: 12px; }
+        .wvp-btn { margin-top: 14px; padding: 10px 20px; font-size: 18px; }
+        .wvp-terms { margin-top: 8px; font-size: 11px; }
+    }
+</style>
+
+<div class="wvp-overlay" id="wvp-overlay" aria-hidden="true">
+    <div class="wvp-frame">
+    <div class="wvp-modal" id="wvp-modal" role="dialog" aria-modal="true" aria-labelledby="wvp-title">
+        <button type="button" class="wvp-close" id="wvp-close" aria-label="Fechar">&times;</button>
+
+        <div class="wvp-head">
+            <p class="wvp-title" id="wvp-title">Entre para a lista VIP da Black</p>
+            <p class="wvp-sub">Entre para o nosso canal de transmissão e receba as ofertas da <strong>Black Friday</strong> <span class="wvp-widi">Widi Care</span> em primeira mão.</p>
+        </div>
+
+        <form class="wvp-form" id="wvp-form" novalidate>
+            <div class="wvp-fields">
+                <input class="wvp-input wvp-full" type="text" name="nome" placeholder="Seu nome" autocomplete="given-name" aria-label="Seu nome" required>
+                <input class="wvp-input wvp-full" type="email" name="email" placeholder="Seu melhor e-mail" autocomplete="email" aria-label="Seu melhor e-mail" required>
+                <input class="wvp-input wvp-full" type="tel" name="whatsapp" placeholder="Seu WhatsApp" autocomplete="tel-national" inputmode="numeric" maxlength="15" aria-label="Seu WhatsApp" required>
+                <input class="wvp-input" type="text" name="cidade" placeholder="Cidade" autocomplete="address-level2" aria-label="Cidade" required>
+                <select class="wvp-input" name="uf" aria-label="Estado (UF)" required>
+                    <option value="" selected disabled>UF</option>
+                    
+                        <option value="AC">AC</option>
+                    
+                        <option value="AL">AL</option>
+                    
+                        <option value="AP">AP</option>
+                    
+                        <option value="AM">AM</option>
+                    
+                        <option value="BA">BA</option>
+                    
+                        <option value="CE">CE</option>
+                    
+                        <option value="DF">DF</option>
+                    
+                        <option value="ES">ES</option>
+                    
+                        <option value="GO">GO</option>
+                    
+                        <option value="MA">MA</option>
+                    
+                        <option value="MT">MT</option>
+                    
+                        <option value="MS">MS</option>
+                    
+                        <option value="MG">MG</option>
+                    
+                        <option value="PA">PA</option>
+                    
+                        <option value="PB">PB</option>
+                    
+                        <option value="PR">PR</option>
+                    
+                        <option value="PE">PE</option>
+                    
+                        <option value="PI">PI</option>
+                    
+                        <option value="RJ">RJ</option>
+                    
+                        <option value="RN">RN</option>
+                    
+                        <option value="RS">RS</option>
+                    
+                        <option value="RO">RO</option>
+                    
+                        <option value="RR">RR</option>
+                    
+                        <option value="SC">SC</option>
+                    
+                        <option value="SP">SP</option>
+                    
+                        <option value="SE">SE</option>
+                    
+                        <option value="TO">TO</option>
+                    
+                </select>
+                <input class="wvp-input wvp-full" type="text" name="aniversario" placeholder="Seu aniversário (dd/mm)" inputmode="numeric" maxlength="5" aria-label="Seu aniversário (dd/mm)" required>
+            </div>
+
+            <div class="wvp-hp" aria-hidden="true">
+                <label>Não preencher <input type="text" name="winnie-pooh" tabindex="-1" autocomplete="off"></label>
+            </div>
+
+            <p class="wvp-hair-q">Qual o seu tipo de cabelo?</p>
+            <div class="wvp-hair" role="radiogroup" aria-label="Tipo de cabelo">
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Cacheados"><span>Cacheados</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Crespos"><span>Crespos</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Lisos"><span>Lisos</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Ondulados"><span>Ondulados</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Quimicamente Tratados"><span>Quimicamente Tratados</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Tingidos"><span>Tingidos</span></label>
+                
+            </div>
+
+            <button type="submit" class="wvp-btn" id="wvp-btn">Quero entrar no canal</button>
+            <p class="wvp-error" id="wvp-error" role="alert"></p>
+            <p class="wvp-terms">*Li e aceito os <a href="/regulamento-promocional/" target="_blank" rel="noopener">Termos de Uso</a> e o <a href="/aviso-de-privacidade/" target="_blank" rel="noopener">Aviso de Privacidade</a>.</p>
+        </form>
+
+        <div class="wvp-success" aria-live="polite">
+            <p class="wvp-success-title">Obrigada, <span id="wvp-success-nome">você</span>!</p>
+            <p>Seu cadastro na lista VIP da Black Friday está feito. 💖</p>
+            <p>Agora falta só um passo: <strong>entre no nosso canal do WhatsApp</strong> para receber as ofertas em primeira mão.</p>
+            <a class="wvp-btn wvp-btn-whats" id="wvp-whats-link" href="#"></a>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    /* ===================== REGRAS DE EXIBIÇÃO ===================== */
+    var POPUP = {
+        segundosParaAbrir: 999999,      // abre X segundos depois que a página carrega
+        diasAposFechar: 2,         // se a pessoa fechar, só reaparece depois de X dias
+        abrirNaSaida: false         // no computador, abre também quando o mouse vai sair da página
+    };
+    /* ============================================================== */
+
+    var VIP = window.WidiVipBF;
+    var overlay = document.getElementById('wvp-overlay');
+    if (!VIP || !overlay) return;
+    // Modo teste: clientes não veem o popup; só quem abriu o site com ?teste-vip=1
+    if (!VIP.popupLiberado) { overlay.parentNode.removeChild(overlay); return; }
+
+
+    var modal = document.getElementById('wvp-modal');
+    var form = document.getElementById('wvp-form');
+    var btn = document.getElementById('wvp-btn');
+    var errorBox = document.getElementById('wvp-error');
+    var STORAGE_FECHOU = 'widi_vip_bf_popup_fechou';
+    var leadId = null;
+    var aberto = false;
+
+    // carrega as fontes da campanha só se ainda não estiverem na página
+    if (!document.querySelector('link[href*="Instrument+Serif"]')) {
+        var f = document.createElement('link');
+        f.rel = 'stylesheet';
+        f.href = 'https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Playfair+Display:ital,wght@1,400;1,700&family=Poppins:wght@300;400;700&display=swap';
+        document.head.appendChild(f);
+    }
+
+    VIP.prepararBotaoCanal(document.getElementById('wvp-whats-link'), function () { return leadId; });
+    VIP.mascaraWhats(form.querySelector('[name="whatsapp"]'));
+
+    var aniv = form.querySelector('[name="aniversario"]');
+    var hairGroup = form.querySelector('.wvp-hair');
+    hairGroup.addEventListener('change', function () { hairGroup.classList.remove('is-invalid'); });
+    aniv.addEventListener('input', function () {
+        var d = aniv.value.replace(/\D/g, '').slice(0, 4);
+        aniv.value = d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
+    });
+
+    function podeAbrir() {
+        if (aberto) return false;
+        if (VIP.sessaoTeste) return true; // no teste abre sempre, para testar várias vezes
+        if (VIP.jaCadastrado()) return false;
+        try {
+            var t = parseInt(localStorage.getItem(STORAGE_FECHOU) || '0', 10);
+            if (t && Date.now() - t < POPUP.diasAposFechar * 864e5) return false;
+        } catch (e) {}
+        return true;
+    }
+
+    function abrir() {
+        if (!podeAbrir()) return;
+        aberto = true;
+        overlay.classList.add('is-open');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('wvp-lock');
+        requestAnimationFrame(function () { overlay.classList.add('is-visible'); });
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'popup_lista_vip_bf_aberto' });
+    }
+
+    function fechar() {
+        overlay.classList.remove('is-visible');
+        document.body.classList.remove('wvp-lock');
+        setTimeout(function () {
+            overlay.classList.remove('is-open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }, 250);
+        if (!modal.classList.contains('is-done')) {
+            try { localStorage.setItem(STORAGE_FECHOU, String(Date.now())); } catch (e) {}
+        }
+    }
+
+    document.getElementById('wvp-close').addEventListener('click', fechar);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) fechar(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay.classList.contains('is-open')) fechar(); });
+
+    // Permite abrir por link/botão: <a href="#lista-vip">...</a> ou WidiVipBF.abrirPopup()
+    VIP.abrirPopup = function () { try { localStorage.removeItem(STORAGE_FECHOU); } catch (e) {} aberto = false; abrir(); };
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[href="#lista-vip"]');
+        if (a) { e.preventDefault(); VIP.abrirPopup(); }
+    });
+
+    setTimeout(abrir, POPUP.segundosParaAbrir * 1000);
+    if (POPUP.abrirNaSaida && window.matchMedia('(pointer:fine)').matches) {
+        document.addEventListener('mouseout', function (e) {
+            if (!e.relatedTarget && e.clientY <= 0) abrir();
+        });
+    }
+
+    /* ---------- Envio ---------- */
+    function showError(msg) { errorBox.textContent = msg; errorBox.classList.add('is-visible'); }
+    form.addEventListener('input', function (e) { if (e.target.classList) e.target.classList.remove('is-invalid'); errorBox.classList.remove('is-visible'); });
+    form.addEventListener('change', function (e) { if (e.target.classList) e.target.classList.remove('is-invalid'); });
+
+    function validate() {
+        var first = null;
+        function check(el, bad) { el.classList.toggle('is-invalid', bad); if (bad && !first) first = el; }
+        check(form.nome, !form.nome.value.trim());
+        check(form.email, !VIP.emailValido(form.email.value.trim()));
+        check(form.whatsapp, !VIP.whatsValido(form.whatsapp.value));
+        check(form.cidade, form.cidade.value.trim().length < 2);
+        check(form.uf, !form.uf.value);
+        var a = aniv.value.trim();
+        var m = a.match(/^(\d{2})\/(\d{2})$/);
+        check(aniv, !m || +m[1] < 1 || +m[1] > 31 || +m[2] < 1 || +m[2] > 12);
+        var semCabelo = !form.querySelector('[name="tipos_cabelo"]:checked');
+        hairGroup.classList.toggle('is-invalid', semCabelo);
+        if (first) { showError('Preencha todos os campos destacados.'); first.focus(); return false; }
+        if (semCabelo) { showError('Escolha seu tipo de cabelo.'); return false; }
+        return true;
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (form.querySelector('[name="winnie-pooh"]').value) return;
+        if (!validate()) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+
+        var cabelos = Array.prototype.slice.call(form.querySelectorAll('[name="tipos_cabelo"]:checked')).map(function (c) { return c.value; });
+
+        VIP.registrar('popup', {
+            nome: form.nome.value.trim(),
+            email: form.email.value.trim(),
+            whatsapp: form.whatsapp.value,
+            cidade: form.cidade.value.trim(),
+            uf: form.uf.value,
+            aniversario: aniv.value.trim(),
+            tipos_cabelo: cabelos
+        }).then(function (id) {
+            leadId = id;
+            document.getElementById('wvp-success-nome').textContent = form.nome.value.trim().split(' ')[0];
+            modal.classList.add('is-done');
+            modal.scrollTop = 0;
+        }).catch(function (err) {
+            showError(VIP.mensagemErro(err));
+            btn.disabled = false;
+            btn.textContent = 'Quero entrar no canal';
+        });
+    });
+})();
+</script>
+<!-- ===== Só do protótipo: botão do popup + envio simulado (nada é salvo) ===== -->
+<style>
+  .proto-bar{position:fixed;left:16px;bottom:16px;z-index:9998;display:flex;gap:8px;align-items:center;font:600 13px Poppins,sans-serif}
+  .proto-bar button{border:0;border-radius:30px;padding:10px 18px;background:#ff1d8e;color:#fff;font:inherit;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+  .proto-bar span{background:rgba(0,0,0,.7);color:#fff;border-radius:30px;padding:8px 14px;font-weight:400}
+</style>
+<div class="proto-bar"><button type="button" id="proto-popup">Ver popup</button><span>Protótipo: nada é salvo</span></div>
+<script>
+(function(){
+  var V=window.WidiVipBF;
+  V.registrar=function(){ return new Promise(function(r){ setTimeout(function(){ r('prototipo'); },600); }); };
+  V.clique=function(){};
+  try{localStorage.removeItem('widi_vip_bf_lead');localStorage.removeItem('widi_vip_bf_popup_fechou');}catch(e){}
+  document.getElementById('proto-popup').addEventListener('click',function(){
+    var m=document.getElementById('wvp-modal'); m.classList.remove('is-done'); document.getElementById('wvp-form').reset();
+    var b=document.getElementById('wvp-btn'); b.disabled=false; b.textContent='Quero entrar no canal';
+    V.abrirPopup();
+  });
+})();
+</script>
+
+</body>
+</html>
