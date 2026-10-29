@@ -1006,34 +1006,6 @@ window.WidiVipBF = window.WidiVipBF || (function () {
     }
     .wvp-overlay.is-visible .wvp-frame { transform: none; }
 
-    /* brilho no canto, igual ao contorno da LP */
-    .wvp-frame::before {
-        content: "";
-        position: absolute;
-        z-index: 2;
-        top: -9px;
-        right: 64px;
-        width: 20px;
-        height: 20px;
-        background: radial-gradient(circle, #fff 0 30%, rgba(255,255,255,.0) 70%);
-        box-shadow: 0 0 14px 4px rgba(255,255,255,.7);
-        clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
-        pointer-events: none;
-    }
-    /* halo suave em volta da estrelinha */
-    .wvp-frame::after {
-        content: "";
-        position: absolute;
-        z-index: 1;
-        top: -16px;
-        right: 57px;
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255, 255, 255, .55) 0, rgba(255, 120, 190, .25) 35%, transparent 70%);
-        pointer-events: none;
-    }
-
     .wvp-close {
         position: absolute;
         top: 12px;
