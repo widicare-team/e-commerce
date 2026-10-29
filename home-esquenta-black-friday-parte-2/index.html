@@ -644,7 +644,7 @@ a{color:inherit;text-decoration:none}
       const f1 = H.fase === 1;
       const fase = f1
         ? { sub: 'oferta misteriosa', ate: 30, cta: 'Compre por linha', tag: 'oferta do dia', cdTxt: 'a oferta misteriosa de hoje acaba em', cdBtn: 'ver a oferta do dia', mq: 'oferta misteriosa', calSub: 'uma oferta misteriosa por dia', calCta: 'Amanhã tem outra oferta misteriosa.' }
-        : { sub: 'linha diferente', ate: 20, cta: 'Compre a linha do dia', tag: 'linha do dia', cdTxt: 'a linha do dia acaba em', cdBtn: 'ver a linha do dia', mq: 'uma oferta por dia', calSub: 'uma oferta por dia', calCta: H.dia === 26 ? 'Amanhã começa a Black Friday.' : 'Amanhã tem outra linha com desconto.' };
+        : { sub: 'oferta misteriosa', ate: 20, cta: 'Compre por linha', tag: 'oferta do dia', cdTxt: 'a oferta misteriosa de hoje acaba em', cdBtn: 'ver a oferta do dia', mq: 'oferta misteriosa', calSub: 'uma oferta misteriosa por dia', calCta: 'Amanhã tem outra oferta misteriosa.' };
       const por = Math.round(H.preco * (1 - H.off / 100) * 100) / 100;
       this.urlHoje = H.url;
       const oferta = {
@@ -674,7 +674,7 @@ a{color:inherit;text-decoration:none}
         return {
           dia: pad(d.dia), dow: d.dow,
           cls: past ? 'is-past' : hoje ? 'is-hoje' : 'is-fut' + (amanha ? ' is-amanha' : ''),
-          nome: aberto ? d.curto : d.fase === 1 ? 'oferta misteriosa' : 'linha surpresa',
+          nome: aberto ? d.curto : 'oferta misteriosa',
           offTxt: aberto ? d.off + '% off' : 'até ' + (d.fase === 1 ? 30 : 20) + '% off',
           tag: past ? 'encerrado' : hoje ? 'hoje' : amanha ? 'amanhã' : 'em breve'
         };
