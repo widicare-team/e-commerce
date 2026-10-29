@@ -619,7 +619,7 @@ a{color:inherit;text-decoration:none}
         { dia: 18, off: 20, img: A.p46, nome: 'Condicionador Pré e Pós Química 300ml', curto: 'Condicionador Pré e Pós Química', n1: 'Condicionador', nb: 'Pré e Pós Química', n2: '300ml', preco: 57.9, url: L + 'produtos/condicionador-widi-care-pre-e-pos-quimica-300ml/' },
         { dia: 19, off: 15, img: A.p47, nome: 'Máscara Juba Reconstrutora 500g', curto: 'Máscara Juba Reconstrutora', n1: 'Máscara', nb: 'Juba Reconstrutora', n2: '500g', preco: 59.9, url: L + 'produtos/mascara-reconstrucao-juba-mascara-reconstrutora-condicionante-500g/' }
       ].map((p) => Object.assign({ fase: 1 }, p));
-      // 20 a 26/11: uma linha por dia
+      // 20 a 26/11: uma oferta por dia
       const linhas = [
         { dia: 20, off: 10, nome: 'PhytoBerry', img: A.p07, preco: 51.9, url: L + 'produtos?m_linha=Phytoberry' },
         { dia: 21, off: 15, nome: 'Juba', img: A.p31, preco: 41.9, url: L + 'search/?q=juba' },
@@ -644,7 +644,7 @@ a{color:inherit;text-decoration:none}
       const f1 = H.fase === 1;
       const fase = f1
         ? { sub: 'oferta misteriosa', ate: 30, cta: 'Compre por linha', tag: 'oferta do dia', cdTxt: 'a oferta misteriosa de hoje acaba em', cdBtn: 'ver a oferta do dia', mq: 'oferta misteriosa', calSub: 'uma oferta misteriosa por dia', calCta: 'Amanhã tem outra oferta misteriosa.' }
-        : { sub: 'linha diferente', ate: 20, cta: 'Compre a linha do dia', tag: 'linha do dia', cdTxt: 'a linha do dia acaba em', cdBtn: 'ver a linha do dia', mq: 'uma linha por dia', calSub: 'uma linha por dia', calCta: H.dia === 26 ? 'Amanhã começa a Black Friday.' : 'Amanhã tem outra linha com desconto.' };
+        : { sub: 'linha diferente', ate: 20, cta: 'Compre a linha do dia', tag: 'linha do dia', cdTxt: 'a linha do dia acaba em', cdBtn: 'ver a linha do dia', mq: 'uma oferta por dia', calSub: 'uma oferta por dia', calCta: H.dia === 26 ? 'Amanhã começa a Black Friday.' : 'Amanhã tem outra linha com desconto.' };
       const por = Math.round(H.preco * (1 - H.off / 100) * 100) / 100;
       this.urlHoje = H.url;
       const oferta = {
