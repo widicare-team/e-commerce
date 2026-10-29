@@ -764,5 +764,710 @@ a{color:inherit;text-decoration:none}
   if (comp.componentDidMount) comp.componentDidMount();
 })();
 </script>
+
+<!-- ===================== POPUP LISTA VIP BF (protótipo: envio simulado, nada é salvo) ===================== -->
+<script>try { localStorage.removeItem('widi_vip_bf_popup_fechou'); localStorage.removeItem('widi_vip_bf_lead'); } catch (e) {}</script>
+<script>
+window.WidiVipBF = window.WidiVipBF || (function () {
+    var CONFIG = {
+        // >>> LANÇAMENTO: troque 'teste' por 'ativo' <<<
+        //  'teste' = popup invisível para clientes (só abre com ?teste-vip=1 no endereço)
+        //            e todo cadastro vai para a campanha "teste" do painel
+        //  'ativo' = popup no ar para todo mundo e cadastros na campanha da BF
+        modo: 'ativo',
+        // Supabase > Project Settings > API Keys
+        supabaseUrl: 'https://prototipo.invalid',
+        // Use a chave PÚBLICA: "publishable" (sb_publishable_...) ou a "anon" antiga. NUNCA a service_role/secret.
+        supabaseKey: '',
+        // Canal do WhatsApp da BF
+        whatsappUrl: 'https://www.whatsapp.com/channel/0029Vb8pbXIDDmFd6rpUjq2W',
+        whatsappLabel: 'Entrar no canal da BF 📢',
+        campanha: 'bf-2026'
+    };
+
+    var STORAGE_LEAD = 'widi_vip_bf_lead';
+    var STORAGE_UTM = 'widi_vip_bf_utm';
+    var STORAGE_TESTE = 'widi_vip_bf_teste';
+
+    // Sessão de teste: abrir qualquer página com ?teste-vip=1 (vale até fechar a aba). ?teste-vip=0 desliga.
+    var sessaoTeste = false;
+    try {
+        var qp = new URLSearchParams(window.location.search).get('teste-vip');
+        if (qp === '1') sessionStorage.setItem(STORAGE_TESTE, '1');
+        if (qp === '0') sessionStorage.removeItem(STORAGE_TESTE);
+        sessaoTeste = sessionStorage.getItem(STORAGE_TESTE) === '1';
+    } catch (e) {}
+    var emTeste = CONFIG.modo !== 'ativo' || sessaoTeste;
+
+    var CABELO_PLURAL = {
+        'Liso': 'Lisos', 'Ondulado': 'Ondulados', 'Cacheado': 'Cacheados', 'Crespo': 'Crespos',
+        'Quimicamente Tratado': 'Quimicamente Tratados', 'Tingido': 'Tingidos'
+    };
+
+    function lsGet(k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } }
+    function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+    function ssGet(k) { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } }
+    function ssSet(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+
+    // Guarda as UTMs da primeira página da visita (o popup pode abrir em outra página)
+    (function guardarUtms() {
+        try {
+            var p = new URLSearchParams(window.location.search);
+            var utm = {};
+            ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'].forEach(function (k) {
+                if (p.get(k)) utm[k] = p.get(k);
+            });
+            if (Object.keys(utm).length) {
+                utm.referrer = document.referrer || '';
+                ssSet(STORAGE_UTM, utm);
+            } else if (!ssGet(STORAGE_UTM)) {
+                ssSet(STORAGE_UTM, { referrer: document.referrer || '' });
+            }
+        } catch (e) {}
+    })();
+
+    function headers() {
+        var h = { 'Content-Type': 'application/json', 'apikey': CONFIG.supabaseKey };
+        if (CONFIG.supabaseKey.indexOf('sb_') !== 0) h['Authorization'] = 'Bearer ' + CONFIG.supabaseKey;
+        return h;
+    }
+
+    function rpc(nome, corpo, keepalive) {
+        return fetch(CONFIG.supabaseUrl.replace(/\/$/, '') + '/rest/v1/rpc/' + nome, {
+            method: 'POST',
+            headers: headers(),
+            body: JSON.stringify(corpo),
+            keepalive: !!keepalive
+        }).then(function (r) {
+            return r.text().then(function (t) {
+                var data = null;
+                try { data = t ? JSON.parse(t) : null; } catch (e) {}
+                if (!r.ok) {
+                    var err = new Error((data && data.message) || ('http_' + r.status));
+                    err.code = (data && data.message) || '';
+                    throw err;
+                }
+                return data;
+            });
+        });
+    }
+
+    function dispositivo() {
+        var ua = navigator.userAgent || '';
+        if (/iPad|Tablet/i.test(ua)) return 'tablet';
+        if (/Mobi|Android|iPhone/i.test(ua)) return 'mobile';
+        return 'desktop';
+    }
+
+    function mensagemErro(err) {
+        var c = (err && err.code) || '';
+        if (c.indexOf('email_invalido') > -1) return 'Confira seu e-mail.';
+        if (c.indexOf('whatsapp_invalido') > -1) return 'Confira seu WhatsApp com DDD.';
+        if (c.indexOf('nome_obrigatorio') > -1) return 'Preencha seu nome.';
+        if (c.indexOf('campos_obrigatorios') > -1) return 'Preencha todos os campos.';
+        return 'Não conseguimos enviar agora. Tente novamente em instantes.';
+    }
+
+    function registrar(origem, dados) {
+        var utm = ssGet(STORAGE_UTM) || {};
+        var payload = {
+            campanha: emTeste ? 'teste' : CONFIG.campanha,
+            origem: origem,
+            nome: dados.nome,
+            sobrenome: dados.sobrenome || '',
+            email: dados.email,
+            whatsapp: dados.whatsapp,
+            cidade: dados.cidade || '',
+            uf: dados.uf || '',
+            aniversario: dados.aniversario || '',
+            tipos_cabelo: (dados.tipos_cabelo || []).map(function (c) { return CABELO_PLURAL[c] || c; }),
+            pagina: window.location.href,
+            referrer: utm.referrer || document.referrer || '',
+            utm_source: utm.utm_source || '',
+            utm_medium: utm.utm_medium || '',
+            utm_campaign: utm.utm_campaign || '',
+            utm_content: utm.utm_content || '',
+            utm_term: utm.utm_term || '',
+            dispositivo: dispositivo()
+        };
+        return rpc('bf_registrar_lead', { dados: payload }).then(function (id) {
+            if (!emTeste) lsSet(STORAGE_LEAD, { id: id, em: Date.now() });
+            window.dataLayer = window.dataLayer || [];
+            window.dataLayer.push({ event: 'lead_lista_vip_bf', origem_form: origem });
+            if (typeof window.fbq === 'function') {
+                window.fbq('track', 'Lead', { content_name: 'Lista VIP Black Friday', content_category: origem });
+            }
+            return id;
+        });
+    }
+
+    // Registra o clique no botão do canal (keepalive = chega mesmo se a página sair)
+    function clique(id) {
+        var lead = id || (lsGet(STORAGE_LEAD) || {}).id;
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'clique_canal_whatsapp_bf' });
+        if (!lead) return;
+        rpc('bf_registrar_clique_whatsapp', { lead_id: lead }, true).catch(function () {});
+    }
+
+    // Prepara um <a> como botão do canal
+    function prepararBotaoCanal(a, getId) {
+        a.href = CONFIG.whatsappUrl;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = CONFIG.whatsappLabel;
+        a.addEventListener('click', function () { clique(getId ? getId() : null); });
+    }
+
+    function mascaraWhats(input) {
+        input.addEventListener('input', function () {
+            var d = input.value.replace(/\D/g, '').slice(0, 11);
+            var out = d;
+            if (d.length > 2) out = '(' + d.slice(0, 2) + ') ' + d.slice(2);
+            if (d.length > 10) out = '(' + d.slice(0, 2) + ') ' + d.slice(2, 7) + '-' + d.slice(7);
+            else if (d.length > 6) out = '(' + d.slice(0, 2) + ') ' + d.slice(2, 6) + '-' + d.slice(6);
+            input.value = out;
+        });
+    }
+
+    function emailValido(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+    function whatsValido(v) { var d = v.replace(/\D/g, ''); return d.length === 10 || d.length === 11; }
+
+    return {
+        config: CONFIG,
+        registrar: registrar,
+        clique: clique,
+        prepararBotaoCanal: prepararBotaoCanal,
+        mascaraWhats: mascaraWhats,
+        emailValido: emailValido,
+        whatsValido: whatsValido,
+        mensagemErro: mensagemErro,
+        jaCadastrado: function () { return !!(lsGet(STORAGE_LEAD) || {}).id; },
+        emTeste: emTeste,
+        sessaoTeste: sessaoTeste,
+        popupLiberado: CONFIG.modo === 'ativo' || sessaoTeste
+    };
+})();
+</script>
+
+<style>
+    .wvp-overlay, .wvp-overlay * { box-sizing: border-box; }
+    .wvp-overlay {
+        --wvp-pink: #ff1d8e;
+        --wvp-pink-dark: #d90f74;
+        position: fixed;
+        inset: 0;
+        z-index: 100000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        background: rgba(0, 0, 0, .72);
+        font-family: 'Poppins', sans-serif;
+        opacity: 0;
+        transition: opacity .25s ease;
+    }
+    .wvp-overlay.is-open { display: flex; }
+    .wvp-overlay.is-visible { opacity: 1; }
+    body.wvp-lock { overflow: hidden; }
+
+    .wvp-modal {
+        position: relative;
+        width: 100%;
+        max-height: calc(100vh - 32px);
+        max-height: calc(100dvh - 32px);
+        overflow-y: auto;
+        padding: 34px 36px 22px;
+        border-radius: 22px;
+        border: 1.5px solid var(--wvp-pink);
+        background:
+            radial-gradient(120% 60% at 100% 0%, rgba(255, 29, 142, .22), transparent 60%),
+            radial-gradient(90% 50% at 0% 100%, rgba(255, 29, 142, .14), transparent 60%),
+            #0a0407;
+        box-shadow: 0 0 0 1px rgba(255, 29, 142, .25), 0 0 28px rgba(255, 29, 142, .45), 0 20px 60px rgba(0, 0, 0, .6);
+        color: #fff;
+        text-align: center;
+        scrollbar-width: thin;
+        scrollbar-color: var(--wvp-pink) transparent;
+    }
+
+    /* moldura por fora do popup: segura o brilho sem ele ser cortado pela rolagem */
+    .wvp-frame {
+        position: relative;
+        width: 100%;
+        max-width: 520px;
+        transform: translateY(16px) scale(.98);
+        transition: transform .25s ease;
+    }
+    .wvp-overlay.is-visible .wvp-frame { transform: none; }
+
+    /* brilho no canto, igual ao contorno da LP */
+    .wvp-frame::before {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        top: -9px;
+        right: 64px;
+        width: 20px;
+        height: 20px;
+        background: radial-gradient(circle, #fff 0 30%, rgba(255,255,255,.0) 70%);
+        box-shadow: 0 0 14px 4px rgba(255,255,255,.7);
+        clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
+        pointer-events: none;
+    }
+    /* halo suave em volta da estrelinha */
+    .wvp-frame::after {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        top: -16px;
+        right: 57px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 255, 255, .55) 0, rgba(255, 120, 190, .25) 35%, transparent 70%);
+        pointer-events: none;
+    }
+
+    .wvp-close {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 34px;
+        height: 34px;
+        border: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, .1);
+        color: #fff;
+        font-size: 22px;
+        line-height: 1;
+        cursor: pointer;
+    }
+    .wvp-close:hover { background: var(--wvp-pink); }
+
+    .wvp-title {
+        font-family: 'Anton', sans-serif;
+        font-weight: 400;
+        color: var(--wvp-pink);
+        text-transform: uppercase;
+        font-size: 28px;
+        line-height: 1.1;
+        margin: 0 0 8px;
+    }
+    .wvp-sub { font-size: 14px; font-weight: 300; line-height: 1.35; margin: 0 0 18px; }
+    .wvp-sub strong { font-weight: 700; }
+    .wvp-widi { font-family: 'Playfair Display', serif; font-style: italic; font-weight: 700; }
+
+    .wvp-fields { display: grid; grid-template-columns: 1fr 96px; gap: 10px; }
+    .wvp-full { grid-column: 1 / -1; }
+    .wvp-input {
+        width: 100%;
+        height: 42px;
+        border: 2px solid transparent;
+        border-radius: 0;
+        background: #f2f2f2;
+        color: #222;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+        font-weight: 300;
+        font-size: 15px;
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    .wvp-input::placeholder { color: #444; opacity: 1; }
+    .wvp-input:focus { border-color: var(--wvp-pink); }
+    .wvp-input.is-invalid { border-color: #ff4d4d; }
+    select.wvp-input { text-align-last: center; cursor: pointer; padding: 0 8px; }
+    select.wvp-input:invalid { color: #444; }
+
+    .wvp-hair-q { margin: 18px 0 10px; font-family: 'Instrument Serif', serif; font-style: italic; font-weight: 400; font-size: 27px; line-height: 1.1; }
+    .wvp-hair { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+    .wvp-chip { position: relative; }
+    .wvp-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+    .wvp-chip span {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 14px 7px 10px;
+        border: 1.5px solid rgba(255, 255, 255, .45);
+        border-radius: 30px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background .15s, border-color .15s, color .15s;
+        user-select: none;
+    }
+    /* bolinha de seleção única (radio) */
+    .wvp-chip span::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255, 255, 255, .7);
+        box-sizing: border-box;
+        transition: background .15s, box-shadow .15s, border-color .15s;
+    }
+    .wvp-chip:hover span { border-color: rgba(255, 255, 255, .8); }
+    .wvp-chip input:checked + span { background: var(--wvp-pink); border-color: var(--wvp-pink); }
+    .wvp-chip input:checked + span::before { border-color: #fff; background: #fff; box-shadow: inset 0 0 0 2.5px var(--wvp-pink); }
+    .wvp-chip input:focus-visible + span { outline: 2px solid #fff; outline-offset: 2px; }
+    .wvp-hair.is-invalid .wvp-chip span { border-color: #ff4d4d; }
+
+    .wvp-btn {
+        display: inline-block;
+        margin-top: 20px;
+        width: 100%;
+        padding: 13px 24px;
+        border: 0;
+        border-radius: 40px;
+        background: var(--wvp-pink);
+        color: #fff;
+        font-family: 'Anton', sans-serif;
+        font-size: 21px;
+        letter-spacing: .4px;
+        text-transform: uppercase;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .2s;
+    }
+    .wvp-btn:hover { background: var(--wvp-pink-dark); color: #fff; }
+    .wvp-btn[disabled] { opacity: .7; cursor: wait; }
+    .wvp-btn-whats { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 15px; text-transform: none; padding: 15px 20px; line-height: 1.3; }
+
+    .wvp-error { display: none; margin: 12px 0 0; font-size: 13px; color: #ff8a8a; }
+    .wvp-error.is-visible { display: block; }
+    .wvp-terms { margin: 14px 0 0; font-size: 12px; font-weight: 300; }
+    .wvp-terms a { color: #2aa3ff; text-decoration: underline; text-underline-offset: 3px; }
+    .wvp-hp { position: absolute !important; left: -9999px !important; width: 1px; height: 1px; overflow: hidden; }
+
+    .wvp-success { display: none; padding: 10px 0 6px; }
+    .wvp-modal.is-done .wvp-form, .wvp-modal.is-done .wvp-head { display: none; }
+    .wvp-modal.is-done .wvp-success { display: block; }
+    .wvp-success .wvp-success-title { font-family: 'Anton', sans-serif; color: var(--wvp-pink); font-size: 32px; text-transform: uppercase; line-height: 1.1; margin: 0 0 14px; }
+    .wvp-success p { font-size: 15px; font-weight: 300; line-height: 1.45; margin: 0 0 8px; }
+    .wvp-success p strong { font-weight: 700; }
+
+    /* telas baixas (notebooks, Windows com zoom 125%/150%): tudo mais compacto para caber sem rolar */
+    @media (min-width: 561px) and (max-height: 760px) {
+        .wvp-modal { padding: 26px 32px 16px; }
+        .wvp-title { font-size: 25px; margin-bottom: 6px; }
+        .wvp-sub { font-size: 13px; margin-bottom: 14px; }
+        .wvp-fields { gap: 8px; }
+        .wvp-input { height: 38px; font-size: 14px; }
+        .wvp-hair-q { font-size: 24px; margin: 12px 0 8px; }
+        .wvp-chip span { padding: 5px 12px 5px 9px; font-size: 12.5px; }
+        .wvp-btn { margin-top: 16px; padding: 10px 24px; font-size: 19px; }
+        .wvp-terms { margin-top: 10px; }
+    }
+    @media (min-width: 561px) and (max-height: 620px) {
+        .wvp-overlay { padding: 8px; }
+        .wvp-modal { max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px); padding: 20px 28px 12px; }
+        .wvp-title { font-size: 22px; }
+        .wvp-sub { font-size: 12.5px; margin-bottom: 10px; }
+        .wvp-input { height: 34px; font-size: 13.5px; }
+        .wvp-hair-q { font-size: 21px; margin: 8px 0 6px; }
+        .wvp-hair { gap: 6px; }
+        .wvp-chip span { padding: 4px 10px 4px 8px; font-size: 12px; }
+        .wvp-btn { margin-top: 12px; padding: 8px 20px; font-size: 18px; }
+        .wvp-terms { margin-top: 8px; font-size: 11px; }
+    }
+
+    /* celular: 1 coluna (cidade | UF lado a lado) */
+    @media (max-width: 560px) {
+        .wvp-overlay { padding: 10px; }
+        .wvp-modal { padding: 34px 18px 20px; border-radius: 18px; }
+        .wvp-title { font-size: 24px; padding: 0 20px; }
+        .wvp-sub { font-size: 13px; }
+        .wvp-fields { grid-template-columns: 1fr 84px; gap: 10px; }
+        .wvp-input { height: 42px; font-size: 16px; }
+        .wvp-hair-q { font-size: 25px; margin-top: 16px; }
+        .wvp-chip span { font-size: 12.5px; padding: 6px 11px 6px 9px; }
+    }
+    @media (max-width: 560px) and (max-height: 720px) {
+        .wvp-modal { padding: 24px 16px 12px; }
+        .wvp-title { font-size: 20px; }
+        .wvp-sub { font-size: 12px; margin-bottom: 10px; }
+        .wvp-fields { gap: 6px; }
+        .wvp-input { height: 36px; }
+        .wvp-hair-q { font-size: 22px; margin: 8px 0 6px; }
+        .wvp-hair { gap: 6px; }
+        .wvp-chip span { padding: 5px 10px 5px 8px; font-size: 12px; }
+        .wvp-btn { margin-top: 14px; padding: 10px 20px; font-size: 18px; }
+        .wvp-terms { margin-top: 8px; font-size: 11px; }
+    }
+</style>
+
+<div class="wvp-overlay" id="wvp-overlay" aria-hidden="true">
+    <div class="wvp-frame">
+    <div class="wvp-modal" id="wvp-modal" role="dialog" aria-modal="true" aria-labelledby="wvp-title">
+        <button type="button" class="wvp-close" id="wvp-close" aria-label="Fechar">&times;</button>
+
+        <div class="wvp-head">
+            <p class="wvp-title" id="wvp-title">Entre para a lista VIP da Black</p>
+            <p class="wvp-sub">Entre para o nosso canal de transmissão e receba as ofertas da <strong>Black Friday</strong> <span class="wvp-widi">Widi Care</span> em primeira mão.</p>
+        </div>
+
+        <form class="wvp-form" id="wvp-form" novalidate>
+            <div class="wvp-fields">
+                <input class="wvp-input wvp-full" type="text" name="nome" placeholder="Seu nome" autocomplete="given-name" aria-label="Seu nome" required>
+                <input class="wvp-input wvp-full" type="email" name="email" placeholder="Seu melhor e-mail" autocomplete="email" aria-label="Seu melhor e-mail" required>
+                <input class="wvp-input wvp-full" type="tel" name="whatsapp" placeholder="Seu WhatsApp" autocomplete="tel-national" inputmode="numeric" maxlength="15" aria-label="Seu WhatsApp" required>
+                <input class="wvp-input" type="text" name="cidade" placeholder="Cidade" autocomplete="address-level2" aria-label="Cidade" required>
+                <select class="wvp-input" name="uf" aria-label="Estado (UF)" required>
+                    <option value="" selected disabled>UF</option>
+                    
+                        <option value="AC">AC</option>
+                    
+                        <option value="AL">AL</option>
+                    
+                        <option value="AP">AP</option>
+                    
+                        <option value="AM">AM</option>
+                    
+                        <option value="BA">BA</option>
+                    
+                        <option value="CE">CE</option>
+                    
+                        <option value="DF">DF</option>
+                    
+                        <option value="ES">ES</option>
+                    
+                        <option value="GO">GO</option>
+                    
+                        <option value="MA">MA</option>
+                    
+                        <option value="MT">MT</option>
+                    
+                        <option value="MS">MS</option>
+                    
+                        <option value="MG">MG</option>
+                    
+                        <option value="PA">PA</option>
+                    
+                        <option value="PB">PB</option>
+                    
+                        <option value="PR">PR</option>
+                    
+                        <option value="PE">PE</option>
+                    
+                        <option value="PI">PI</option>
+                    
+                        <option value="RJ">RJ</option>
+                    
+                        <option value="RN">RN</option>
+                    
+                        <option value="RS">RS</option>
+                    
+                        <option value="RO">RO</option>
+                    
+                        <option value="RR">RR</option>
+                    
+                        <option value="SC">SC</option>
+                    
+                        <option value="SP">SP</option>
+                    
+                        <option value="SE">SE</option>
+                    
+                        <option value="TO">TO</option>
+                    
+                </select>
+                <input class="wvp-input wvp-full" type="text" name="aniversario" placeholder="Seu aniversário (dd/mm)" inputmode="numeric" maxlength="5" aria-label="Seu aniversário (dd/mm)" required>
+            </div>
+
+            <div class="wvp-hp" aria-hidden="true">
+                <label>Não preencher <input type="text" name="winnie-pooh" tabindex="-1" autocomplete="off"></label>
+            </div>
+
+            <p class="wvp-hair-q">Qual o seu tipo de cabelo?</p>
+            <div class="wvp-hair" role="radiogroup" aria-label="Tipo de cabelo">
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Cacheados"><span>Cacheados</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Crespos"><span>Crespos</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Lisos"><span>Lisos</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Ondulados"><span>Ondulados</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Quimicamente Tratados"><span>Quimicamente Tratados</span></label>
+                
+                    <label class="wvp-chip"><input type="radio" name="tipos_cabelo" value="Tingidos"><span>Tingidos</span></label>
+                
+            </div>
+
+            <button type="submit" class="wvp-btn" id="wvp-btn">Quero entrar no canal</button>
+            <p class="wvp-error" id="wvp-error" role="alert"></p>
+            <p class="wvp-terms">*Li e aceito os <a href="/regulamento-promocional/" target="_blank" rel="noopener">Termos de Uso</a> e o <a href="/aviso-de-privacidade/" target="_blank" rel="noopener">Aviso de Privacidade</a>.</p>
+        </form>
+
+        <div class="wvp-success" aria-live="polite">
+            <p class="wvp-success-title">Obrigada, <span id="wvp-success-nome">você</span>!</p>
+            <p>Seu cadastro na lista VIP da Black Friday está feito. 💖</p>
+            <p>Agora falta só um passo: <strong>entre no nosso canal do WhatsApp</strong> para receber as ofertas em primeira mão.</p>
+            <a class="wvp-btn wvp-btn-whats" id="wvp-whats-link" href="#"></a>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    /* ===================== REGRAS DE EXIBIÇÃO ===================== */
+    var POPUP = {
+        segundosParaAbrir: 1,      // abre X segundos depois que a página carrega
+        diasAposFechar: 2,         // se a pessoa fechar, só reaparece depois de X dias
+        abrirNaSaida: true         // no computador, abre também quando o mouse vai sair da página
+    };
+    /* ============================================================== */
+
+    var VIP = window.WidiVipBF;
+    var overlay = document.getElementById('wvp-overlay');
+    if (!VIP || !overlay) return;
+    // Modo teste: clientes não veem o popup; só quem abriu o site com ?teste-vip=1
+    if (!VIP.popupLiberado) { overlay.parentNode.removeChild(overlay); return; }
+
+
+    var modal = document.getElementById('wvp-modal');
+    var form = document.getElementById('wvp-form');
+    var btn = document.getElementById('wvp-btn');
+    var errorBox = document.getElementById('wvp-error');
+    var STORAGE_FECHOU = 'widi_vip_bf_popup_fechou';
+    var leadId = null;
+    var aberto = false;
+
+    // carrega as fontes da campanha só se ainda não estiverem na página
+    if (!document.querySelector('link[href*="Instrument+Serif"]')) {
+        var f = document.createElement('link');
+        f.rel = 'stylesheet';
+        f.href = 'https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Playfair+Display:ital,wght@1,400;1,700&family=Poppins:wght@300;400;700&display=swap';
+        document.head.appendChild(f);
+    }
+
+    VIP.prepararBotaoCanal(document.getElementById('wvp-whats-link'), function () { return leadId; });
+    VIP.mascaraWhats(form.querySelector('[name="whatsapp"]'));
+
+    var aniv = form.querySelector('[name="aniversario"]');
+    var hairGroup = form.querySelector('.wvp-hair');
+    hairGroup.addEventListener('change', function () { hairGroup.classList.remove('is-invalid'); });
+    aniv.addEventListener('input', function () {
+        var d = aniv.value.replace(/\D/g, '').slice(0, 4);
+        aniv.value = d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
+    });
+
+    function podeAbrir() {
+        if (aberto) return false;
+        if (VIP.sessaoTeste) return true; // no teste abre sempre, para testar várias vezes
+        if (VIP.jaCadastrado()) return false;
+        try {
+            var t = parseInt(localStorage.getItem(STORAGE_FECHOU) || '0', 10);
+            if (t && Date.now() - t < POPUP.diasAposFechar * 864e5) return false;
+        } catch (e) {}
+        return true;
+    }
+
+    function abrir() {
+        if (!podeAbrir()) return;
+        aberto = true;
+        overlay.classList.add('is-open');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('wvp-lock');
+        requestAnimationFrame(function () { overlay.classList.add('is-visible'); });
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({ event: 'popup_lista_vip_bf_aberto' });
+    }
+
+    function fechar() {
+        overlay.classList.remove('is-visible');
+        document.body.classList.remove('wvp-lock');
+        setTimeout(function () {
+            overlay.classList.remove('is-open');
+            overlay.setAttribute('aria-hidden', 'true');
+        }, 250);
+        if (!modal.classList.contains('is-done')) {
+            try { localStorage.setItem(STORAGE_FECHOU, String(Date.now())); } catch (e) {}
+        }
+    }
+
+    document.getElementById('wvp-close').addEventListener('click', fechar);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) fechar(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && overlay.classList.contains('is-open')) fechar(); });
+
+    // Permite abrir por link/botão: <a href="#lista-vip">...</a> ou WidiVipBF.abrirPopup()
+    VIP.abrirPopup = function () { try { localStorage.removeItem(STORAGE_FECHOU); } catch (e) {} aberto = false; abrir(); };
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[href="#lista-vip"]');
+        if (a) { e.preventDefault(); VIP.abrirPopup(); }
+    });
+
+    setTimeout(abrir, POPUP.segundosParaAbrir * 1000);
+    if (POPUP.abrirNaSaida && window.matchMedia('(pointer:fine)').matches) {
+        document.addEventListener('mouseout', function (e) {
+            if (!e.relatedTarget && e.clientY <= 0) abrir();
+        });
+    }
+
+    /* ---------- Envio ---------- */
+    function showError(msg) { errorBox.textContent = msg; errorBox.classList.add('is-visible'); }
+    form.addEventListener('input', function (e) { if (e.target.classList) e.target.classList.remove('is-invalid'); errorBox.classList.remove('is-visible'); });
+    form.addEventListener('change', function (e) { if (e.target.classList) e.target.classList.remove('is-invalid'); });
+
+    function validate() {
+        var first = null;
+        function check(el, bad) { el.classList.toggle('is-invalid', bad); if (bad && !first) first = el; }
+        check(form.nome, !form.nome.value.trim());
+        check(form.email, !VIP.emailValido(form.email.value.trim()));
+        check(form.whatsapp, !VIP.whatsValido(form.whatsapp.value));
+        check(form.cidade, form.cidade.value.trim().length < 2);
+        check(form.uf, !form.uf.value);
+        var a = aniv.value.trim();
+        var m = a.match(/^(\d{2})\/(\d{2})$/);
+        check(aniv, !m || +m[1] < 1 || +m[1] > 31 || +m[2] < 1 || +m[2] > 12);
+        var semCabelo = !form.querySelector('[name="tipos_cabelo"]:checked');
+        hairGroup.classList.toggle('is-invalid', semCabelo);
+        if (first) { showError('Preencha todos os campos destacados.'); first.focus(); return false; }
+        if (semCabelo) { showError('Escolha seu tipo de cabelo.'); return false; }
+        return true;
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (form.querySelector('[name="winnie-pooh"]').value) return;
+        if (!validate()) return;
+
+        btn.disabled = true;
+        btn.textContent = 'Enviando...';
+
+        var cabelos = Array.prototype.slice.call(form.querySelectorAll('[name="tipos_cabelo"]:checked')).map(function (c) { return c.value; });
+
+        VIP.registrar('popup', {
+            nome: form.nome.value.trim(),
+            email: form.email.value.trim(),
+            whatsapp: form.whatsapp.value,
+            cidade: form.cidade.value.trim(),
+            uf: form.uf.value,
+            aniversario: aniv.value.trim(),
+            tipos_cabelo: cabelos
+        }).then(function (id) {
+            leadId = id;
+            document.getElementById('wvp-success-nome').textContent = form.nome.value.trim().split(' ')[0];
+            modal.classList.add('is-done');
+            modal.scrollTop = 0;
+        }).catch(function (err) {
+            showError(VIP.mensagemErro(err));
+            btn.disabled = false;
+            btn.textContent = 'Quero entrar no canal';
+        });
+    });
+})();
+</script>
+<script>
+(function () {
+  var V = window.WidiVipBF; if (!V) return;
+  V.registrar = function () { return new Promise(function (r) { setTimeout(function () { r('prototipo'); }, 600); }); };
+  V.clique = function () {};
+})();
+</script>
+<!-- =================== FIM POPUP LISTA VIP BF =================== -->
 </body>
 </html>
