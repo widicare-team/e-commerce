@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel Pesquisa CRM</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--rosa:#D6418B;--roxo:#46459B;--rosinha:#F7D1E6;--verde:#35B69F;--tinta:#27264F;--cinza:#6E6D8A;--linha:#E9E4F0;--fundo:#F6F4FA;--card:#fff}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font-family:Montserrat,system-ui,sans-serif;color:var(--tinta);background:var(--fundo)}
+button,input,select{font:inherit}
+.top{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--linha);padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.top h1{font-size:17px;margin:0 auto 0 0;color:var(--roxo)}
+.top h1 small{display:block;font-size:11px;color:var(--cinza);font-weight:600}
+.sel,.btn{border:1.5px solid var(--linha);background:#fff;border-radius:10px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--tinta);cursor:pointer}
+.btn.pri{background:var(--rosa);border-color:var(--rosa);color:#fff}
+main{max-width:1240px;margin:0 auto;padding:20px 16px 60px}
+.demo{background:#FFF6DB;border:1px solid #F1D48A;color:#7A5A00;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:16px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--linha)}
+.kpi span{font-size:12px;color:var(--cinza);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.kpi b{display:block;font-size:28px;margin-top:6px}
+.kpi i{font-style:normal;font-size:12px;color:var(--cinza)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--linha);min-width:0}
+.card h2{font-size:14px;margin:0 0 4px}
+.card p.d{font-size:12px;color:var(--cinza);margin:0 0 12px}
+.full{grid-column:1/-1}
+.cv{position:relative;height:260px}
+.cv.alto{height:320px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--linha);vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--cinza);position:sticky;top:0;background:#fff}
+.tbl{max-height:520px;overflow:auto}
+.heat td.n{text-align:center;font-weight:700;min-width:64px}
+.chip{display:inline-block;background:#F2EFF8;border-radius:99px;padding:2px 8px;margin:1px;font-size:11px;font-weight:600}
+.ok{color:var(--verde);font-weight:700}.err{color:#C53030;font-weight:700}
+.busca{width:100%;max-width:320px;border:1.5px solid var(--linha);border-radius:10px;padding:8px 12px;font-size:13px;margin-bottom:10px}
+.outros{margin:0;padding:0;list-style:none;max-height:300px;overflow:auto}
+.outros li{padding:10px 0;border-bottom:1px solid var(--linha);font-size:13px}
+.outros li small{color:var(--cinza)}
+.vazio{text-align:center;color:var(--cinza);padding:40px 0;font-size:14px}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="app" hidden>
+  <div class="top">
+    <h1>Pesquisa de perfil · Widi Care<small id="atualizado">—</small></h1>
+    <select class="sel" id="f-camp" aria-label="Campanha"></select>
+    <select class="sel" id="f-per" aria-label="Período">
+      <option value="0">Todo o período</option><option value="1">Hoje</option><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option>
+    </select>
+    <button class="btn" id="b-reload">Atualizar</button>
+    <button class="btn pri" id="b-csv">Exportar CSV</button>
+      </div>
+  <main>
+    <div class="demo" id="demo-aviso" hidden>Modo demonstração: dados fictícios. Tire o <b>?demo=1</b> do link para ver os dados reais.</div>
+    <div class="kpis">
+      <div class="kpi"><span>Respostas</span><b id="k-resp">0</b><i id="k-resp-s"></i></div>
+      <div class="kpi"><span>Cupons gerados</span><b id="k-cup">0</b><i id="k-cup-s"></i></div>
+      <div class="kpi"><span>Cupom pendente</span><b id="k-pend">0</b><i>erro na Nuvemshop, enviar manualmente</i></div>
+      <div class="kpi"><span>Tipos de cabelo por pessoa</span><b id="k-tipos">0</b><i>média de opções marcadas</i></div>
+    </div>
+    <div id="vazio" class="vazio" hidden>Nenhuma resposta no filtro selecionado.</div>
+    <div class="grid" id="conteudo">
+      <div class="card full"><h2>Respostas por dia</h2><p class="d">Pico costuma vir logo após o disparo do e-mail.</p><div class="cv"><canvas id="c-dia"></canvas></div></div>
+      <div class="card"><h2>P1 · Tipo de cabelo</h2><p class="d">% das pessoas que marcaram cada opção (múltipla escolha, soma passa de 100%).</p><div class="cv"><canvas id="c-tipos"></canvas></div></div>
+      <div class="card"><h2>P2 · O que o cabelo mais precisa</h2><p class="d">% das respostas.</p><div class="cv alto"><canvas id="c-nec"></canvas></div></div>
+      <div class="card"><h2>P3 · O que mais pesa na escolha</h2><p class="d">% das respostas.</p><div class="cv"><canvas id="c-mot"></canvas></div></div>
+      <div class="card"><h2>P4 · O que faria comprar mais vezes</h2><p class="d">% das respostas.</p><div class="cv alto"><canvas id="c-rec"></canvas></div></div>
+      <div class="card full"><h2>Necessidade × tipo de cabelo</h2><p class="d">Quantas pessoas de cada tipo escolheram cada necessidade. Base para montar os segmentos de recomendação.</p><div class="tbl"><table class="heat" id="t-heat"></table></div></div>
+      <div class="card full"><h2>“Outro motivo” (P4)</h2><p class="d">Textos livres de quem escolheu “Outro motivo”.</p><ul class="outros" id="l-outros"></ul></div>
+      <div class="card full"><h2>Respostas</h2>
+        <input class="busca" id="busca" type="search" placeholder="Buscar por nome, e-mail, CPF ou cupom">
+        <div class="tbl"><table id="t-resp"></table></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ===================== CONFIG ===================== */
+var SUPABASE_URL = 'https://vomuotdwcfqixkxghpye.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_OOYlv-i3BQ9HaW0sIHvCMQ__hox3RfS';
+var CAMPANHA_PADRAO = 'pesquisa-crm-2026';
+var CHAVE_PAINEL = '83f4e823e952236a40cb3f44e05851d71c20c356'; // provisório, sem login (sql/02-painel-sem-login.sql)
+/* ================================================== */
+
+var OP = {
+  tipos_cabelo: ['Liso','Ondulado','Cacheado','Crespo','Quimicamente tratado','Tingido'],
+  necessidade: ['Hidratação e maciez','Nutrição e controle do frizz','Definição e valorização da curvatura','Fortalecimento e redução da quebra','Brilho e reparação dos danos','Cuidados com cabelos quimicamente tratados','Volume e densidade','Ainda não sei, quero descobrir!'],
+  motivador: ['O resultado que o produto entrega','O preço e as promoções','A indicação de profissionais ou influenciadores','As avaliações de outros consumidores','A composição e os ativos da fórmula','A praticidade da rotina de cuidados'],
+  recompra: ['Mais promoções e benefícios exclusivos','Novidades e lançamentos','Indicações de produtos mais adequados para o meu cabelo','Mais informações sobre como usar os produtos','Mais variedade de produtos para minhas necessidades','Já encontrei outras marcas que atendem ao que preciso','Outro motivo']
+};
+var DEMO = new URLSearchParams(location.search).get('demo') === '1';
+var sb = null, TODOS = [], FILTRADOS = [], charts = {};
+var $ = function(id){ return document.getElementById(id); };
+
+Chart.defaults.font.family = 'Montserrat, system-ui, sans-serif';
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#6E6D8A';
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]; }); }
+function dataBR(iso){ var d = new Date(iso); return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}); }
+function diaKey(iso){ var d = new Date(iso); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function cpfFmt(c){ c = String(c || ''); return c.length === 11 ? c.slice(0,3) + '.' + c.slice(3,6) + '.' + c.slice(6,9) + '-' + c.slice(9) : c; }
+function pct(n, t){ return t ? Math.round(n / t * 1000) / 10 : 0; }
+
+/* ---------- dados ---------- */
+function demoDados(){
+  var r = [], nomes = ['Ana','Bia','Carla','Duda','Eva','Fê','Gabi','Helô','Iris','Ju','Lara','Mari','Nat','Paula','Rafa','Sofia'];
+  function pick(a, pesos){ var t = 0, i; for (i = 0; i < a.length; i++) t += (pesos ? pesos[i] : 1); var x = Math.random() * t; for (i = 0; i < a.length; i++){ x -= (pesos ? pesos[i] : 1); if (x <= 0) return a[i]; } return a[0]; }
+  for (var i = 0; i < 420; i++){
+    var tipos = [pick(OP.tipos_cabelo.slice(0,4), [2,4,6,3])];
+    if (Math.random() < .35) tipos.push('Tingido');
+    if (Math.random() < .2) tipos.push('Quimicamente tratado');
+    var rec = pick(OP.recompra, [6,3,5,2,3,1,1]);
+    var d = new Date(Date.now() - Math.pow(Math.random(), 2.2) * 12 * 86400000);
+    r.push({ id: 'd' + i, campanha: CAMPANHA_PADRAO, created_at: d.toISOString(), nome: pick(nomes) + ' ' + pick(['Silva','Souza','Lima','Costa','Alves']),
+      email: 'cliente' + i + '@exemplo.com', cpf: String(10000000000 + Math.floor(Math.random() * 89999999999)), tipos_cabelo: tipos,
+      necessidade: tipos[0] === 'Cacheado' || tipos[0] === 'Crespo' ? pick(OP.necessidade, [3,3,6,2,1,1,1,1]) : pick(OP.necessidade, [5,4,1,3,3,2,2,2]),
+      motivador: pick(OP.motivador, [7,4,2,3,3,2]), recompra: rec, recompra_outro: rec === 'Outro motivo' ? pick(['Frete mais barato','Kits menores para testar','Entrega mais rápida']) : null,
+      cupom: Math.random() < .97 ? 'PRESENTE-' + Math.random().toString(36).slice(2,8).toUpperCase() : null,
+      cupom_erro: null, utm_source: 'perfit', utm_campaign: 'pesquisa-crm' });
+  }
+  r.forEach(function(x){ if (!x.cupom) x.cupom_erro = 'nuvemshop_500'; });
+  return r.sort(function(a,b){ return a.created_at < b.created_at ? 1 : -1; });
+}
+
+async function carregar(){
+  if (DEMO){ TODOS = demoDados(); return; }
+  var tudo = [], de = 0, passo = 1000;
+  while (true){
+    var q = await sb.rpc('pq_painel_dados', { chave: CHAVE_PAINEL }).range(de, de + passo - 1);
+    if (q.error) throw q.error;
+    tudo = tudo.concat(q.data);
+    if (q.data.length < passo) break;
+    de += passo;
+  }
+  TODOS = tudo;
+}
+
+/* ---------- filtros ---------- */
+function montarCampanhas(){
+  var sel = $('f-camp'), atual = sel.value;
+  var camps = Array.from(new Set(TODOS.map(function(r){ return r.campanha; })));
+  camps.sort(function(a,b){ return (a === 'teste') - (b === 'teste') || a.localeCompare(b); }); // "teste" por último
+  if (!camps.length) camps = [CAMPANHA_PADRAO];
+  sel.innerHTML = camps.map(function(c){ return '<option>' + esc(c) + '</option>'; }).join('');
+  sel.value = camps.indexOf(atual) > -1 ? atual : (camps.indexOf(CAMPANHA_PADRAO) > -1 ? CAMPANHA_PADRAO : camps[0]);
+}
+
+function filtrar(){
+  var camp = $('f-camp').value, dias = +$('f-per').value, limite = 0;
+  if (dias){ var h = new Date(); h.setHours(0,0,0,0); limite = h.getTime() - (dias - 1) * 86400000; }
+  FILTRADOS = TODOS.filter(function(r){ return r.campanha === camp && (!limite || new Date(r.created_at).getTime() >= limite); });
+  render();
+}
+
+/* ---------- render ---------- */
+function contar(campo, multi){
+  var m = {}; OP[campo].forEach(function(o){ m[o] = 0; });
+  FILTRADOS.forEach(function(r){ (multi ? (r[campo] || []) : [r[campo]]).forEach(function(v){ if (v in m) m[v]++; }); });
+  return m;
+}
+
+function barras(id, campo, multi, cor){
+  var m = contar(campo, multi), total = FILTRADOS.length;
+  var pares = OP[campo].map(function(o){ return [o, m[o]]; }).sort(function(a,b){ return b[1] - a[1]; });
+  var cfg = {
+    type: 'bar',
+    data: { labels: pares.map(function(p){ return p[0]; }), datasets: [{ data: pares.map(function(p){ return pct(p[1], total); }), _n: pares.map(function(p){ return p[1]; }), backgroundColor: cor, borderRadius: 6, maxBarThickness: 26 }] },
+    options: { indexAxis: 'y', maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(c){ return c.raw + '% (' + c.dataset._n[c.dataIndex] + ' pessoas)'; } } } },
+      scales: { x: { beginAtZero: true, ticks: { callback: function(v){ return v + '%'; } }, grid: { color: '#F0EDF5' } },
+        y: { grid: { display: false }, ticks: { color: '#27264F', callback: function(v){ var l = this.getLabelForValue(v); return l.length > 34 ? l.slice(0, 32) + '…' : l; } } } } }
+  };
+  if (charts[id]) charts[id].destroy();
+  charts[id] = new Chart($(id), cfg);
+}
+
+function porDia(){
+  var m = {};
+  FILTRADOS.forEach(function(r){ var k = diaKey(r.created_at); m[k] = (m[k] || 0) + 1; });
+  var ks = Object.keys(m).sort();
+  if (ks.length){ // preenche dias vazios
+    var d = new Date(ks[0] + 'T12:00:00'), fim = new Date(ks[ks.length-1] + 'T12:00:00'), todos = [];
+    while (d <= fim){ todos.push(diaKey(d.toISOString())); d = new Date(d.getTime() + 86400000); }
+    ks = todos;
+  }
+  if (charts.dia) charts.dia.destroy();
+  charts.dia = new Chart($('c-dia'), {
+    type: 'line',
+    data: { labels: ks.map(function(k){ var p = k.split('-'); return p[2] + '/' + p[1]; }), datasets: [{ data: ks.map(function(k){ return m[k] || 0; }), borderColor: '#D6418B', backgroundColor: 'rgba(214,65,139,.12)', fill: true, tension: .3, pointRadius: 3 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#F0EDF5' } }, x: { grid: { display: false } } } }
+  });
+}
+
+function heat(){
+  var tipos = OP.tipos_cabelo, mx = 0, m = {};
+  OP.necessidade.forEach(function(n){ m[n] = {}; tipos.forEach(function(t){ m[n][t] = 0; }); });
+  FILTRADOS.forEach(function(r){ (r.tipos_cabelo || []).forEach(function(t){ if (m[r.necessidade] && t in m[r.necessidade]){ m[r.necessidade][t]++; mx = Math.max(mx, m[r.necessidade][t]); } }); });
+  var h = '<tr><th>Necessidade</th>' + tipos.map(function(t){ return '<th style="text-align:center">' + esc(t) + '</th>'; }).join('') + '</tr>';
+  OP.necessidade.forEach(function(n){
+    h += '<tr><td>' + esc(n) + '</td>' + tipos.map(function(t){
+      var v = m[n][t], a = mx ? v / mx : 0;
+      return '<td class="n" style="background:rgba(214,65,139,' + (a * .75).toFixed(2) + ');color:' + (a > .55 ? '#fff' : '#27264F') + '">' + (v || '·') + '</td>';
+    }).join('') + '</tr>';
+  });
+  $('t-heat').innerHTML = h;
+}
+
+function outros(){
+  var l = FILTRADOS.filter(function(r){ return r.recompra_outro; });
+  $('l-outros').innerHTML = l.length ? l.map(function(r){ return '<li>' + esc(r.recompra_outro) + '<br><small>' + esc(r.nome) + ' · ' + dataBR(r.created_at) + '</small></li>'; }).join('') : '<li><small>Nenhum ainda.</small></li>';
+}
+
+function tabela(){
+  var q = $('busca').value.trim().toLowerCase();
+  var l = FILTRADOS.filter(function(r){ return !q || (r.nome + ' ' + r.email + ' ' + (r.cpf || '') + ' ' + cpfFmt(r.cpf) + ' ' + (r.cupom || '')).toLowerCase().indexOf(q) > -1; });
+  var h = '<tr><th>Data</th><th>Nome</th><th>E-mail</th><th>CPF</th><th>Tipo de cabelo</th><th>Necessidade</th><th>O que pesa</th><th>Recompra</th><th>Cupom</th></tr>';
+  l.slice(0, 300).forEach(function(r){
+    h += '<tr><td>' + dataBR(r.created_at) + '</td><td>' + esc(r.nome) + '</td><td>' + esc(r.email) + '</td><td style="white-space:nowrap">' + esc(cpfFmt(r.cpf)) + '</td><td>' + (r.tipos_cabelo || []).map(function(t){ return '<span class="chip">' + esc(t) + '</span>'; }).join('') +
+      '</td><td>' + esc(r.necessidade) + '</td><td>' + esc(r.motivador) + '</td><td>' + esc(r.recompra) + (r.recompra_outro ? '<br><small>' + esc(r.recompra_outro) + '</small>' : '') +
+      '</td><td>' + (r.cupom ? '<span class="ok">' + esc(r.cupom) + '</span>' : '<span class="err" title="' + esc(r.cupom_erro) + '">pendente</span>') + '</td></tr>';
+  });
+  if (l.length > 300) h += '<tr><td colspan="9"><small>Mostrando 300 de ' + l.length + '. Use a busca ou o CSV para ver tudo.</small></td></tr>';
+  $('t-resp').innerHTML = h;
+}
+
+function render(){
+  var t = FILTRADOS.length, cup = FILTRADOS.filter(function(r){ return r.cupom; }).length;
+  $('k-resp').textContent = t.toLocaleString('pt-BR');
+  var hoje = diaKey(new Date().toISOString());
+  $('k-resp-s').textContent = FILTRADOS.filter(function(r){ return diaKey(r.created_at) === hoje; }).length + ' hoje';
+  $('k-cup').textContent = cup.toLocaleString('pt-BR');
+  $('k-cup-s').textContent = pct(cup, t) + '% das respostas';
+  $('k-pend').textContent = (t - cup).toLocaleString('pt-BR');
+  $('k-tipos').textContent = t ? (FILTRADOS.reduce(function(s, r){ return s + (r.tipos_cabelo || []).length; }, 0) / t).toFixed(1).replace('.', ',') : '0';
+  $('vazio').hidden = !!t; $('conteudo').hidden = !t;
+  if (!t) return;
+  porDia();
+  barras('c-tipos', 'tipos_cabelo', true, '#46459B');
+  barras('c-nec', 'necessidade', false, '#D6418B');
+  barras('c-mot', 'motivador', false, '#35B69F');
+  barras('c-rec', 'recompra', false, '#8E6BBF');
+  heat(); outros(); tabela();
+}
+
+/* ---------- CSV (Perfit / CRM) ---------- */
+function csv(){
+  var cols = ['created_at','nome','email','cpf','tipos_cabelo','necessidade','motivador','recompra','recompra_outro','cupom','cupom_erro','utm_source','utm_campaign'];
+  var linhas = [cols.join(';')].concat(FILTRADOS.map(function(r){
+    return cols.map(function(c){ var v = c === 'tipos_cabelo' ? (r[c] || []).join(', ') : (r[c] == null ? '' : r[c]); return '"' + String(v).replace(/"/g, '""') + '"'; }).join(';');
+  }));
+  var blob = new Blob(['﻿' + linhas.join('\n')], { type: 'text/csv;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pesquisa-crm-' + $('f-camp').value + '-' + diaKey(new Date().toISOString()) + '.csv';
+  a.click();
+}
+
+/* ---------- início (sem login, provisório) ---------- */
+async function abrir(){
+  $('app').hidden = false;
+  $('demo-aviso').hidden = !DEMO;
+  try { await carregar(); }
+  catch (e){ alert('Erro ao carregar: ' + (e.message || e)); return; }
+  $('atualizado').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'}) + ' · ' + TODOS.length + ' respostas no total';
+  montarCampanhas(); filtrar();
+}
+
+function iniciar(){
+  if (!DEMO) sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
+  abrir();
+}
+
+$('b-reload').addEventListener('click', abrir);
+$('b-csv').addEventListener('click', csv);
+$('f-camp').addEventListener('change', filtrar);
+$('f-per').addEventListener('change', filtrar);
+$('busca').addEventListener('input', tabela);
+iniciar();
+</script>
+</body>
+</html>
