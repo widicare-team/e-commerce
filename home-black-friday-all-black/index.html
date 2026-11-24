@@ -539,6 +539,24 @@ a:hover{color:inherit}
 @media (min-width:1041px) and (max-width:1279px){.kits2 .kit-t{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:10px}}
 
 .kit-c{white-space:nowrap}
+
+/* linhas no celular: painel mais fino */
+@media (max-width:640px){
+.pnwrap{flex:0 0 68% !important}
+.lngrid .card{flex:0 0 58% !important}
+.pn{justify-content:space-between}
+.pn .pn-top{flex:1 1 auto;justify-content:center;padding:20px 18px 18px !important;gap:12px !important}
+.pn-t{font-size:38px !important;line-height:.95 !important}
+.pn-top p:nth-of-type(1){font-size:15px !important;line-height:1.3 !important}
+.pn-top p:nth-of-type(2){font-size:13.5px !important;line-height:1.45 !important}
+.pn-prod{zoom:.86 !important;margin:0 14px !important}
+.pn-foot{padding:14px 14px 16px !important}
+.pn-foot{justify-content:center !important}.home .pn-foot .pn-cta{width:auto !important;min-height:38px !important;padding:0 18px !important;font-size:11.5px !important;font-weight:800 !important;letter-spacing:.02em !important;white-space:nowrap !important}
+}
+
+/* teste: setas nos kits no celular, iguais às dos fullbanners */
+@media (max-width:1040px){.home .kw .arw{display:flex !important;top:50%;margin-top:-18px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(0,0,0,.45);color:#ffffff;box-shadow:none;z-index:3}.home .kw .arw:hover{background:rgba(0,0,0,.65)}.home .kw .arw-l{left:6px}.home .kw .arw-r{right:6px}.home .kw .arw svg{width:20px;height:20px}}
+@media (max-width:1040px){.home .kw .arw.kw-off{opacity:0;pointer-events:none}.home .kw .arw{transition:opacity .2s}}
 </style>
 </helmet>
 <div class="home {{temaCls}}">
@@ -1247,6 +1265,19 @@ class Component extends DCLogic {
     }, subs, this.barBtns, this.nav);
   }
 }
+</script>
+<script>
+(function(){function liga(){var t=document.querySelector('.kw .trio');if(!t){return setTimeout(liga,300);}
+var l=document.querySelector('.kw .arw-l'),r=document.querySelector('.kw .arw-r');
+function cards(){return Array.prototype.slice.call(t.children);}
+function alvo(c){return Math.max(0,Math.min(t.scrollWidth-t.clientWidth,c.offsetLeft-t.offsetLeft-(t.clientWidth-c.offsetWidth)/2));}
+function atual(){var cs=cards(),best=0,bd=1e9;cs.forEach(function(c,i){var d=Math.abs(alvo(c)-t.scrollLeft);if(d<bd){bd=d;best=i;}});return best;}
+function at(){var i=atual(),n=cards().length;l.classList.toggle('kw-off',i<=0);r.classList.toggle('kw-off',i>=n-1);}
+window.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('.kw .arw');if(!b||!window.matchMedia('(max-width:1040px)').matches)return;
+e.preventDefault();e.stopPropagation();var cs=cards(),i=atual()+(b.classList.contains('arw-l')?-1:1);i=Math.max(0,Math.min(cs.length-1,i));
+t.scrollTo({left:alvo(cs[i]),behavior:'smooth'});},true);
+t.addEventListener('scroll',function(){clearTimeout(t._k);t._k=setTimeout(at,80);},{passive:true});window.addEventListener('resize',at);at();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',liga);else liga();})();
 </script>
 </body>
 </html>
